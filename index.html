@@ -36,13 +36,7 @@
   <script>
     (function($) {
       const dataMap = new Map()
-      $.fn.slider = function(opts, ...args) {
-        if (typeof opts === 'string') {
-          return this.each((index, element) => {
-            let instance = $(element).data('slider')
-            instance[opts](...args)
-          })
-        }
+      $.fn.slider = function(opts) {
         return this.each((index, element) => {
           let instance = $(element).data('slider')
           if (!instance) {
@@ -54,7 +48,7 @@
     })(jQuery)
   </script>
   <script>
-    $('.test-slider').slider()
+    $('.test-slider').slider({ autoPlay: true })
   </script>
 </body>
 
