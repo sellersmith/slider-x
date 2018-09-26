@@ -5,6 +5,9 @@ class SliderController {
     this.totalChild = this.$el.children().length
 
     this.opts = opts
+    this.defaultOpts = {
+      duration: 400
+    }
 
     this.autoTimeoutId = ''
     this.active = false
