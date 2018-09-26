@@ -6,6 +6,8 @@ class SliderController {
 
     this.opts = opts
     this.defaultOpts = {
+      autoPlay: false,
+      autoPlayDelay: 3000,
       duration: 400
     }
 
@@ -16,11 +18,13 @@ class SliderController {
   }
 
   autoPlay() {
+    const delay = this.opts.autoPlayDelay || this.defaultOpts.autoPlayDelay
+
     this.autoTimeoutId = setTimeout(() => {
       this.moveSlide('next')
       clearTimeout(this.autoTimeoutId)
       this.autoPlay()
-    }, 3000)
+    }, delay)
   }
 
   initialize() {
@@ -40,8 +44,9 @@ class SliderController {
     $('<button>').text('Prev').insertAfter(this.el).click(() => this.prev.apply(this))
 
 
+    // Set slide auto play
     if (this.opts.autoPlay) {
-      // this.autoPlay()
+      this.autoPlay()
     }
 
     return this
@@ -50,16 +55,41 @@ class SliderController {
   next() {
     if (this.active) return
     this.active = true
-    this.moveSlide("next")
+
+    // clear auto play
+    clearTimeout(this.autoTimeoutId)
+
+    // move slide then re-set the auto-play
+    this.moveSlide("next", () => {
+      setTimeout(() => {
+        if(this.opts.autoPlay) {
+          this.autoPlay()
+        }
+        this.active = false
+      }, this.duration)
+    })
   }
 
   prev() {
     if (this.active) return
     this.active = true
-    this.moveSlide("prev")
+    // clear auto play
+    clearTimeout(this.autoTimeoutId)
+
+    // move slide then re-set the auto-play
+    this.moveSlide("prev", () => {
+      this.moveSlide("next", () => {
+        setTimeout(() => {
+          if(this.opts.autoPlay) {
+            this.autoPlay()
+          }
+          this.active = false
+        }, this.duration)
+      })
+    })
   }
 
-  moveSlide(direction) {
+  moveSlide(direction, callback) {
     let currIndex = this.curr
     let nextIndex, nextSlidePos, currSlidePos
 
@@ -82,9 +112,7 @@ class SliderController {
     setTimeout(() => {
       $curr.addClass('animation').css('left', currSlidePos)
       $next.addClass('animation').css('left', '0')
-      setTimeout(() => {
-        this.active = false
-      }, 400)
+      callback && callback()
     }, 20)
 
     this.curr = nextIndex

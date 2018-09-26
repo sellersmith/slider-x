@@ -25,18 +25,18 @@
   </div>
 
   <div class='test-slider'>
-      <div class="border child-1">foo</div>
-      <div class="border child-2">bar</div>
-      <div class="border child-3">fuu</div>
-      <div class="border child-4">baz</div>
-      <div class="border child-5">fo-ba</div>
-    </div>
-  
+    <div class="border child-1">foo</div>
+    <div class="border child-2">bar</div>
+    <div class="border child-3">fuu</div>
+    <div class="border child-4">baz</div>
+    <div class="border child-5">fo-ba</div>
+  </div>
+
   <script src="main.js"></script>
   <script>
-    (function($) {
+    (function ($) {
       const dataMap = new Map()
-      $.fn.slider = function(opts) {
+      $.fn.slider = function (opts) {
         return this.each((index, element) => {
           let instance = $(element).data('slider')
           if (!instance) {
@@ -48,7 +48,7 @@
     })(jQuery)
   </script>
   <script>
-    $('.test-slider').slider({ autoPlay: true, autoPlayDelay: 5000 })
+    $('.test-slider').slider({ autoPlay: true })
   </script>
 </body>
 
