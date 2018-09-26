@@ -6,10 +6,18 @@ class SliderController {
 
     this.opts = opts
 
-    this.autoPlayIntervalId = ''
+    this.autoTimeoutId = ''
     this.active = false
     this.curr = 0
     this.initialize(this.el, this.opts)
+  }
+
+  autoPlay() {
+    this.autoTimeoutId = setTimeout(() => {
+      this.moveSlide('next')
+      clearTimeout(this.autoTimeoutId)
+      this.autoPlay()
+    }, 3000)
   }
 
   initialize() {
@@ -30,8 +38,7 @@ class SliderController {
 
 
     if (this.opts.autoPlay) {
-      console.log('auto play on')
-      this.autoPlayIntervalId = setInterval(() => this.moveSlide('next'), 3000)
+      // this.autoPlay()
     }
 
     return this
