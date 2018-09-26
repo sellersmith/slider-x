@@ -2,7 +2,7 @@ class SliderController {
   constructor(ele, opts) {
     this.el = ele
     this.$el = $(this.el)
-    this.totalChild = this.$el.children().length
+    this.totalSlide = this.$el.children().length
 
     this.opts = opts
     this.defaultOpts = {
@@ -88,7 +88,9 @@ class SliderController {
 
   moveSlide(direction, toIndex, callback) {
     let currIndex = this.curr
-    let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalChild)
+    let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
+
+    // console.log(nextIndex)
 
     let $curr = this.$el.children().eq(currIndex)
     let $next = this.$el.children().eq(nextIndex)

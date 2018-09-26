@@ -1,12 +1,13 @@
-const getSlideMovementData = (direction, curr, next, totalSilde) => {
+const getSlideMovementData = (direction, currIndex, toIndex, totalSilde) => {
   let nextIndex, nextSlidePos, currSlidePos
 
   if (direction === "next") {
-    next ? nextIndex = next : nextIndex = curr === totalSilde - 1 ? 0 : curr + 1
+    toIndex ? nextIndex = toIndex : nextIndex = currIndex === totalSilde - 1 ? 0 : currIndex + 1
     nextSlidePos = '100%'
     currSlidePos = '-100%'
   } else if (direction === "prev") {
-    next ? nextIndex = next : nextIndex = curr === 0 ? totalSilde - 1 : curr - 1
+    // toIndex = 0 is a falsy value
+    (toIndex || toIndex === 0) ? nextIndex = toIndex : nextIndex = currIndex === 0 ? totalSilde - 1 : currIndex - 1
     nextSlidePos = '-100%'
     currSlidePos = '100%'
   }
