@@ -14,6 +14,7 @@ class SliderController {
     this.autoTimeoutId = ''
     this.active = false
     this.curr = 0
+    this.duration = this.opts.duration || this.defaultOpts.duration
     this.initialize(this.el, this.opts)
   }
 
@@ -62,9 +63,7 @@ class SliderController {
     // move slide then re-set the auto-play
     this.moveSlide("next", () => {
       setTimeout(() => {
-        if(this.opts.autoPlay) {
-          this.autoPlay()
-        }
+        if(this.opts.autoPlay) this.autoPlay()
         this.active = false
       }, this.duration)
     })
@@ -80,9 +79,7 @@ class SliderController {
     this.moveSlide("prev", () => {
       this.moveSlide("next", () => {
         setTimeout(() => {
-          if(this.opts.autoPlay) {
-            this.autoPlay()
-          }
+          if(this.opts.autoPlay) this.autoPlay()
           this.active = false
         }, this.duration)
       })
@@ -93,6 +90,7 @@ class SliderController {
     let currIndex = this.curr
     let nextIndex, nextSlidePos, currSlidePos
 
+    // Find out currSlide n nextSlide
     if (direction === "next") {
       nextIndex = currIndex === (this.totalChild - 1) ? 0 : currIndex + 1
       nextSlidePos = '100%'
@@ -106,12 +104,12 @@ class SliderController {
     let $curr = this.$el.children().eq(currIndex)
     let $next = this.$el.children().eq(nextIndex)
 
-    $('.animation').removeClass('animation')
+    $next.css({'transition':  '' })
     $next.css('left', nextSlidePos)
 
     setTimeout(() => {
-      $curr.addClass('animation').css('left', currSlidePos)
-      $next.addClass('animation').css('left', '0')
+      $curr.css({'transition': `left ${this.duration}ms linear` , 'left':  currSlidePos})
+      $next.css({'transition': `left ${this.duration}ms linear` , 'left':  '0'})
       callback && callback()
     }, 20)
 
