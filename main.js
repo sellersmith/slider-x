@@ -8,7 +8,7 @@ class SliderController {
     this.defaultOpts = {
       autoPlay: false,
       autoPlayDelay: 3000,
-      duration: 400
+      duration: 450
     }
 
     this.autoTimeoutId = ''
@@ -18,14 +18,16 @@ class SliderController {
     this.initialize(this.el, this.opts)
   }
 
-  autoPlay() {
-    const delay = this.opts.autoPlayDelay || this.defaultOpts.autoPlayDelay
+  setAutoPlay() {
+    if (this.opts.autoPlay) {
+      const delay = this.opts.autoPlayDelay || this.defaultOpts.autoPlayDelay
 
-    this.autoTimeoutId = setTimeout(() => {
-      this.moveSlide('next')
-      clearTimeout(this.autoTimeoutId)
-      this.autoPlay()
-    }, delay)
+      this.clearAutoPlay()
+      this.autoTimeoutId = setTimeout(() => {
+        this.moveSlide('next')
+        this.setAutoPlay()
+      }, delay)
+    }
   }
 
   clearAutoPlay() {
@@ -48,11 +50,7 @@ class SliderController {
     $('<button>').text('Next').insertAfter(this.el).click(() => this.next.apply(this))
     $('<button>').text('Prev').insertAfter(this.el).click(() => this.prev.apply(this))
 
-
-    // Set slide auto play
-    if (this.opts.autoPlay) {
-      this.autoPlay()
-    }
+    this.setAutoPlay()
 
     console.log(this)
     return this
@@ -60,48 +58,35 @@ class SliderController {
 
   next() {
     if (this.active) return
-    this.active = true
     this.clearAutoPlay()
-
-    // move slide then re-set the auto-play
-    this.moveSlide("next", undefined, () => {
-      setTimeout(() => {
-        if(this.opts.autoPlay) this.autoPlay()
-        this.active = false
-      }, this.duration)
-    })
+    this.active = true
+    this.moveSlide("next")
   }
 
   prev() {
     if (this.active) return
-    this.active = true
     this.clearAutoPlay()
-
-    // move slide then re-set the auto-play
-    this.moveSlide("prev", undefined, () => {
-      setTimeout(() => {
-        if(this.opts.autoPlay) this.autoPlay()
-        this.active = false
-      }, this.duration)
-    })
+    this.active = true
+    this.moveSlide("prev")
   }
 
-  moveSlide(direction, toIndex, callback) {
+  moveSlide(direction, toIndex) {
     let currIndex = this.curr
     let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
-
-    // console.log(nextIndex)
 
     let $curr = this.$el.children().eq(currIndex)
     let $next = this.$el.children().eq(nextIndex)
 
-    $next.css({'transition':  '' })
+    $next.css({ 'transition': '' })
     $next.css('left', nextSlidePos)
 
     setTimeout(() => {
-      $curr.css({'transition': `left ${this.duration}ms ease-in-out` , 'left':  currSlidePos})
-      $next.css({'transition': `left ${this.duration}ms ease-in-out` , 'left':  '0'})
-      callback && callback()
+      $curr.css({ 'transition': `left ${this.duration}ms ease-in-out`, 'left': currSlidePos })
+      $next.css({ 'transition': `left ${this.duration}ms ease-in-out`, 'left': '0' })
+      setTimeout(() => {
+        this.setAutoPlay()
+        this.active = false
+      }, this.duration)
     }, 20)
 
     this.curr = nextIndex
