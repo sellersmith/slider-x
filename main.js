@@ -28,6 +28,10 @@ class SliderController {
     }, delay)
   }
 
+  clearAutoPlay() {
+    clearTimeout(this.autoTimeoutId)
+  }
+
   initialize() {
     console.log("Init new PF Slider")
 
@@ -50,18 +54,17 @@ class SliderController {
       this.autoPlay()
     }
 
+    console.log(this)
     return this
   }
 
   next() {
     if (this.active) return
     this.active = true
-
-    // clear auto play
-    clearTimeout(this.autoTimeoutId)
+    this.clearAutoPlay()
 
     // move slide then re-set the auto-play
-    this.moveSlide("next", () => {
+    this.moveSlide("next", undefined, () => {
       setTimeout(() => {
         if(this.opts.autoPlay) this.autoPlay()
         this.active = false
@@ -72,34 +75,20 @@ class SliderController {
   prev() {
     if (this.active) return
     this.active = true
-    // clear auto play
-    clearTimeout(this.autoTimeoutId)
+    this.clearAutoPlay()
 
     // move slide then re-set the auto-play
-    this.moveSlide("prev", () => {
-      this.moveSlide("next", () => {
-        setTimeout(() => {
-          if(this.opts.autoPlay) this.autoPlay()
-          this.active = false
-        }, this.duration)
-      })
+    this.moveSlide("prev", undefined, () => {
+      setTimeout(() => {
+        if(this.opts.autoPlay) this.autoPlay()
+        this.active = false
+      }, this.duration)
     })
   }
 
-  moveSlide(direction, callback) {
+  moveSlide(direction, toIndex, callback) {
     let currIndex = this.curr
-    let nextIndex, nextSlidePos, currSlidePos
-
-    // Find out currSlide n nextSlide
-    if (direction === "next") {
-      nextIndex = currIndex === (this.totalChild - 1) ? 0 : currIndex + 1
-      nextSlidePos = '100%'
-      currSlidePos = '-100%'
-    } else if (direction === "prev") {
-      nextIndex = currIndex === 0 ? (this.totalChild - 1) : currIndex - 1
-      nextSlidePos = '-100%'
-      currSlidePos = '100%'
-    }
+    let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalChild)
 
     let $curr = this.$el.children().eq(currIndex)
     let $next = this.$el.children().eq(nextIndex)
@@ -108,11 +97,21 @@ class SliderController {
     $next.css('left', nextSlidePos)
 
     setTimeout(() => {
-      $curr.css({'transition': `left ${this.duration}ms linear` , 'left':  currSlidePos})
-      $next.css({'transition': `left ${this.duration}ms linear` , 'left':  '0'})
+      $curr.css({'transition': `left ${this.duration}ms ease-in-out` , 'left':  currSlidePos})
+      $next.css({'transition': `left ${this.duration}ms ease-in-out` , 'left':  '0'})
       callback && callback()
     }, 20)
 
     this.curr = nextIndex
+  }
+
+  goto(index) {
+    this.clearAutoPlay()
+
+    if (index > this.curr) {
+      this.moveSlide("next", index)
+    } else if (index < this.curr) {
+      this.moveSlide("prev", index)
+    }
   }
 }
