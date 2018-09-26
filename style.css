@@ -37,9 +37,9 @@
   align-items: center;
 }
 
-.slide.animation {
+/* .slide.animation {
   transition: left 400ms linear;
-}
+} */
 
 .child-1 {
   background: lightcoral;

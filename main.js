@@ -12,6 +12,7 @@ class SliderController {
     this.autoTimeoutId = ''
     this.active = false
     this.curr = 0
+    this.duration = this.opts.duration || this.defaultOpts.duration
     this.initialize(this.el, this.opts)
   }
 
@@ -76,15 +77,16 @@ class SliderController {
     let $curr = this.$el.children().eq(currIndex)
     let $next = this.$el.children().eq(nextIndex)
 
-    $('.animation').removeClass('animation')
+    // $curr.css({'transition':  `` })
+    $next.css({'transition':  `` })
     $next.css('left', nextSlidePos)
-
+    console.log(this.duration)
     setTimeout(() => {
-      $curr.addClass('animation').css('left', currSlidePos)
-      $next.addClass('animation').css('left', '0')
+      $curr.css({'transition':  `left ${this.duration}ms linear` , 'left' :  currSlidePos})
+      $next.css({'transition':  `left ${this.duration}ms linear` , 'left' :  '0'})
       setTimeout(() => {
         this.active = false
-      }, 400)
+      }, this.duration)
     }, 20)
 
     this.curr = nextIndex
