@@ -1,21 +1,137 @@
+const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, prevCtrl } = DomClasses
+
 class SliderController {
   constructor(ele, opts) {
     this.el = ele
     this.$el = $(this.el)
+    this.$slider = ''
+
     this.totalSlide = this.$el.children().length
 
     this.opts = opts
     this.defaultOpts = {
       autoPlay: false,
       autoPlayDelay: 3000,
-      duration: 450
+      duration: 450,
+      loop: true
     }
 
     this.autoTimeoutId = ''
     this.active = false
     this.curr = 0
-    this.duration = this.opts.duration || this.defaultOpts.duration
-    this.initialize(this.el, this.opts)
+
+    // update DOM + set event handler
+    this.initialize()
+    this.$el.on('click', this.handleClick.bind(this))
+  }
+
+  initialize() {
+    this.verifyOptions()
+    this.updateSliderDOM()
+    this.customsizeLoop(this.curr)
+    this.setAutoPlay()
+    return this
+  }
+
+  updateSliderDOM() {
+    this.$el.addClass(wrapper)
+
+    // create an inner div to wrap all slide item
+    const $inner = $(`<div class=${inner}></div>`)
+    this.$el.children().each((i, child) => {
+      $(child).addClass(slide)
+      if (i === this.curr) {
+        $(child).css('left', '0')
+      }
+      $inner.append(child)
+    })
+
+    // save the inner DOM
+    this.$slider = $inner
+
+    // append controllers
+    const $nextCtrl = $(`<a class='${nextCtrl} ${controller}' data-action='next'>Next</a>`)
+    const $prevCtrl = $(`<a class='${prevCtrl} ${controller}' data-action='prev'>Prev</a>`)
+    
+    // append indicators
+    const $indicators = $(`<ol class='${indicators}'></ol>`)
+    for (let i = 0; i < this.totalSlide; i++) {
+      const $indItem = $(`<li data-goto-slide=${i}  data-action='goto'></li>`)
+      $indicators.append($indItem)
+    }
+    
+    this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
+  }
+
+  verifyOptions() {
+    //boolean
+    ['loop', 'autoPlay'].forEach(item => {
+      if (typeof this.opts[item] !== typeof true && this.opts[item] === undefined) {
+        this.opts[item] = this.defaultOpts[item]
+        console.warn(`${item} must Boolean !!!`)
+      }
+    });
+    //number
+    ['autoPlayDelay', 'duration'].forEach(item => {
+      console.log("options[item]", this.opts[item])
+      if (typeof this.opts[item] === 'number' && this.opts[item] !== undefined) {
+        this.opts[item] = parseInt(this.opts[item])
+      } else {
+        this.opts[item] = this.defaultOpts[item]
+      }
+    })
+
+    console.log(this.opts)
+
+  }
+
+  customsizeLoop(index) {
+    if (!this.loop) {
+      this.opts.autoPlay = false
+    }
+   
+    if (index === 0 && !this.opts.loop) {
+      $('.'+prevCtrl).addClass('pf-disabled')
+    }
+    else if (index === this.totalSlide - 1 && !this.opts.loop) {
+      $('.'+nextCtrl).addClass('pf-disabled')
+    }
+    else {
+      $('.'+controller).removeClass('pf-disabled')
+    }
+  }
+  handleClick(e) {
+    const action = e.target.dataset.action
+    switch (action) {
+      case 'next': this.next(); break
+      case 'prev': this.prev(); break
+      case 'goto':
+        // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
+        const index = parseInt(e.target.dataset.gotoSlide) || 0
+        this.goto(index)
+        break
+      default: console.log('Slider clicked')
+    }
+  }
+
+  destroy() {
+    // save all items, remove all classes on them
+    const items = []
+    this.$slider.children().each((i, child) => {
+      $(child).removeClass(slide)
+      items.push($(child))
+    })
+
+    // remove class, event handler, data-instance and all children
+    this.$el.removeClass(wrapper)
+    this.$el.off('click', this.handleClick)
+    this.$el.data('slider', '')
+    this.$el.empty()
+
+    // append the original item
+    for (let item of items) {
+      this.$el.append(item)
+    }
   }
 
   setAutoPlay() {
@@ -34,26 +150,28 @@ class SliderController {
     clearTimeout(this.autoTimeoutId)
   }
 
-  initialize() {
-    console.log("Init new PF Slider")
+  moveSlide(direction, toIndex) {
+    let currIndex = this.curr
+    let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
 
-    const currIndex = this.curr
-    this.$el.addClass('slider')
+    let $curr = this.$slider.children().eq(currIndex)
+    let $next = this.$slider.children().eq(nextIndex)
 
-    this.$el.children().each((i, child) => {
-      $(child).addClass('slide')
-      if (i === currIndex) {
-        $(child).css('left', '0')
-      }
-    })
+    $next.css({ 'transition': '' })
+    $next.css('left', nextSlidePos)
 
-    $('<button>').text('Next').insertAfter(this.el).click(() => this.next.apply(this))
-    $('<button>').text('Prev').insertAfter(this.el).click(() => this.prev.apply(this))
+    const duration = this.opts.duration || this.defaultOpts.duration
+    this.customsizeLoop(nextIndex)
+    setTimeout(() => {
+      $curr.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': currSlidePos })
+      $next.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': '0' })
+      setTimeout(() => {
+        this.setAutoPlay()
+        this.active = false
+      }, this.duration)
+    }, 20)
 
-    this.setAutoPlay()
-
-    console.log(this)
-    return this
+    this.curr = nextIndex
   }
 
   next() {
@@ -68,28 +186,6 @@ class SliderController {
     this.clearAutoPlay()
     this.active = true
     this.moveSlide("prev")
-  }
-
-  moveSlide(direction, toIndex) {
-    let currIndex = this.curr
-    let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
-
-    let $curr = this.$el.children().eq(currIndex)
-    let $next = this.$el.children().eq(nextIndex)
-
-    $next.css({ 'transition': '' })
-    $next.css('left', nextSlidePos)
-
-    setTimeout(() => {
-      $curr.css({ 'transition': `left ${this.duration}ms ease-in-out`, 'left': currSlidePos })
-      $next.css({ 'transition': `left ${this.duration}ms ease-in-out`, 'left': '0' })
-      setTimeout(() => {
-        this.setAutoPlay()
-        this.active = false
-      }, this.duration)
-    }, 20)
-
-    this.curr = nextIndex
   }
 
   goto(index) {

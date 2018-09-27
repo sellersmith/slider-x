@@ -1,3 +1,16 @@
+const prefix = 'pf'
+
+const DomClasses = {
+    wrapper: `${prefix}-slide-wrapper`,
+    inner: `${prefix}-slide-inner`,
+    slide: `${prefix}-slide-item`,
+    indicators: `${prefix}-slide-indicators`,
+    indicatorItem: `${prefix}-slide-indicator-item`,
+    controller: `${prefix}-slide-controller`,
+    nextCtrl: `${prefix}-slide-controller-next`,
+    prevCtrl: `${prefix}-slide-controller-prev`,
+}
+
 const getSlideMovementData = (direction, currIndex, toIndex, totalSilde) => {
   let nextIndex, nextSlidePos, currSlidePos
 
