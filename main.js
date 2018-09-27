@@ -23,6 +23,7 @@ class SliderController {
     // update DOM + set event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
+    console.log(this)
   }
 
   initialize() {
@@ -70,6 +71,7 @@ class SliderController {
         this.opts[key] = value
       }
     })
+    
   }
 
   customsizeLoop(index) {
@@ -84,7 +86,7 @@ class SliderController {
       $('.'+nextCtrl).addClass('pf-slider-nav-disabled')
     }
   }
-
+  
   handleClick(e) {
     const action = e.target.dataset.action
     switch (action) {
@@ -175,6 +177,14 @@ class SliderController {
     this.$el.find('ol').children().eq(curr).addClass('active')
   }
 
+  updateOptions(object){
+    Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
+      if (typeof object[key] !== typeof value) {
+        object[key] = value
+      }
+    })
+    Object.assign(this.opts ,  object)
+  }
   next() {
     if (this.active) return
     this.clearAutoPlay()
