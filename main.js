@@ -33,7 +33,7 @@ class SliderController {
     return this
   }
 
-  updateSliderDOM() {
+  setupSliderDOM() {
     this.$el.addClass(wrapper)
 
     // create an inner div to wrap all slide item
@@ -168,10 +168,22 @@ class SliderController {
       setTimeout(() => {
         this.setAutoPlay()
         this.active = false
-      }, this.duration)
+      }, duration)
     }, 20)
 
     this.curr = nextIndex
+    this.updateSliderDOM()
+  }
+
+  updateSliderDOM() {
+    // add class .active for current active slide n indicator
+    const curr = this.curr
+
+    this.$slider.children(`.${slide}.active`).removeClass('active')
+    this.$slider.children().eq(curr).addClass('active')
+
+    this.$el.find('li.active').removeClass('active')
+    this.$el.find('ol').children().eq(curr).addClass('active')
   }
 
   next() {
