@@ -1,14 +1,15 @@
 const prefix = 'pf'
 
 const DomClasses = {
-    wrapper: `${prefix}-slide-wrapper`,
-    inner: `${prefix}-slide-inner`,
-    slide: `${prefix}-slide-item`,
-    indicators: `${prefix}-slide-indicators`,
-    indicatorItem: `${prefix}-slide-indicator-item`,
-    controller: `${prefix}-slide-controller`,
-    nextCtrl: `${prefix}-slide-controller-next`,
-    prevCtrl: `${prefix}-slide-controller-prev`,
+    wrapper: `${prefix}-slider-wrapper`,
+    inner: `${prefix}-slider-inner`,
+    slide: `${prefix}-slider-slide`,
+    indicators: `${prefix}-slider-pagination`,
+    indicatorItem: `${prefix}-slider-pagination-item`,
+    controller: `${prefix}-slider-nav`,
+    disabledCtrl: `${prefix}-slider-nav-disabled`,
+    nextCtrl: `${prefix}-slider-nav-next`,
+    prevCtrl: `${prefix}-slider-nav-prev`,
 }
 
 const getSlideMovementData = (direction, currIndex, toIndex, totalSilde) => {

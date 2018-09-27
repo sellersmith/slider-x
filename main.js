@@ -1,4 +1,4 @@
-const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, prevCtrl } = DomClasses
+const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, prevCtrl, disabledCtrl } = DomClasses
 
 class SliderController {
   constructor(ele, opts) {
@@ -27,6 +27,7 @@ class SliderController {
 
   initialize() {
     this.verifyOptions()
+    this.setupSliderDOM()
     this.updateSliderDOM()
     this.customsizeLoop(this.curr)
     this.setAutoPlay()
@@ -56,7 +57,7 @@ class SliderController {
     // append indicators
     const $indicators = $(`<ol class='${indicators}'></ol>`)
     for (let i = 0; i < this.totalSlide; i++) {
-      const $indItem = $(`<li data-goto-slide=${i}  data-action='goto'></li>`)
+      const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
     
@@ -64,42 +65,29 @@ class SliderController {
   }
 
   verifyOptions() {
-    //boolean
-    ['loop', 'autoPlay'].forEach(item => {
-      if (typeof this.opts[item] !== typeof true && this.opts[item] === undefined) {
-        this.opts[item] = this.defaultOpts[item]
-        console.warn(`${item} must Boolean !!!`)
-      }
-    });
-    //number
-    ['autoPlayDelay', 'duration'].forEach(item => {
-      console.log("options[item]", this.opts[item])
-      if (typeof this.opts[item] === 'number' && this.opts[item] !== undefined) {
-        this.opts[item] = parseInt(this.opts[item])
-      } else {
-        this.opts[item] = this.defaultOpts[item]
+    Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
+      if (typeof this.opts[key] !== typeof value) {
+        this.opts[key] = value
       }
     })
-
-    console.log(this.opts)
-
   }
 
   customsizeLoop(index) {
-    if (!this.loop) {
+    if (!this.opts.loop) {
       this.opts.autoPlay = false
     }
    
     if (index === 0 && !this.opts.loop) {
-      $('.'+prevCtrl).addClass('pf-disabled')
+      $('.'+prevCtrl).addClass('pf-slider-nav-disabled')
     }
     else if (index === this.totalSlide - 1 && !this.opts.loop) {
-      $('.'+nextCtrl).addClass('pf-disabled')
+      $('.'+nextCtrl).addClass('pf-slider-nav-disabled')
     }
     else {
-      $('.'+controller).removeClass('pf-disabled')
+      $('.'+controller).removeClass('pf-slider-nav-disabled')
     }
   }
+
   handleClick(e) {
     const action = e.target.dataset.action
     switch (action) {
@@ -161,9 +149,11 @@ class SliderController {
 
     $next.css({ 'transition': '' })
     $next.css('left', nextSlidePos)
+    // $next.css('transform', `translate3d(${nextSlidePos}px, 0, 0)`)
 
     const duration = this.opts.duration || this.defaultOpts.duration
     this.customsizeLoop(nextIndex)
+
     setTimeout(() => {
       $curr.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': currSlidePos })
       $next.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': '0' })
@@ -211,4 +201,11 @@ class SliderController {
       this.moveSlide("prev", index)
     }
   }
+}
+
+SliderController.defaultOptions = {
+  autoPlay: false,
+  autoPlayDelay: 3000,
+  duration: 450,
+  loop: true
 }
