@@ -37,20 +37,26 @@
   <script src="./main.js"></script>
   <script>
     (function ($) {
-      const dataMap = new Map()
-      $.fn.slider = function (opts) {
-        return this.each((index, element) => {
+      $.fn.slider = function (opts, ...args) {
+        return this.each((i, element) => {
           let instance = $(element).data('slider')
           if (!instance) {
+            if (typeof opts === 'string') {
+              throw new Error('This element was not initialized as a Slider yet')
+            }
             instance = new SliderController(element, opts)
             $(element).data('slider', instance)
+          } else {
+            if (typeof opts === 'string') {
+              instance[opts](...args)
+            }
           }
         })
       }
-    }) (jQuery)
+    })(jQuery)
   </script>
   <script>
-    $('.test-slider').slider({ autoPlay: true, autoPlayDelay: 3000, duration: "djasnkj" , loop : false })
+    $('.test-slider').slider({ autoPlay: true, autoPlayDelay: 3000, duration: "djasnkj", loop: false })
   </script>
 </body>
 

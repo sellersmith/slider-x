@@ -7,14 +7,7 @@ class SliderController {
     this.$slider = '' // the .inner div that wrap all slide
 
     this.totalSlide = this.$el.children().length
-
     this.opts = opts
-    this.defaultOpts = {
-      autoPlay: false,
-      autoPlayDelay: 3000,
-      duration: 450,
-      loop: true
-    }
 
     this.autoTimeoutId = ''
     this.active = false
@@ -29,7 +22,6 @@ class SliderController {
     this.verifyOptions()
     this.setupSliderDOM()
     this.updateSliderDOM()
-    this.customsizeLoop(this.curr)
     this.setAutoPlay()
     return this
   }
@@ -72,19 +64,19 @@ class SliderController {
     })
   }
 
-  customsizeLoop(index) {
+  updateSliderCtrlDOM(index) {
     if (!this.opts.loop) {
       this.opts.autoPlay = false
     }
    
     if (index === 0 && !this.opts.loop) {
-      $('.'+prevCtrl).addClass('pf-slider-nav-disabled')
+      $(`.${prevCtrl}`).addClass('pf-slider-nav-disabled')
     }
     else if (index === this.totalSlide - 1 && !this.opts.loop) {
-      $('.'+nextCtrl).addClass('pf-slider-nav-disabled')
+      $(`.${nextCtrl}`).addClass('pf-slider-nav-disabled')
     }
     else {
-      $('.'+controller).removeClass('pf-slider-nav-disabled')
+      $(`.${controller}`).removeClass('pf-slider-nav-disabled')
     }
   }
 
@@ -126,7 +118,7 @@ class SliderController {
 
   setAutoPlay() {
     if (this.opts.autoPlay) {
-      const delay = this.opts.autoPlayDelay || this.defaultOpts.autoPlayDelay
+      const delay = this.opts.autoPlayDelay || this.constructor.defaultOpts.autoPlayDelay
 
       this.clearAutoPlay()
       this.autoTimeoutId = setTimeout(() => {
@@ -151,8 +143,8 @@ class SliderController {
     $next.css('left', nextSlidePos)
     // $next.css('transform', `translate3d(${nextSlidePos}px, 0, 0)`)
 
-    const duration = this.opts.duration || this.defaultOpts.duration
-    this.customsizeLoop(nextIndex)
+    const duration = this.opts.duration || this.constructor.defaultOpts.duration
+    this.updateSliderCtrlDOM(nextIndex)
 
     setTimeout(() => {
       $curr.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': currSlidePos })
@@ -176,6 +168,8 @@ class SliderController {
 
     this.$el.find('li.active').removeClass('active')
     this.$el.find('ol').children().eq(curr).addClass('active')
+
+    this.updateSliderCtrlDOM(curr)
   }
 
   next() {
