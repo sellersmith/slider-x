@@ -65,11 +65,11 @@ class SliderController {
   }
 
   updateOptions(object) {
-    const keyExies = Object.keys(object)
+    const keyExist = Object.keys(object)
     Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
-      if (keyExies.includes(key)) {
+      if (keyExist.includes(key)) {
       }
-      if (typeof object[key] !== typeof value && keyExies.includes(key)) {
+      if (typeof object[key] !== typeof value && keyExist.includes(key)) {
         object[key] = value
       }
     })
