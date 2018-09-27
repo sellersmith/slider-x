@@ -45,14 +45,14 @@ class SliderController {
     // append controllers
     const $nextCtrl = $(`<a class='${nextCtrl} ${controller}' data-action='next'>Next</a>`)
     const $prevCtrl = $(`<a class='${prevCtrl} ${controller}' data-action='prev'>Prev</a>`)
-    
+
     // append indicators
     const $indicators = $(`<ol class='${indicators}'></ol>`)
     for (let i = 0; i < this.totalSlide; i++) {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
-    
+
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
   }
 
@@ -64,9 +64,12 @@ class SliderController {
     })
   }
 
-  updateOptions(object){
+  updateOptions(object) {
+    const keyExies = Object.keys(object)
     Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
-      if (typeof object[key] !== typeof value) {
+      if (keyExies.includes(key)) {
+      }
+      if (typeof object[key] !== typeof value && keyExies.includes(key)) {
         object[key] = value
       }
     })
@@ -90,7 +93,7 @@ class SliderController {
       this.$el.find(`.${nextCtrl}`).addClass('pf-slider-nav-disabled')
     }
   }
-  
+
   handleClick(e) {
     const action = e.target.dataset.action
     switch (action) {
