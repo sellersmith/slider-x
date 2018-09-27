@@ -78,6 +78,26 @@ class SliderController {
     }
   }
 
+  destroy() {
+    // save all items, remove all classes on them
+    const items = []
+    this.$slider.children().each((i, child) => {
+      $(child).removeClass(slide)
+      items.push($(child))
+    })
+
+    // remove class, event handler, data-instance and all children
+    this.$el.removeClass(wrapper)
+    this.$el.off('click', this.handleClick)
+    this.$el.data('slider', '')
+    this.$el.empty()
+    
+    // append the original item
+    for (let item of items) {
+      this.$el.append(item)
+    }
+  }
+
   setAutoPlay() {
     if (this.opts.autoPlay) {
       const delay = this.opts.autoPlayDelay || this.defaultOpts.autoPlayDelay
