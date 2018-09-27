@@ -18,7 +18,6 @@ class SliderController {
     this.autoTimeoutId = ''
     this.active = false
     this.curr = 0
-    this.duration = this.opts.duration || this.defaultOpts.duration
 
     // update DOM + set event handler
     this.initialize()
@@ -28,13 +27,14 @@ class SliderController {
   initialize() {
     console.log("Init new PF Slider")
 
-    this.updateSliderDOM()
+    this.setupSliderDOM()
     this.setAutoPlay()
+    this.updateSliderDOM()
     console.log(this)
     return this
   }
 
-  updateSliderDOM() {
+  setupSliderDOM() {
     this.$el.addClass(wrapper)
 
     // create an inner div to wrap all slide item
@@ -132,10 +132,22 @@ class SliderController {
       setTimeout(() => {
         this.setAutoPlay()
         this.active = false
-      }, this.duration)
+      }, duration)
     }, 20)
 
     this.curr = nextIndex
+    this.updateSliderDOM()
+  }
+
+  updateSliderDOM() {
+    // add class .active for current active slide n indicator
+    const curr = this.curr
+
+    this.$slider.children(`.${slide}.active`).removeClass('active')
+    this.$slider.children().eq(curr).addClass('active')
+
+    this.$el.find('li.active').removeClass('active')
+    this.$el.find('ol').children().eq(curr).addClass('active')
   }
 
   next() {
