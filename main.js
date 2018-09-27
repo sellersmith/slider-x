@@ -12,7 +12,8 @@ class SliderController {
     this.defaultOpts = {
       autoPlay: false,
       autoPlayDelay: 3000,
-      duration: 450
+      duration: 450,
+      loop: true
     }
 
     this.autoTimeoutId = ''
@@ -25,12 +26,10 @@ class SliderController {
   }
 
   initialize() {
-    console.log("Init new PF Slider")
-
-    this.setupSliderDOM()
-    this.setAutoPlay()
+    this.verifyOptions()
     this.updateSliderDOM()
-    console.log(this)
+    this.customsizeLoop(this.curr)
+    this.setAutoPlay()
     return this
   }
 
@@ -53,17 +52,54 @@ class SliderController {
     // append controllers
     const $nextCtrl = $(`<a class='${nextCtrl} ${controller}' data-action='next'>Next</a>`)
     const $prevCtrl = $(`<a class='${prevCtrl} ${controller}' data-action='prev'>Prev</a>`)
-
+    
     // append indicators
     const $indicators = $(`<ol class='${indicators}'></ol>`)
     for (let i = 0; i < this.totalSlide; i++) {
       const $indItem = $(`<li data-goto-slide=${i}  data-action='goto'></li>`)
       $indicators.append($indItem)
     }
-
+    
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
   }
 
+  verifyOptions() {
+    //boolean
+    ['loop', 'autoPlay'].forEach(item => {
+      if (typeof this.opts[item] !== typeof true && this.opts[item] === undefined) {
+        this.opts[item] = this.defaultOpts[item]
+        console.warn(`${item} must Boolean !!!`)
+      }
+    });
+    //number
+    ['autoPlayDelay', 'duration'].forEach(item => {
+      console.log("options[item]", this.opts[item])
+      if (typeof this.opts[item] === 'number' && this.opts[item] !== undefined) {
+        this.opts[item] = parseInt(this.opts[item])
+      } else {
+        this.opts[item] = this.defaultOpts[item]
+      }
+    })
+
+    console.log(this.opts)
+
+  }
+
+  customsizeLoop(index) {
+    if (!this.loop) {
+      this.opts.autoPlay = false
+    }
+   
+    if (index === 0 && !this.opts.loop) {
+      $('.'+prevCtrl).addClass('pf-disabled')
+    }
+    else if (index === this.totalSlide - 1 && !this.opts.loop) {
+      $('.'+nextCtrl).addClass('pf-disabled')
+    }
+    else {
+      $('.'+controller).removeClass('pf-disabled')
+    }
+  }
   handleClick(e) {
     const action = e.target.dataset.action
     switch (action) {
@@ -91,7 +127,7 @@ class SliderController {
     this.$el.off('click', this.handleClick)
     this.$el.data('slider', '')
     this.$el.empty()
-    
+
     // append the original item
     for (let item of items) {
       this.$el.append(item)
@@ -127,7 +163,7 @@ class SliderController {
     $next.css('left', nextSlidePos)
 
     const duration = this.opts.duration || this.defaultOpts.duration
-
+    this.customsizeLoop(nextIndex)
     setTimeout(() => {
       $curr.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': currSlidePos })
       $next.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': '0' })
