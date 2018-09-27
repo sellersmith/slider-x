@@ -76,15 +76,12 @@ class SliderController {
     if (!this.opts.loop) {
       this.opts.autoPlay = false
     }
-   
+    $('.'+controller).removeClass('pf-slider-nav-disabled')
     if (index === 0 && !this.opts.loop) {
       $('.'+prevCtrl).addClass('pf-slider-nav-disabled')
     }
     else if (index === this.totalSlide - 1 && !this.opts.loop) {
       $('.'+nextCtrl).addClass('pf-slider-nav-disabled')
-    }
-    else {
-      $('.'+controller).removeClass('pf-slider-nav-disabled')
     }
   }
 
