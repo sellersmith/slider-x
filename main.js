@@ -3,8 +3,8 @@ const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, 
 class SliderController {
   constructor(ele, opts) {
     this.el = ele
-    this.$el = $(this.el)
-    this.$slider = ''
+    this.$el = $(this.el) // the original element
+    this.$slider = '' // the .inner div that wrap all slide
 
     this.totalSlide = this.$el.children().length
 
@@ -96,6 +96,8 @@ class SliderController {
     for (let item of items) {
       this.$el.append(item)
     }
+
+    // !TODO!: remove all inline css (transition, left...)
   }
 
   setAutoPlay() {
