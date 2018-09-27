@@ -19,7 +19,10 @@ class SliderController {
     this.active = false
     this.curr = 0
     this.duration = this.opts.duration || this.defaultOpts.duration
+
+    // update DOM + set event handler
     this.initialize()
+    this.$el.on('click', this.handleClick.bind(this))
   }
 
   setAutoPlay() {
@@ -47,6 +50,20 @@ class SliderController {
     return this
   }
 
+  handleClick(e) {
+    const action = e.target.dataset.action
+    switch(action) {
+      case 'next': this.next(); break
+      case 'prev': this.prev(); break
+      case 'goto':
+        // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
+        const index = parseInt(e.target.dataset.gotoSlide) || 0 
+        this.goto(index)
+        break
+      default: console.log('Slider clicked')
+    }
+  }
+
   updateSliderDOM() {
     this.$el.addClass(wrapper)
 
@@ -63,21 +80,14 @@ class SliderController {
     // save the inner DOM
     this.$slider = $inner
 
-    // append indicators n controllers
-    const $nextCtrl = $(`<a class='${nextCtrl} ${controller}'>Next</a>`)
-    $nextCtrl.on('click', () => this.next.apply(this))
+    // append controllers
+    const $nextCtrl = $(`<a class='${nextCtrl} ${controller}' data-action='next'>Next</a>`)
+    const $prevCtrl = $(`<a class='${prevCtrl} ${controller}' data-action='prev'>Prev</a>`)
 
-    const $prevCtrl = $(`<a class='${prevCtrl} ${controller}'>Prev</a>`)
-    $prevCtrl.on('click', () => this.prev.apply(this))
-
-    // add <li>s as indicator item
+    // append indicators
     const $indicators = $(`<ol class='${indicators}'></ol>`)
     for (let i = 0; i < this.totalSlide; i++) {
-      const $indItem = $(`<li data-goto-slide=${i}></li>`)
-      $indItem.on('click', () => {
-        console.log(this)
-        this.goto.call(this, i)
-      })
+      const $indItem = $(`<li data-goto-slide=${i}  data-action='goto'></li>`)
       $indicators.append($indItem)
     }
 
