@@ -11,11 +11,11 @@ class SliderController {
 
     this.autoTimeoutId = ''
     this.active = false
-    this.curr = 0
 
     // update DOM + set event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
+    console.log(this)
   }
 
   initialize() {
@@ -33,7 +33,7 @@ class SliderController {
     const $inner = $(`<div class=${inner}></div>`)
     this.$el.children().each((i, child) => {
       $(child).addClass(slide)
-      if (i === this.curr) {
+      if (i === this.opts.curr) {
         $(child).css('left', '0')
       }
       $inner.append(child)
@@ -64,22 +64,33 @@ class SliderController {
     })
   }
 
+  updateOptions(object){
+    Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
+      if (typeof object[key] !== typeof value) {
+        object[key] = value
+      }
+    })
+    Object.assign(this.opts, object)
+
+    this.updateSliderCtrlDOM(this.opts.curr)
+    this.setAutoPlay()
+  }
+
   updateSliderCtrlDOM(index) {
     if (!this.opts.loop) {
       this.opts.autoPlay = false
     }
-   
+
+    this.$el.find('a').removeClass('pf-slider-nav-disabled')
+
     if (index === 0 && !this.opts.loop) {
-      $(`.${prevCtrl}`).addClass('pf-slider-nav-disabled')
+      this.$el.find(`.${prevCtrl}`).addClass('pf-slider-nav-disabled')
     }
     else if (index === this.totalSlide - 1 && !this.opts.loop) {
-      $(`.${nextCtrl}`).addClass('pf-slider-nav-disabled')
-    }
-    else {
-      $(`.${controller}`).removeClass('pf-slider-nav-disabled')
+      this.$el.find(`.${nextCtrl}`).addClass('pf-slider-nav-disabled')
     }
   }
-
+  
   handleClick(e) {
     const action = e.target.dataset.action
     switch (action) {
@@ -118,7 +129,7 @@ class SliderController {
 
   setAutoPlay() {
     if (this.opts.autoPlay) {
-      const delay = this.opts.autoPlayDelay || this.constructor.defaultOpts.autoPlayDelay
+      const delay = this.opts.autoPlayDelay
 
       this.clearAutoPlay()
       this.autoTimeoutId = setTimeout(() => {
@@ -133,7 +144,7 @@ class SliderController {
   }
 
   moveSlide(direction, toIndex) {
-    let currIndex = this.curr
+    let currIndex = this.opts.curr
     let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
 
     let $curr = this.$slider.children().eq(currIndex)
@@ -143,7 +154,7 @@ class SliderController {
     $next.css('left', nextSlidePos)
     // $next.css('transform', `translate3d(${nextSlidePos}px, 0, 0)`)
 
-    const duration = this.opts.duration || this.constructor.defaultOpts.duration
+    const duration = this.opts.duration
     this.updateSliderCtrlDOM(nextIndex)
 
     setTimeout(() => {
@@ -155,13 +166,13 @@ class SliderController {
       }, duration)
     }, 20)
 
-    this.curr = nextIndex
+    this.opts.curr = nextIndex
     this.updateSliderDOM()
   }
 
   updateSliderDOM() {
     // add class .active for current active slide n indicator
-    const curr = this.curr
+    const curr = this.opts.curr
 
     this.$slider.children(`.${slide}.active`).removeClass('active')
     this.$slider.children().eq(curr).addClass('active')
@@ -189,15 +200,16 @@ class SliderController {
   goto(index) {
     this.clearAutoPlay()
 
-    if (index > this.curr) {
+    if (index > this.opts.curr) {
       this.moveSlide("next", index)
-    } else if (index < this.curr) {
+    } else if (index < this.opts.curr) {
       this.moveSlide("prev", index)
     }
   }
 }
 
 SliderController.defaultOptions = {
+  curr: 0,
   autoPlay: false,
   autoPlayDelay: 3000,
   duration: 450,
