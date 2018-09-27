@@ -25,22 +25,6 @@ class SliderController {
     this.$el.on('click', this.handleClick.bind(this))
   }
 
-  setAutoPlay() {
-    if (this.opts.autoPlay) {
-      const delay = this.opts.autoPlayDelay || this.defaultOpts.autoPlayDelay
-
-      this.clearAutoPlay()
-      this.autoTimeoutId = setTimeout(() => {
-        this.moveSlide('next')
-        this.setAutoPlay()
-      }, delay)
-    }
-  }
-
-  clearAutoPlay() {
-    clearTimeout(this.autoTimeoutId)
-  }
-
   initialize() {
     console.log("Init new PF Slider")
 
@@ -48,20 +32,6 @@ class SliderController {
     this.setAutoPlay()
     console.log(this)
     return this
-  }
-
-  handleClick(e) {
-    const action = e.target.dataset.action
-    switch(action) {
-      case 'next': this.next(); break
-      case 'prev': this.prev(); break
-      case 'goto':
-        // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
-        const index = parseInt(e.target.dataset.gotoSlide) || 0 
-        this.goto(index)
-        break
-      default: console.log('Slider clicked')
-    }
   }
 
   updateSliderDOM() {
@@ -94,18 +64,34 @@ class SliderController {
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
   }
 
-  next() {
-    if (this.active) return
-    this.clearAutoPlay()
-    this.active = true
-    this.moveSlide("next")
+  handleClick(e) {
+    const action = e.target.dataset.action
+    switch (action) {
+      case 'next': this.next(); break
+      case 'prev': this.prev(); break
+      case 'goto':
+        // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
+        const index = parseInt(e.target.dataset.gotoSlide) || 0
+        this.goto(index)
+        break
+      default: console.log('Slider clicked')
+    }
   }
 
-  prev() {
-    if (this.active) return
-    this.clearAutoPlay()
-    this.active = true
-    this.moveSlide("prev")
+  setAutoPlay() {
+    if (this.opts.autoPlay) {
+      const delay = this.opts.autoPlayDelay || this.defaultOpts.autoPlayDelay
+
+      this.clearAutoPlay()
+      this.autoTimeoutId = setTimeout(() => {
+        this.moveSlide('next')
+        this.setAutoPlay()
+      }, delay)
+    }
+  }
+
+  clearAutoPlay() {
+    clearTimeout(this.autoTimeoutId)
   }
 
   moveSlide(direction, toIndex) {
@@ -118,9 +104,11 @@ class SliderController {
     $next.css({ 'transition': '' })
     $next.css('left', nextSlidePos)
 
+    const duration = this.opts.duration || this.defaultOpts.duration
+
     setTimeout(() => {
-      $curr.css({ 'transition': `left ${this.duration}ms ease-in-out`, 'left': currSlidePos })
-      $next.css({ 'transition': `left ${this.duration}ms ease-in-out`, 'left': '0' })
+      $curr.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': currSlidePos })
+      $next.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': '0' })
       setTimeout(() => {
         this.setAutoPlay()
         this.active = false
@@ -128,6 +116,20 @@ class SliderController {
     }, 20)
 
     this.curr = nextIndex
+  }
+
+  next() {
+    if (this.active) return
+    this.clearAutoPlay()
+    this.active = true
+    this.moveSlide("next")
+  }
+
+  prev() {
+    if (this.active) return
+    this.clearAutoPlay()
+    this.active = true
+    this.moveSlide("prev")
   }
 
   goto(index) {
