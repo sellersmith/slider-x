@@ -1,7 +1,11 @@
+const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, prevCtrl } = DomClasses
+
 class SliderController {
   constructor(ele, opts) {
     this.el = ele
     this.$el = $(this.el)
+    this.$slider = ''
+
     this.totalSlide = this.$el.children().length
 
     this.opts = opts
@@ -15,7 +19,7 @@ class SliderController {
     this.active = false
     this.curr = 0
     this.duration = this.opts.duration || this.defaultOpts.duration
-    this.initialize(this.el, this.opts)
+    this.initialize()
   }
 
   setAutoPlay() {
@@ -37,23 +41,38 @@ class SliderController {
   initialize() {
     console.log("Init new PF Slider")
 
-    const currIndex = this.curr
-    this.$el.addClass('slider')
-
-    this.$el.children().each((i, child) => {
-      $(child).addClass('slide')
-      if (i === currIndex) {
-        $(child).css('left', '0')
-      }
-    })
-
-    $('<button>').text('Next').insertAfter(this.el).click(() => this.next.apply(this))
-    $('<button>').text('Prev').insertAfter(this.el).click(() => this.prev.apply(this))
-
+    this.updateSliderDOM()
     this.setAutoPlay()
-
     console.log(this)
     return this
+  }
+
+  updateSliderDOM() {
+    this.$el.addClass(wrapper)
+
+    // create an inner div to wrap all slide item
+    const $inner = $(`<div class=${inner}></div>`)
+    this.$el.children().each((i, child) => {
+      $(child).addClass(slide)
+      if (i === this.curr) {
+        $(child).css('left', '0')
+      }
+      $inner.append(child)
+    })
+
+    // save the inner DOM
+    this.$slider = $inner
+
+    // append indicators n controllers
+    const $nextCtrl = $('<button>Next</button>')
+    $nextCtrl.on('click', () => this.next.apply(this))
+
+    const $prevCtrl = $('<button>Prev</button>')
+    $prevCtrl.on('click', () => this.prev.apply(this))
+
+    const $indicators = $('<ol></ol>')
+
+    this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
   }
 
   next() {
@@ -74,8 +93,8 @@ class SliderController {
     let currIndex = this.curr
     let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
 
-    let $curr = this.$el.children().eq(currIndex)
-    let $next = this.$el.children().eq(nextIndex)
+    let $curr = this.$slider.children().eq(currIndex)
+    let $next = this.$slider.children().eq(nextIndex)
 
     $next.css({ 'transition': '' })
     $next.css('left', nextSlidePos)
