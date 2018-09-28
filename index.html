@@ -17,10 +17,10 @@
 
 <body>
   <h1>Final slider</h1>
-  <div class='test-slider'>
+  <div class='test-slider' style="font-weight: 300; text-transform: uppercase;">
     <div class="child-1">0</div>
     <div class="child-2">1</div>
-    <div class="child-3">2</div>
+    <div class="child-3" style="font-size: 2em;">2</div>
     <div class="child-4">3</div>
     <div class="child-5">4</div>
   </div>
@@ -35,26 +35,6 @@
 
   <script src="./helpers.js"></script>
   <script src="./main.js"></script>
-  <script>
-    (function ($) {
-      $.fn.slider = function (opts, ...args) {
-        return this.each((i, element) => {
-          let instance = $(element).data('slider')
-          if (!instance) {
-            if (typeof opts === 'string') {
-              throw new Error('This element was not initialized as a Slider yet')
-            }
-            instance = new SliderController(element, opts)
-            $(element).data('slider', instance)
-          } else {
-            if (typeof opts === 'string') {
-              instance[opts](...args)
-            }
-          }
-        })
-      }
-    })(jQuery)
-  </script>
   <script>
     $('.test-slider').slider({ autoPlay: true, autoPlayDelay: 3000, duration: "djasnkj", loop: false })
   </script>
