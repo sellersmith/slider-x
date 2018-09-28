@@ -44,11 +44,11 @@ class SliderController {
     this.$slider = $inner
 
     // Append controllers
-    const $nextCtrl = $(`<a class='${nextCtrl} ${controller}' data-action='next'>Next</a>`)
-    const $prevCtrl = $(`<a class='${prevCtrl} ${controller}' data-action='prev'>Prev</a>`)
+    const $nextCtrl = $(`<a class='${nextCtrl} ${controller} nav-style-1' data-action='next'></a>`)
+    const $prevCtrl = $(`<a class='${prevCtrl} ${controller} nav-style-1' data-action='prev'></a>`)
 
     // Append indicators
-    const $indicators = $(`<ol class='${indicators}'></ol>`)
+    const $indicators = $(`<ol class='${indicators} pagination-style-1'></ol>`)
     for (let i = 0; i < this.totalSlide; i++) {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
