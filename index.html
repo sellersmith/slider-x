@@ -2,79 +2,58 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Final slider</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-          crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-            crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Final slider</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="main.css">
 </head>
 
 <body>
-    <h1>Final slider</h1>
-    <div class='test-slider-1'>
-        <div class="child-1">0</div>
-        <div class="child-2">1</div>
-        <div class="child-3">2</div>
-        <div class="child-4">3</div>
-        <div class="child-5">4</div>
-    </div>
-    <br><br><br><br>
-    <div class='test-slider-2'>
-        <div class="child-1">00</div>
-        <div class="child-2">11</div>
-        <div class="child-3">22</div>
-        <div class="child-4">33</div>
-        <div class="child-5">44</div>
-    </div>
-<script src="./helpers.js"></script>
-<script src="./main.js"></script>
-<script>
-    (function ($) {
-        $.fn.slider = function (opts, ...args) {
-            return this.each((i, element) => {
-                let instance = $(element).data('slider')
-                if (!instance) {
-                    if (typeof opts === 'string') {
-                        throw new Error('This element was not initialized as a Slider yet')
-                    }
-                    instance = new SliderController(element, opts)
-                    $(element).data('slider', instance)
-                } else {
-                    if (typeof opts === 'string') {
-                        instance[opts](...args)
-                    }
-                }
-            })
-        }
-    })(jQuery)
-</script>
-<script>
+  <h1>Final slider</h1>
+  <div class='test-slider-1' style="font-weight: 300; text-transform: uppercase;">
+    <div class="child-1">0</div>
+    <div class="child-2">1</div>
+    <div class="child-3" style="font-size: 2em;">2</div>
+    <div class="child-4">3</div>
+    <div class="child-5">4</div>
+  </div>
+  <br><br><br>
+  <div class='test-slider-2'>
+    <div class="child-1">00</div>
+    <div class="child-2">11</div>
+    <div class="child-3">22</div>
+    <div class="child-4">33</div>
+    <div class="child-5">44</div>
+  </div>
+
+  <script src="./helpers.js"></script>
+  <script src="./main.js"></script>
+  <script>
     $('.test-slider-1').slider({
-      autoPlay: false, 
-      duration: 500, 
+      autoPlay: false,
+      duration: 500,
       loop: false,
       navStyle: 'nav-style-2',
       paginationStyle: 'pagination-style-1'
     })
 
     $('.test-slider-2').slider({
-      autoPlay: true, 
-      autoPlayDelay: 3000, 
-      duration: "sample-text-to-test-default-opts", 
+      autoPlay: true,
+      autoPlayDelay: 3000,
+      duration: "sample-text-to-test-default-opts",
       loop: true,
       navStyle: 'nav-style-3',
       paginationStyle: 'pagination-style-2'
     })
-</script>
+  </script>
 </body>
 
 </html>

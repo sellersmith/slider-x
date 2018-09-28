@@ -3,7 +3,7 @@ const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, 
 class SliderController {
   constructor(ele, opts) {
     this.el = ele
-    this.originalStyles = {}
+    this.originalStyles = { wrapper: '', inner: [] }
 
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
@@ -14,7 +14,7 @@ class SliderController {
     this.autoTimeoutId = ''
     this.moveLock = false
 
-    // Update DOM + set event handler
+    // Setup DOM + set event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
     console.log(this)
@@ -29,11 +29,17 @@ class SliderController {
 
   setupSliderDOM() {
     this.$el.addClass(wrapper)
+    // Save original styles
+    this.originalStyles.wrapper = this.$el.attr('style') ? this.$el.attr('style') : ''
 
     // Create an inner div to wrap all slide item
     const $inner = $(`<div class=${inner}></div>`)
     this.$el.children().each((i, child) => {
       $(child).addClass(slide)
+      // Save original styles
+      const childStyles = $(child).attr('style') ? $(child).attr('style') : ''
+      this.originalStyles.inner.push(childStyles)
+
       if (i === this.opts.curr) {
         $(child).css('left', '0')
       }
@@ -130,15 +136,16 @@ class SliderController {
   }
 
   destroy() {
-    // Save all items, remove all classes on them
+    // Save all items, remove all classes, inline-style n reverse the original style
     const items = []
     this.$slider.children().each((i, child) => {
-      $(child).removeClass(slide)
+      $(child).removeClass(slide).removeClass('active').attr('style', '').attr('style', this.originalStyles.inner[i])
       items.push($(child))
     })
 
     // Remove class, event handler, data-instance and all children
-    this.$el.removeClass(wrapper)
+    // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problem in the future
+    this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
     this.$el.off('click', this.handleClick)
     this.$el.data('slider', '')
     this.$el.empty()
@@ -151,7 +158,7 @@ class SliderController {
     // !TODO!: remove all inline css (transition, left...)
   }
 
-  setAutoPlay() {    
+  setAutoPlay() {
     if (this.opts.autoPlay) {
       const delay = this.opts.autoPlayDelay
 
@@ -232,6 +239,8 @@ class SliderController {
   }
 }
 
+
+// Class property
 SliderController.defaultOptions = {
   curr: 0,
   paginationStyle: 'pagination-style-1',
@@ -246,3 +255,23 @@ SliderController.styleOptions = {
   paginations: ['pagination-style-1', 'pagination-style-2', 'pagination-style-3'],
   navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5']
 }
+
+// Create jquery plugin
+;(function ($) {
+  $.fn.slider = function (opts, ...args) {
+    return this.each((i, element) => {
+      let instance = $(element).data('slider')
+      if (!instance) {
+        if (typeof opts === 'string') {
+          throw new Error('This element was not initialized as a Slider yet')
+        }
+        instance = new SliderController(element, opts)
+        $(element).data('slider', instance)
+      } else {
+        if (typeof opts === 'string') {
+          instance[opts](...args)
+        }
+      }
+    })
+  }
+})(jQuery)
