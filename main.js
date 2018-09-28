@@ -51,11 +51,11 @@ class SliderController {
     this.$slider = $inner
 
     // Append controllers
-    const $nextCtrl = $(`<a class='${nextCtrl} ${controller}' data-action='next'>Next</a>`)
-    const $prevCtrl = $(`<a class='${prevCtrl} ${controller}' data-action='prev'>Prev</a>`)
+    const $nextCtrl = $(`<a class='${nextCtrl} ${controller} ${this.opts.navStyle}' data-action='next'></a>`)
+    const $prevCtrl = $(`<a class='${prevCtrl} ${controller} ${this.opts.navStyle}' data-action='prev'></a>`)
 
     // Append indicators
-    const $indicators = $(`<ol class='${indicators}'></ol>`)
+    const $indicators = $(`<ol class='${indicators} ${this.opts.paginationStyle}'></ol>`)
     for (let i = 0; i < this.totalSlide; i++) {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
@@ -76,6 +76,9 @@ class SliderController {
 
     // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
+    
+    // Set the style of slider nav n pagination to legal values
+    this.updateStyle()
   }
 
   updateOptions(newOtps) {
@@ -92,8 +95,20 @@ class SliderController {
     // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
 
+    // Set the style of slider nav n pagination to legal values
+    this.updateStyle()
+
     this.updateSliderCtrlDOM(this.opts.curr)
     this.setAutoPlay()
+  }
+
+  updateStyle() {
+    // Set the style of slider nav n pagination to legal values
+    const defPags = this.constructor.styleOptions.paginations
+    const defNavs = this.constructor.styleOptions.navs
+
+    if (defPags.indexOf(this.opts.paginationStyle) < 0) this.opts.paginationStyle = defPags[0]
+    if (defNavs.indexOf(this.opts.navStyle) < 0) this.opts.navStyle = defNavs[0]
   }
 
   updateSliderCtrlDOM(index) {
@@ -227,12 +242,18 @@ class SliderController {
 // Class property
 SliderController.defaultOptions = {
   curr: 0,
+  paginationStyle: 'pagination-style-1',
+  navStyle: 'nav-style-1',
   autoPlay: false,
   autoPlayDelay: 3000,
   duration: 450,
   loop: true
 }
 
+SliderController.styleOptions = {
+  paginations: ['pagination-style-1', 'pagination-style-2', 'pagination-style-3'],
+  navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5']
+}
 
 // Create jquery plugin
 ;(function ($) {

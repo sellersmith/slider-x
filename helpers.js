@@ -8,8 +8,8 @@ const DomClasses = {
     indicatorItem: `${prefix}-slider-pagination-item`,
     controller: `${prefix}-slider-nav`,
     disabledCtrl: `${prefix}-slider-nav-disabled`,
-    nextCtrl: `${prefix}-slider-nav-next`,
-    prevCtrl: `${prefix}-slider-nav-prev`,
+    nextCtrl: `${prefix}-next-nav`,
+    prevCtrl: `${prefix}-prev-nav`,
 }
 
 const getSlideMovementData = (direction, currIndex, toIndex, totalSilde) => {

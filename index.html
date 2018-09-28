@@ -8,6 +8,7 @@
   <title>Final slider</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
     crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
 
@@ -17,15 +18,15 @@
 
 <body>
   <h1>Final slider</h1>
-  <div class='test-slider' style="font-weight: 300; text-transform: uppercase;">
+  <div class='test-slider-1' style="font-weight: 300; text-transform: uppercase;">
     <div class="child-1">0</div>
     <div class="child-2">1</div>
     <div class="child-3" style="font-size: 2em;">2</div>
     <div class="child-4">3</div>
     <div class="child-5">4</div>
   </div>
-
-  <div class='test-slider'>
+  <br><br><br>
+  <div class='test-slider-2'>
     <div class="child-1">00</div>
     <div class="child-2">11</div>
     <div class="child-3">22</div>
@@ -36,7 +37,22 @@
   <script src="./helpers.js"></script>
   <script src="./main.js"></script>
   <script>
-    $('.test-slider').slider({ autoPlay: true, autoPlayDelay: 3000, duration: "djasnkj", loop: false })
+    $('.test-slider-1').slider({
+      autoPlay: false,
+      duration: 500,
+      loop: false,
+      navStyle: 'nav-style-2',
+      paginationStyle: 'pagination-style-1'
+    })
+
+    $('.test-slider-2').slider({
+      autoPlay: true,
+      autoPlayDelay: 3000,
+      duration: "sample-text-to-test-default-opts",
+      loop: true,
+      navStyle: 'nav-style-3',
+      paginationStyle: 'pagination-style-2'
+    })
   </script>
 </body>
 
