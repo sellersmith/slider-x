@@ -3,8 +3,8 @@ const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, 
 class SliderController {
   constructor(ele, opts) {
     this.el = ele
-    this.$el = $(this.el) // the original element
-    this.$slider = '' // the .inner div that wrap all slide
+    this.$el = $(this.el) // The original element
+    this.$slider = '' // The .inner div that wrap all slide
 
     this.totalSlide = this.$el.children().length
     this.opts = opts
@@ -12,7 +12,7 @@ class SliderController {
     this.autoTimeoutId = ''
     this.active = false
 
-    // update DOM + set event handler
+    // Update DOM + set event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
     console.log(this)
@@ -28,7 +28,7 @@ class SliderController {
   setupSliderDOM() {
     this.$el.addClass(wrapper)
 
-    // create an inner div to wrap all slide item
+    // Create an inner div to wrap all slide item
     const $inner = $(`<div class=${inner}></div>`)
     this.$el.children().each((i, child) => {
       $(child).addClass(slide)
@@ -38,14 +38,14 @@ class SliderController {
       $inner.append(child)
     })
 
-    // save the inner DOM
+    // Save the inner DOM
     this.$slider = $inner
 
-    // append controllers
+    // Append controllers
     const $nextCtrl = $(`<a class='${nextCtrl} ${controller}' data-action='next'>Next</a>`)
     const $prevCtrl = $(`<a class='${prevCtrl} ${controller}' data-action='prev'>Prev</a>`)
 
-    // append indicators
+    // Append indicators
     const $indicators = $(`<ol class='${indicators}'></ol>`)
     for (let i = 0; i < this.totalSlide; i++) {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
@@ -54,7 +54,7 @@ class SliderController {
 
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
 
-    // set the .active class
+    // Set the .active class
     this.updateSliderDOM()
   }
 
@@ -65,7 +65,7 @@ class SliderController {
       }
     })
 
-    // turn off autoPlay if loop is false
+    // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
   }
 
@@ -73,12 +73,14 @@ class SliderController {
     const { defaultOptions } = this.constructor
 
     for (let key in newOtps) {
-      if (typeof newOtps[key] === typeof defaultOptions[key]) {
+      // The type of newOpts values must be legal
+      // And update 'curr' key is forbidden
+      if (typeof newOtps[key] === typeof defaultOptions[key] && key !== 'curr') {
         this.opts[key] = newOtps[key]
       }
     }
 
-    // turn off autoPlay if loop is false
+    // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
 
     this.updateSliderCtrlDOM(this.opts.curr)
@@ -111,20 +113,20 @@ class SliderController {
   }
 
   destroy() {
-    // save all items, remove all classes on them
+    // Save all items, remove all classes on them
     const items = []
     this.$slider.children().each((i, child) => {
       $(child).removeClass(slide)
       items.push($(child))
     })
 
-    // remove class, event handler, data-instance and all children
+    // Remove class, event handler, data-instance and all children
     this.$el.removeClass(wrapper)
     this.$el.off('click', this.handleClick)
     this.$el.data('slider', '')
     this.$el.empty()
 
-    // append the original item
+    // Append the original item
     for (let item of items) {
       this.$el.append(item)
     }
@@ -176,7 +178,7 @@ class SliderController {
   }
 
   updateSliderDOM() {
-    // add class .active for current active slide n indicator
+    // Add class .active for current active slide n indicator
     const curr = this.opts.curr
 
     this.$slider.children(`.${slide}.active`).removeClass('active')
