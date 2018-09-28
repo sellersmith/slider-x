@@ -17,6 +17,7 @@ class SliderController {
     // Setup DOM + set event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
+    // this.el.addEventListener('drag', this.handleDrag.bind(this))
     console.log(this)
   }
 
@@ -129,7 +130,7 @@ class SliderController {
     })
 
     // Remove class, event handler, data-instance and all children
-    // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problem in the future
+    // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
     this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
     this.$el.off('click', this.handleClick)
     this.$el.data('slider', '')
@@ -139,8 +140,6 @@ class SliderController {
     for (let item of items) {
       this.$el.append(item)
     }
-
-    // !TODO!: remove all inline css (transition, left...)
   }
 
   setAutoPlay() {
