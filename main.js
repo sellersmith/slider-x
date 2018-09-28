@@ -34,16 +34,11 @@ class SliderController {
     this.originalStyles.wrapper = this.$el.attr('style') ? this.$el.attr('style') : ''
 
     // Create an inner div to wrap all slide item
-    const $inner = $(`<div class=${inner}></div>`)
+    const $inner = $(`<div></div>`)
     this.$el.children().each((i, child) => {
-      $(child).addClass(slide)
       // Save original styles
       const childStyles = $(child).attr('style') ? $(child).attr('style') : ''
       this.originalStyles.inner.push(childStyles)
-
-      if (i === this.opts.curr) {
-        $(child).css('left', '0')
-      }
       $inner.append(child)
     })
 
@@ -51,11 +46,11 @@ class SliderController {
     this.$slider = $inner
 
     // Append controllers
-    const $nextCtrl = $(`<a class='${nextCtrl} ${controller} ${this.opts.navStyle}' data-action='next'></a>`)
-    const $prevCtrl = $(`<a class='${prevCtrl} ${controller} ${this.opts.navStyle}' data-action='prev'></a>`)
+    const $nextCtrl = $(`<a data-action='next'></a>`)
+    const $prevCtrl = $(`<a data-action='prev'></a>`)
 
     // Append indicators
-    const $indicators = $(`<ol class='${indicators} ${this.opts.paginationStyle}'></ol>`)
+    const $indicators = $('<ol>')
     for (let i = 0; i < this.totalSlide; i++) {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
@@ -63,10 +58,26 @@ class SliderController {
 
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
 
-    // Set the .active class
-    this.updateSliderDOM()
+    // Add style for slider
+    this.updateSliderStyle()
+    this.udpateActiveSlideStyle()
   }
 
+  handleClick(e) {
+    const action = e.target.dataset.action
+    switch (action) {
+      case 'next': this.next(); break
+      case 'prev': this.prev(); break
+      case 'goto':
+        // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
+        const index = parseInt(e.target.dataset.gotoSlide) || 0
+        this.goto(index)
+        break
+      default: console.log('Slider clicked')
+    }
+  }
+
+  /* LOGIC FUNCTION */
   verifyOptions() {
     Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
       if (typeof this.opts[key] !== typeof value) {
@@ -78,7 +89,7 @@ class SliderController {
     if (!this.opts.loop) this.opts.autoPlay = false
     
     // Set the style of slider nav n pagination to legal values
-    this.updateStyle()
+    this.updateStyleOption()
   }
 
   updateOptions(newOtps) {
@@ -96,14 +107,15 @@ class SliderController {
     if (!this.opts.loop) this.opts.autoPlay = false
 
     // Set the style of slider nav n pagination to legal values
-    this.updateStyle()
+    this.updateStyleOption()
+    this.updateSliderStyle()
 
-    this.updateSliderCtrlDOM(this.opts.curr)
+    this.updateSliderCtrlStyle(this.opts.curr)
     this.setAutoPlay()
   }
 
-  updateStyle() {
-    // Set the style of slider nav n pagination to legal values
+  updateStyleOption() {
+    // Set the style of slider nav n pagination to standard values
     const defPags = this.constructor.styleOptions.paginations
     const defNavs = this.constructor.styleOptions.navs
 
@@ -111,31 +123,23 @@ class SliderController {
     if (defNavs.indexOf(this.opts.navStyle) < 0) this.opts.navStyle = defNavs[0]
   }
 
-  updateSliderCtrlDOM(index) {
-    this.$el.find('a').removeClass('pf-slider-nav-disabled')
+  setAutoPlay() {
+    if (this.opts.autoPlay) {
+      const delay = this.opts.autoPlayDelay
 
-    if (index === 0 && !this.opts.loop) {
-      this.$el.find(`.${prevCtrl}`).addClass('pf-slider-nav-disabled')
-    }
-    else if (index === this.totalSlide - 1 && !this.opts.loop) {
-      this.$el.find(`.${nextCtrl}`).addClass('pf-slider-nav-disabled')
-    }
-  }
-
-  handleClick(e) {
-    const action = e.target.dataset.action
-    switch (action) {
-      case 'next': this.next(); break
-      case 'prev': this.prev(); break
-      case 'goto':
-        // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
-        const index = parseInt(e.target.dataset.gotoSlide) || 0
-        this.goto(index)
-        break
-      default: console.log('Slider clicked')
+      this.clearAutoPlay()
+      this.autoTimeoutId = setTimeout(() => {
+        this.moveSlide('next')
+        this.setAutoPlay()
+      }, delay)
     }
   }
 
+  clearAutoPlay() {
+    clearTimeout(this.autoTimeoutId)
+  }
+
+  /* CONTROLLER FUNCTIONS */
   destroy() {
     // Save all items, remove all classes, inline-style n reverse the original style
     const items = []
@@ -157,22 +161,6 @@ class SliderController {
     }
   }
 
-  setAutoPlay() {
-    if (this.opts.autoPlay) {
-      const delay = this.opts.autoPlayDelay
-
-      this.clearAutoPlay()
-      this.autoTimeoutId = setTimeout(() => {
-        this.moveSlide('next')
-        this.setAutoPlay()
-      }, delay)
-    }
-  }
-
-  clearAutoPlay() {
-    clearTimeout(this.autoTimeoutId)
-  }
-
   moveSlide(direction, toIndex) {
     let currIndex = this.opts.curr
     let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
@@ -185,7 +173,7 @@ class SliderController {
     // $next.css('transform', `translate3d(${nextSlidePos}px, 0, 0)`)
 
     const duration = this.opts.duration
-    this.updateSliderCtrlDOM(nextIndex)
+    this.updateSliderCtrlStyle(nextIndex)
 
     setTimeout(() => {
       $curr.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': currSlidePos })
@@ -197,20 +185,7 @@ class SliderController {
     }, 20)
 
     this.opts.curr = nextIndex
-    this.updateSliderDOM()
-  }
-
-  updateSliderDOM() {
-    // Add class .active for current active slide n indicator
-    const curr = this.opts.curr
-
-    this.$slider.children(`.${slide}.active`).removeClass('active')
-    this.$slider.children().eq(curr).addClass('active')
-
-    this.$el.find('li.active').removeClass('active')
-    this.$el.find('ol').children().eq(curr).addClass('active')
-
-    this.updateSliderCtrlDOM(curr)
+    this.udpateActiveSlideStyle()
   }
 
   next() {
@@ -236,10 +211,45 @@ class SliderController {
       this.moveSlide("prev", index)
     }
   }
+
+  /* STYLE FUNCTIONS */
+  updateSliderStyle() {
+    this.$slider.addClass(inner)
+    this.$slider.children().addClass(slide)
+    this.$slider.children().eq(this.opts.curr).css('left', '0')
+    
+    this.$el.children('a[data-action="next"]').attr('class', '').attr('class', `${nextCtrl} ${controller} ${this.opts.navStyle}`)
+    this.$el.children('a[data-action="prev"]').attr('class', '').attr('class', `${prevCtrl} ${controller} ${this.opts.navStyle}`)
+
+    this.$el.children('ol').attr('class', '').attr('class', `${indicators} ${this.opts.paginationStyle}`)
+  }
+
+  updateSliderCtrlStyle(index) {
+    this.$el.find('a').removeClass('pf-slider-nav-disabled')
+
+    if (index === 0 && !this.opts.loop) {
+      this.$el.find(`.${prevCtrl}`).addClass('pf-slider-nav-disabled')
+    }
+    else if (index === this.totalSlide - 1 && !this.opts.loop) {
+      this.$el.find(`.${nextCtrl}`).addClass('pf-slider-nav-disabled')
+    }
+  }
+
+  udpateActiveSlideStyle() {
+    // Add class .active for current active slide n indicator
+    const curr = this.opts.curr
+
+    this.$slider.children(`.${slide}.active`).removeClass('active')
+    this.$slider.children().eq(curr).addClass('active')
+
+    this.$el.find('li.active').removeClass('active')
+    this.$el.find('ol').children().eq(curr).addClass('active')
+
+    this.updateSliderCtrlStyle(curr)
+  }
 }
 
-
-// Class property
+// Class properties
 SliderController.defaultOptions = {
   curr: 0,
   paginationStyle: 'pagination-style-1',
