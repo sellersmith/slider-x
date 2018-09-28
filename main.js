@@ -21,7 +21,6 @@ class SliderController {
   initialize() {
     this.verifyOptions()
     this.setupSliderDOM()
-    this.updateSliderDOM()
     this.setAutoPlay()
     return this
   }
@@ -54,6 +53,9 @@ class SliderController {
     }
 
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
+
+    // set the .active class
+    this.updateSliderDOM()
   }
 
   verifyOptions() {
@@ -62,28 +64,28 @@ class SliderController {
         this.opts[key] = value
       }
     })
+
+    // turn off autoPlay if loop is false
+    if (!this.opts.loop) this.opts.autoPlay = false
   }
 
-  updateOptions(object) {
-    const keyExist = Object.keys(object)
-    Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
-      if (keyExist.includes(key)) {
+  updateOptions(newOtps) {
+    const { defaultOptions } = this.constructor
+
+    for (let key in newOtps) {
+      if (typeof newOtps[key] === typeof defaultOptions[key]) {
+        this.opts[key] = newOtps[key]
       }
-      if (typeof object[key] !== typeof value && keyExist.includes(key)) {
-        object[key] = value
-      }
-    })
-    Object.assign(this.opts, object)
+    }
+
+    // turn off autoPlay if loop is false
+    if (!this.opts.loop) this.opts.autoPlay = false
 
     this.updateSliderCtrlDOM(this.opts.curr)
     this.setAutoPlay()
   }
 
   updateSliderCtrlDOM(index) {
-    if (!this.opts.loop) {
-      this.opts.autoPlay = false
-    }
-
     this.$el.find('a').removeClass('pf-slider-nav-disabled')
 
     if (index === 0 && !this.opts.loop) {
@@ -130,7 +132,7 @@ class SliderController {
     // !TODO!: remove all inline css (transition, left...)
   }
 
-  setAutoPlay() {
+  setAutoPlay() {    
     if (this.opts.autoPlay) {
       const delay = this.opts.autoPlayDelay
 
