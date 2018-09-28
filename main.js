@@ -3,14 +3,16 @@ const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, 
 class SliderController {
   constructor(ele, opts) {
     this.el = ele
+    this.originalStyles = {}
+
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
 
     this.totalSlide = this.$el.children().length
-    this.opts = opts
+    this.opts = Object.assign({}, opts) // Each slider's opts is a specific instance of opts argument
 
     this.autoTimeoutId = ''
-    this.active = false
+    this.moveLock = false
 
     // Update DOM + set event handler
     this.initialize()
@@ -169,7 +171,7 @@ class SliderController {
       $next.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': '0' })
       setTimeout(() => {
         this.setAutoPlay()
-        this.active = false
+        this.moveLock = false
       }, duration)
     }, 20)
 
@@ -191,16 +193,16 @@ class SliderController {
   }
 
   next() {
-    if (this.active) return
+    if (this.moveLock) return
     this.clearAutoPlay()
-    this.active = true
+    this.moveLock = true
     this.moveSlide("next")
   }
 
   prev() {
-    if (this.active) return
+    if (this.moveLock) return
     this.clearAutoPlay()
-    this.active = true
+    this.moveLock = true
     this.moveSlide("prev")
   }
 
