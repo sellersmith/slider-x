@@ -20,21 +20,21 @@
 
 <body>
     <h1>Final slider</h1>
-    <div class='test-slider'>
+    <div class='test-slider-1'>
         <div class="child-1">0</div>
         <div class="child-2">1</div>
         <div class="child-3">2</div>
         <div class="child-4">3</div>
         <div class="child-5">4</div>
     </div>
-
-    <!--<div class='test-slider'>-->
-        <!--<div class="child-1">00</div>-->
-        <!--<div class="child-2">11</div>-->
-        <!--<div class="child-3">22</div>-->
-        <!--<div class="child-4">33</div>-->
-        <!--<div class="child-5">44</div>-->
-    <!--</div>-->
+    <br><br><br><br>
+    <div class='test-slider-2'>
+        <div class="child-1">00</div>
+        <div class="child-2">11</div>
+        <div class="child-3">22</div>
+        <div class="child-4">33</div>
+        <div class="child-5">44</div>
+    </div>
 <script src="./helpers.js"></script>
 <script src="./main.js"></script>
 <script>
@@ -58,7 +58,22 @@
     })(jQuery)
 </script>
 <script>
-    $('.test-slider').slider({autoPlay: true, autoPlayDelay: 3000, duration: "djasnkj", loop: false})
+    $('.test-slider-1').slider({
+      autoPlay: false, 
+      duration: 500, 
+      loop: false,
+      navStyle: 'nav-style-2',
+      paginationStyle: 'pagination-style-1'
+    })
+
+    $('.test-slider-2').slider({
+      autoPlay: true, 
+      autoPlayDelay: 3000, 
+      duration: "sample-text-to-test-default-opts", 
+      loop: true,
+      navStyle: 'nav-style-3',
+      paginationStyle: 'pagination-style-2'
+    })
 </script>
 </body>
 
