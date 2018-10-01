@@ -7,15 +7,11 @@
 }
 
 .pf-slider-slide {
-  will-change: contents;
   width: 100%;
   height: 100%;
   position: absolute;
   left: 100%;
   top: 0;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .pf-slider-wrapper{
@@ -42,6 +38,14 @@
   color: #fff;
   font-family: FontAwesome;
 }
+.pf-slider-inner .pf-slider-slide:first-child{
+  position: relative;
+  width: 100%;
+  font-size: 0px;
+  line-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
 
 /*Arrow Style 1*/
 .pf-slider-nav.nav-style-1 {
@@ -52,7 +56,6 @@
   justify-content: center;
   text-align: center;
   background-color: #171717;
-  opacity: 0.5;
   top: 40%;
   border-radius: 100%;
   transition: all .3s;
@@ -234,7 +237,7 @@
 
 .pf-slider-nav-disabled {
   pointer-events : none ;
-  opacity : 0.5;
+  opacity : 0.5 !important;
 }
 
 
@@ -331,4 +334,34 @@
   width: 6px;
   border: #fff solid 2px;
   border-radius: 100%;
+}
+
+
+
+
+/*RESPONSIVE*/
+@media(max-width: 576px){
+  .pf-slider-nav.nav-style-1,
+  .pf-slider-nav.nav-style-2,
+  .pf-slider-nav.nav-style-4,
+  .pf-slider-nav.nav-style-5{
+    width: 30px;
+    height: 30px;
+  }
+  .pf-slider-nav.nav-style-1::before,
+  .pf-slider-nav.nav-style-2::before,
+  .pf-slider-nav.nav-style-3::before,
+  .pf-slider-nav.nav-style-4::before,
+  .pf-slider-nav.nav-style-5::before{
+    font-size: 10px;
+  }
+  .pf-slider-nav.nav-style-5{
+    right: 10px;
+  }
+  .pf-prev-nav.nav-style-5{
+    right: 41px;
+  }
+  .pf-slider-pagination{
+    bottom: 15px;
+  }
 }
