@@ -87,19 +87,35 @@ class SliderController {
 
     // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
-    
+
     // Set the style of slider nav n pagination to legal values
-    this.updateStyleOption()
+    const defPags = this.constructor.styleOptions.paginations
+    const defNavs = this.constructor.styleOptions.navs
+
+    if (defPags.indexOf(this.opts.paginationStyle) < 0) this.opts.paginationStyle = defPags[0]
+    if (defNavs.indexOf(this.opts.navStyle) < 0) this.opts.navStyle = defNavs[0]
   }
 
   updateOptions(newOtps) {
     const { defaultOptions } = this.constructor
 
+    const defPags = this.constructor.styleOptions.paginations
+    const currPag = this.opts.paginationStyle
+
+    const defNavs = this.constructor.styleOptions.navs
+    const currNav = this.opts.navStyle
+
     for (let key in newOtps) {
       // The type of newOpts values must be legal
       // And update 'curr' key is forbidden
       if (typeof newOtps[key] === typeof defaultOptions[key] && key !== 'curr') {
-        this.opts[key] = newOtps[key]
+        let newValue = newOtps[key]
+        
+        // Keep the current pagination n nav style if the new options is not available
+        if (key === 'paginationStyle' && defPags.indexOf(newOtps[key]) < 0) newValue = currPag
+        if (key === 'navStyle' && defNavs.indexOf(newOtps[key]) < 0) newValue = currNav
+
+        this.opts[key] = newValue
       }
     }
 
@@ -107,20 +123,10 @@ class SliderController {
     if (!this.opts.loop) this.opts.autoPlay = false
 
     // Set the style of slider nav n pagination to legal values
-    this.updateStyleOption()
     this.updateSliderStyle()
 
     this.updateSliderCtrlStyle(this.opts.curr)
     this.setAutoPlay()
-  }
-
-  updateStyleOption() {
-    // Set the style of slider nav n pagination to standard values
-    const defPags = this.constructor.styleOptions.paginations
-    const defNavs = this.constructor.styleOptions.navs
-
-    if (defPags.indexOf(this.opts.paginationStyle) < 0) this.opts.paginationStyle = defPags[0]
-    if (defNavs.indexOf(this.opts.navStyle) < 0) this.opts.navStyle = defNavs[0]
   }
 
   setAutoPlay() {
@@ -217,11 +223,18 @@ class SliderController {
     this.$slider.addClass(inner)
     this.$slider.children().addClass(slide)
     this.$slider.children().eq(this.opts.curr).css('transform', 'translate3d(0, 0, 0)')
-    
-    this.$el.children('a[data-action="next"]').attr('class', '').attr('class', `${nextCtrl} ${controller} ${this.opts.navStyle}`)
-    this.$el.children('a[data-action="prev"]').attr('class', '').attr('class', `${prevCtrl} ${controller} ${this.opts.navStyle}`)
 
-    this.$el.children('ol').attr('class', '').attr('class', `${indicators} ${this.opts.paginationStyle}`)
+    const { navStyle } = this.opts
+    const { paginationStyle } = this.opts
+
+    this.$el.children('a[data-action="next"]').attr('class', '').attr('class', `${nextCtrl} ${controller} ${navStyle}`)
+    this.$el.children('a[data-action="prev"]').attr('class', '').attr('class', `${prevCtrl} ${controller} ${navStyle}`)
+
+    this.$el.children('ol').attr('class', '').attr('class', `${indicators} ${paginationStyle}`)
+
+    // Toggle show/hide nav/pagination
+    navStyle === 'none' ? this.$el.children('a').hide() : this.$el.children('a').show()
+    paginationStyle === 'none' ? this.$el.children('ol').hide() : this.$el.children('ol').show()
   }
 
   updateSliderCtrlStyle(index) {
@@ -261,26 +274,31 @@ SliderController.defaultOptions = {
 }
 
 SliderController.styleOptions = {
-  paginations: ['pagination-style-1', 'pagination-style-2', 'pagination-style-3'],
-  navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5']
+  /**
+   * The default style is the first array element
+   * Add more style (class name) for pagination or nav to these below arrays
+   * Remember to keep the 'none' in order to toggle show/hide pagination/nav option
+   */
+  paginations: ['pagination-style-1', 'pagination-style-2', 'pagination-style-3', 'none'],
+  navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5', 'none']
 }
 
-// Create jquery plugin
-;(function ($) {
-  $.fn.slider = function (opts, ...args) {
-    return this.each((i, element) => {
-      let instance = $(element).data('slider')
-      if (!instance) {
-        if (typeof opts === 'string') {
-          throw new Error('This element was not initialized as a Slider yet')
+  // Create jquery plugin
+  ; (function ($) {
+    $.fn.slider = function (opts, ...args) {
+      return this.each((i, element) => {
+        let instance = $(element).data('slider')
+        if (!instance) {
+          if (typeof opts === 'string') {
+            throw new Error('This element was not initialized as a Slider yet')
+          }
+          instance = new SliderController(element, opts)
+          $(element).data('slider', instance)
+        } else {
+          if (typeof opts === 'string') {
+            instance[opts](...args)
+          }
         }
-        instance = new SliderController(element, opts)
-        $(element).data('slider', instance)
-      } else {
-        if (typeof opts === 'string') {
-          instance[opts](...args)
-        }
-      }
-    })
-  }
-})(jQuery)
+      })
+    }
+  })(jQuery)
