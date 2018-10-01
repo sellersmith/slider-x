@@ -169,15 +169,15 @@ class SliderController {
     let $next = this.$slider.children().eq(nextIndex)
 
     $next.css({ 'transition': '' })
-    $next.css('left', nextSlidePos)
+    $next.css('transform', `translate3d(${nextSlidePos}, 0, 0)`)
     // $next.css('transform', `translate3d(${nextSlidePos}px, 0, 0)`)
 
     const duration = this.opts.duration
     this.updateSliderCtrlStyle(nextIndex)
 
     setTimeout(() => {
-      $curr.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': currSlidePos })
-      $next.css({ 'transition': `left ${duration}ms ease-in-out`, 'left': '0' })
+      $curr.css({ 'transition': `transform ${duration}ms ease-in-out`, 'transform': `translate3d(${currSlidePos}, 0, 0)` })
+      $next.css({ 'transition': `transform ${duration}ms ease-in-out`, 'transform': 'translate3d(0, 0, 0)' })
       setTimeout(() => {
         this.setAutoPlay()
         this.moveLock = false
@@ -216,7 +216,7 @@ class SliderController {
   updateSliderStyle() {
     this.$slider.addClass(inner)
     this.$slider.children().addClass(slide)
-    this.$slider.children().eq(this.opts.curr).css('left', '0')
+    this.$slider.children().eq(this.opts.curr).css('transform', 'translate3d(0, 0, 0)')
     
     this.$el.children('a[data-action="next"]').attr('class', '').attr('class', `${nextCtrl} ${controller} ${this.opts.navStyle}`)
     this.$el.children('a[data-action="prev"]').attr('class', '').attr('class', `${prevCtrl} ${controller} ${this.opts.navStyle}`)
