@@ -111,7 +111,7 @@ class SliderController {
       if (typeof newOtps[key] === typeof defaultOptions[key] && key !== 'curr') {
         let newValue = newOtps[key]
         
-        // Keep the current pagination n nav style if the new options is not available
+        // Keep the current pagination n nav style if the new options is not valid
         if (key === 'paginationStyle' && defPags.indexOf(newOtps[key]) < 0) newValue = currPag
         if (key === 'navStyle' && defNavs.indexOf(newOtps[key]) < 0) newValue = currNav
 
@@ -168,15 +168,19 @@ class SliderController {
   }
 
   moveSlide(direction, toIndex) {
-    let currIndex = this.opts.curr
-    let { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
+    const currIndex = this.opts.curr
+    const { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
 
-    let $curr = this.$slider.children().eq(currIndex)
-    let $next = this.$slider.children().eq(nextIndex)
+    const $curr = this.$slider.children().eq(currIndex)
+    const $next = this.$slider.children().eq(nextIndex)
+
+    if (this.opts.adaptiveHeight) {
+      const nextHeight = $next.height()
+      this.$slider.css({ height: `${nextHeight}px` })
+    }
 
     $next.css({ 'transition': '' })
     $next.css('transform', `translate3d(${nextSlidePos}, 0, 0)`)
-    // $next.css('transform', `translate3d(${nextSlidePos}px, 0, 0)`)
 
     const duration = this.opts.duration
     this.updateSliderCtrlStyle(nextIndex)
@@ -220,9 +224,24 @@ class SliderController {
 
   /* STYLE FUNCTIONS */
   updateSliderStyle() {
-    this.$slider.addClass(inner)
-    this.$slider.children().addClass(slide)
-    this.$slider.children().eq(this.opts.curr).css('transform', 'translate3d(0, 0, 0)')
+    const $slides = this.$slider.children()
+    const $curr = $slides.eq(this.opts.curr)
+    let firstHeight = $curr.height()
+
+    const { adaptiveHeight, height } = this.opts
+    if (!adaptiveHeight) {
+      // Slider height = the highest child in case adaptiveHeight is off
+      for (let i = 0; i < $slides.length; i++) {
+        if ($slides.eq(i).height() > firstHeight) firstHeight = $slides.eq(i).height()
+      }
+
+      // This below line is to stretch all slide height to equal to each other
+      // $slides.css({ 'height': `${height}px` })
+    }
+
+    this.$slider.addClass(inner).css({ height: `${firstHeight}px` })
+    $slides.addClass(slide)
+    $curr.css('transform', 'translate3d(0, 0, 0)')
 
     const { navStyle } = this.opts
     const { paginationStyle } = this.opts
@@ -265,12 +284,14 @@ class SliderController {
 // Class properties
 SliderController.defaultOptions = {
   curr: 0,
-  paginationStyle: 'pagination-style-1',
-  navStyle: 'nav-style-1',
   autoPlay: false,
   autoPlayDelay: 3000,
   duration: 450,
-  loop: true
+  loop: true,
+  paginationStyle: 'pagination-style-1',
+  navStyle: 'nav-style-1',
+  adaptiveHeight: false,
+  height: 350,
 }
 
 SliderController.styleOptions = {

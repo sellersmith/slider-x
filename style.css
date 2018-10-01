@@ -2,8 +2,31 @@
   height: 300px;
 }
 
-.w-300px {
-  width: 300px;
+.h-400px {
+  height: 400px;
+}
+
+.h-200px {
+  height: 200px;
+}
+
+.h-500px {
+  height: 500px;
+}
+
+.test-slider-1 {
+  background: dodgerblue;
+}
+
+.test-slider-2 {
+  background: lightseagreen;
+}
+
+.pf-slider-slide {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em;
 }
 
 .child-1 {
