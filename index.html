@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
 
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="main.css">
@@ -19,11 +20,11 @@
 <body>
   <h1>Final slider</h1>
   <div class='test-slider-1' style="font-weight: 300; text-transform: uppercase;">
-    <div class="h-200px">0</div>
-    <div class="h-400px">1</div>
-    <div class="h-300px" style="font-size: 2em;">2</div>
-    <div class="h-500px">3</div>
-    <div class="h-300px">4</div>
+    <div class="child-1 h-200px">0</div>
+    <div class="child-2 h-400px">1</div>
+    <div class="child-3 h-300px" style="font-size: 2em;">2</div>
+    <div class="child-4 h-500px">3</div>
+    <div class="child-5 h-300px">4</div>
   </div>
   <br><br><br>
   <div class='test-slider-2 h-300px'>
@@ -34,7 +35,20 @@
     <div class="">44</div>
   </div>
 
+  <!-- <script>
+    $(test).on('es_dragstart', (e, data) => {
+      console.log('dragStart')
+    })
+    $(test).on('es_dragmove', (e, data) => {
+      console.log('dragMove', data)
+    })
+    $(test).on('es_dragstop', (e, data) => {
+      console.log('dragEnd', data)
+    })
+  </script> -->
+
   <script src="./helpers.js"></script>
+  <script src="./draggable.js"></script>
   <script src="./main.js"></script>
   <script>
     $('.test-slider-1').slider({
@@ -46,7 +60,7 @@
     })
 
     $('.test-slider-2').slider({
-      autoPlay: true,
+      autoPlay: false,
       autoPlayDelay: 3000,
       duration: "sample-text-to-test-default-opts",
       loop: true,

@@ -7,6 +7,7 @@ class SliderController {
 
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
+    this.$curr = ''
 
     this.totalSlide = this.$el.children().length
     this.opts = Object.assign({}, opts) // Each slider's opts is a specific instance of opts argument
@@ -17,7 +18,15 @@ class SliderController {
     // Setup DOM + set event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
-    // this.el.addEventListener('drag', this.handleDrag.bind(this))
+
+    // Set up drag n drop event
+    this.mouse = { firstX: 0, firstY: 0, lastX: 0, lastY: 0, currX: 0, currY: 0, timeStamp: 0, speed: 0 }
+    this.sliderWidth = this.$el.width()
+
+    this.$el.on('mousedown', this.handleMouseDown.bind(this))
+    this.$el.on('mousemove', this.handleMouseMove.bind(this))
+    this.$el.on('es_dragstop', this.handleMouseUp.bind(this))
+
     console.log(this)
   }
 
@@ -29,7 +38,7 @@ class SliderController {
   }
 
   setupSliderDOM() {
-    this.$el.addClass(wrapper)
+    this.$el.addClass(wrapper).addClass('jsn-es-draggable')
     // Save original styles
     this.originalStyles.wrapper = this.$el.attr('style') ? this.$el.attr('style') : ''
 
@@ -39,6 +48,7 @@ class SliderController {
       // Save original styles
       const childStyles = $(child).attr('style') ? $(child).attr('style') : ''
       this.originalStyles.inner.push(childStyles)
+
       $inner.append(child)
     })
 
@@ -77,6 +87,60 @@ class SliderController {
     }
   }
 
+  handleMouseDown(e) {
+    this.mouse.firstX = e.pageX
+    this.mouse.firstY = e.pageY
+    this.mouse.lastX = e.pageX
+    this.mouse.lastY = e.pageY
+    this.mouse.timeStamp = Date.now()
+  }
+
+  setMouseSpeed(pageX, pageY) {
+    const time = Date.now() - this.mouse.timeStamp
+    this.mouse.timeStamp = Date.now()
+
+    this.mouse.speed = calculateSpeed(this.mouse.lastX, this.mouse.lastY, pageX, pageY, time)
+    this.mouse.lastX = pageX
+    this.mouse.lastY = pageY
+  }
+
+  handleMouseMove(e) {
+    // Dragging .... (If e.buttons = 0 the mouse is just moving not dragging)
+    if (e.buttons === 1) {
+      // this.setMouseSpeed(e.pageX, e.pageY)
+
+      const translateRange = ((e.pageX - this.mouse.lastX) / this.sliderWidth) * 100       // -30
+      const currTranslateRange = `${Number(translateRange).toString()}%`                   // => '-30%'
+      const nextTranslateRange = `${Number(100 + translateRange).toString()}%`             // => '70%'
+      const prevTranslateRange = `${Number(-100 + translateRange).toString()}%`            // => '-130%'
+
+      const $curr = this.$slider.children().eq(this.opts.curr)
+
+      let { nextIndex } = getSlideMovementData('next', this.opts.curr, undefined, this.totalSlide)
+      const $next = this.$slider.children().eq(nextIndex)
+
+      // TODO: fix this dummy code
+      // This is stupid because the getMovementData return the variable name nextIndex
+      nextIndex = getSlideMovementData('prev', this.opts.curr, undefined, this.totalSlide).nextIndex
+      const prevIndex = nextIndex
+      const $prev = this.$slider.children().eq(prevIndex)
+
+      // Move the next n prev slide to the right n left of the curr slide
+      this.translateSlide($next, '100%')
+      this.translateSlide($prev, '-100%')
+
+      // The key is: move all 3 slide! Genius!
+      this.translateSlide($prev, prevTranslateRange)
+      this.translateSlide($curr, currTranslateRange)
+      this.translateSlide($next, nextTranslateRange)
+    }
+  }
+
+  handleMouseUp(e, data) {
+    console.log('dragEnd', data)
+    // console.log(e.pageX, e.pageY)
+  }
+
   /* LOGIC FUNCTION */
   verifyOptions() {
     Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
@@ -110,7 +174,7 @@ class SliderController {
       // And update 'curr' key is forbidden
       if (typeof newOtps[key] === typeof defaultOptions[key] && key !== 'curr') {
         let newValue = newOtps[key]
-        
+
         // Keep the current pagination n nav style if the new options is not valid
         if (key === 'paginationStyle' && defPags.indexOf(newOtps[key]) < 0) newValue = currPag
         if (key === 'navStyle' && defNavs.indexOf(newOtps[key]) < 0) newValue = currNav
@@ -169,7 +233,7 @@ class SliderController {
 
   moveSlide(direction, toIndex) {
     const currIndex = this.opts.curr
-    const { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
+    const { nextIndex, nextSlideX, currSlideX } = getSlideMovementData(direction, currIndex, toIndex, this.totalSlide)
 
     const $curr = this.$slider.children().eq(currIndex)
     const $next = this.$slider.children().eq(nextIndex)
@@ -179,15 +243,14 @@ class SliderController {
       this.$slider.css({ height: `${nextHeight}px` })
     }
 
-    $next.css({ 'transition': '' })
-    $next.css('transform', `translate3d(${nextSlidePos}, 0, 0)`)
+    this.translateSlide($next, nextSlideX)
 
     const duration = this.opts.duration
     this.updateSliderCtrlStyle(nextIndex)
 
     setTimeout(() => {
-      $curr.css({ 'transition': `transform ${duration}ms ease-in-out`, 'transform': `translate3d(${currSlidePos}, 0, 0)` })
-      $next.css({ 'transition': `transform ${duration}ms ease-in-out`, 'transform': 'translate3d(0, 0, 0)' })
+      this.translateSlide($curr, currSlideX, duration)
+      this.translateSlide($next, 0, duration)
       setTimeout(() => {
         this.setAutoPlay()
         this.moveLock = false
@@ -196,6 +259,16 @@ class SliderController {
 
     this.opts.curr = nextIndex
     this.udpateActiveSlideStyle()
+  }
+
+  translateSlide($slide, slideX, duration = 0) {
+    if (duration) {
+      $slide.css({ 'transition': `transform ${duration}ms ease-in-out` })
+    } else {
+      $slide.css({ 'transition': '' })
+    }
+
+    $slide.css('transform', `translate3d(${slideX}, 0, 0)`)
   }
 
   next() {
@@ -226,20 +299,20 @@ class SliderController {
   updateSliderStyle() {
     const $slides = this.$slider.children()
     const $curr = $slides.eq(this.opts.curr)
-    let firstHeight = $curr.height()
+    let sliderHeight = $curr.height()
 
     const { adaptiveHeight, height } = this.opts
     if (!adaptiveHeight) {
       // Slider height = the highest child in case adaptiveHeight is off
       for (let i = 0; i < $slides.length; i++) {
-        if ($slides.eq(i).height() > firstHeight) firstHeight = $slides.eq(i).height()
+        if ($slides.eq(i).height() > sliderHeight) sliderHeight = $slides.eq(i).height()
       }
 
-      // This below line is to stretch all slide height to equal to each other
-      // $slides.css({ 'height': `${height}px` })
+      // This below line is to stretch all slide height to equal to the heightest slide
+      $slides.css({ 'height': `${sliderHeight}px` })
     }
 
-    this.$slider.addClass(inner).css({ height: `${firstHeight}px` })
+    this.$slider.addClass(inner).css({ height: `${sliderHeight}px` })
     $slides.addClass(slide)
     $curr.css('transform', 'translate3d(0, 0, 0)')
 
