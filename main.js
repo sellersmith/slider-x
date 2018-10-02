@@ -1,4 +1,4 @@
-const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = DomClasses
+const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
 class SliderController {
   constructor(ele, opts) {
@@ -86,6 +86,7 @@ class SliderController {
   }
 
   handleDragMove(e, data) {
+    if (Math.abs(data.moveX) < SliderController.constructor.MIN_DRAG_DISTANCE) return
     this.clearAutoPlay()
 
     const translateRange = (data.moveX / this.sliderWidth) * 100    // -30
@@ -115,6 +116,7 @@ class SliderController {
   }
 
   handleDragStop(e, data) {
+    if (Math.abs(data.moveX) < SliderController.constructor.MIN_DRAG_DISTANCE) return
     // Turn off draggable until slides move completely
     this.moveByDrag = true
 
@@ -295,7 +297,7 @@ class SliderController {
 
   translateSlide($slide, toX, duration) {
     if (duration) {
-      $slide.css({ 'transition': `transform ${duration}ms ease-out` })
+      $slide.css({ 'transition': `transform ${duration}ms ease` })
     } else {
       $slide.css({ 'transition': '' })
     }
@@ -350,13 +352,13 @@ class SliderController {
   }
 
   updateSliderCtrlStyle(index) {
-    this.$el.find('a').removeClass('pf-slider-nav-disabled')
+    this.$el.find('a').removeClass(disabledCtrl)
 
     if (index === 0 && !this.opts.loop) {
-      this.$el.find(`.${prevCtrl}`).addClass('pf-slider-nav-disabled')
+      this.$el.find(`.${prevCtrl}`).addClass(disabledCtrl)
     }
     else if (index === this.totalSlide - 1 && !this.opts.loop) {
-      this.$el.find(`.${nextCtrl}`).addClass('pf-slider-nav-disabled')
+      this.$el.find(`.${nextCtrl}`).addClass(disabledCtrl)
     }
   }
 
@@ -375,6 +377,8 @@ class SliderController {
 }
 
 // Class properties
+SliderController.constructor.MIN_DRAG_DISTANCE = 5
+
 SliderController.defaultOptions = {
   curr: 0,
   autoPlay: false,

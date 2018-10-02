@@ -1,16 +1,16 @@
 const prefix = 'pf'
 
-const DomClasses = {
-    wrapper: `${prefix}-slider-wrapper`,
-    inner: `${prefix}-slider-inner`,
-    slide: `${prefix}-slider-slide`,
-    indicators: `${prefix}-slider-pagination`,
-    indicatorItem: `${prefix}-slider-pagination-item`,
-    controller: `${prefix}-slider-nav`,
-    disabledCtrl: `${prefix}-slider-nav-disabled`,
-    nextCtrl: `${prefix}-next-nav`,
-    prevCtrl: `${prefix}-prev-nav`,
-    turnOffMouseEvent: `${prefix}-slider-mouse-event-off`
+const SliderClasses = {
+  wrapper: `${prefix}-slider-wrapper`,
+  inner: `${prefix}-slider-inner`,
+  slide: `${prefix}-slider-slide`,
+  indicators: `${prefix}-slider-pagination`,
+  indicatorItem: `${prefix}-slider-pagination-item`,
+  controller: `${prefix}-slider-nav`,
+  disabledCtrl: `${prefix}-slider-nav-disabled`,
+  nextCtrl: `${prefix}-next-nav`,
+  prevCtrl: `${prefix}-prev-nav`,
+  turnOffMouseEvent: `${prefix}-slider-mouse-event-off`
 }
 
 const getSlideMovementData = (slider, direction, toIndex) => {
@@ -29,4 +29,3 @@ const getSlideMovementData = (slider, direction, toIndex) => {
 
   return { nextIndex, nextSlidePos, currSlidePos }
 }
-
