@@ -7,7 +7,6 @@ class SliderController {
 
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
-    this.$curr = ''
 
     this.totalSlide = this.$el.children().length
     this.opts = Object.assign({}, opts) // Each slider's opts is a specific instance of opts argument
@@ -93,7 +92,8 @@ class SliderController {
     const nextTranslateRange = 100 + translateRange                 // => 70
     const prevTranslateRange = -100 + translateRange                // => -130
 
-    const $curr = this.$slider.children().eq(this.opts.curr)
+    const { curr } = this.opts
+    const $curr = this.$slider.children().eq(curr)
 
     let { nextIndex } = getSlideMovementData(this, 'next')
     const $next = this.$slider.children().eq(nextIndex)
@@ -103,6 +103,10 @@ class SliderController {
     nextIndex = getSlideMovementData(this, 'prev').nextIndex
     const prevIndex = nextIndex
     const $prev = this.$slider.children().eq(prevIndex)
+
+    // Drag is forbidden in these below cases:
+    if (curr === 0 && !this.opts.loop && translateRange > 0) return
+    if (curr === this.totalSlide - 1 && !this.opts.loop && translateRange < 0) return
 
     // The key is: move all 3 slide! Genius!
     this.translateSlide($prev, prevTranslateRange)
