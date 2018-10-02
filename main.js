@@ -1,4 +1,4 @@
-const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, prevCtrl, disabledCtrl } = DomClasses
+const { wrapper, inner, slide, indicators, indicatorItem, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = DomClasses
 
 class SliderController {
   constructor(ele, opts) {
@@ -19,9 +19,7 @@ class SliderController {
     this.$el.on('click', this.handleClick.bind(this))
 
     // Set up drag n drop event
-    this.slideIsMoving = false
     this.moveByDrag = false
-
     this.sliderWidth = this.$el.width()
 
     this.$el.on('es_dragmove', this.handleDragMove.bind(this))
@@ -89,34 +87,27 @@ class SliderController {
   }
 
   handleDragMove(e, data) {
-    // Dragging .... (If e.buttons = 0 the mouse is just moving not dragging)
-    if (e.buttons === 1 && !this.slideIsMoving) {
-      this.clearAutoPlay()
+    this.clearAutoPlay()
 
-      const translateRange = (data.moveX / this.sliderWidth) * 100    // -30
-      const nextTranslateRange = 100 + translateRange                 // => 70
-      const prevTranslateRange = -100 + translateRange                // => -130
+    const translateRange = (data.moveX / this.sliderWidth) * 100    // -30
+    const nextTranslateRange = 100 + translateRange                 // => 70
+    const prevTranslateRange = -100 + translateRange                // => -130
 
-      const $curr = this.$slider.children().eq(this.opts.curr)
+    const $curr = this.$slider.children().eq(this.opts.curr)
 
-      let { nextIndex } = this.getSlideMovementData('next', this.opts.curr)
-      const $next = this.$slider.children().eq(nextIndex)
+    let { nextIndex } = getSlideMovementData(this, 'next')
+    const $next = this.$slider.children().eq(nextIndex)
 
-      // TODO: fix this dummy code
-      // This is stupid because the getMovementData return the variable name nextIndex
-      nextIndex = this.getSlideMovementData('prev', this.opts.curr).nextIndex
-      const prevIndex = nextIndex
-      const $prev = this.$slider.children().eq(prevIndex)
+    // TODO: fix this dummy code
+    // This is stupid because the getMovementData return the variable name nextIndex
+    nextIndex = getSlideMovementData(this, 'prev').nextIndex
+    const prevIndex = nextIndex
+    const $prev = this.$slider.children().eq(prevIndex)
 
-      // Move the next n prev slide to the right n left of the curr slide
-      // this.translateSlide($next, 100)
-      // this.translateSlide($prev, -100)
-
-      // The key is: move all 3 slide! Genius!
-      this.translateSlide($prev, prevTranslateRange)
-      this.translateSlide($curr, translateRange)
-      this.translateSlide($next, nextTranslateRange)
-    }
+    // The key is: move all 3 slide! Genius!
+    this.translateSlide($prev, prevTranslateRange)
+    this.translateSlide($curr, translateRange)
+    this.translateSlide($next, nextTranslateRange)
   }
 
   handleDragStop(e, data) {
@@ -129,15 +120,17 @@ class SliderController {
     const mouseSpeed = data.velocityX
     const distRatio = data.moveX / this.sliderWidth
 
+    let direction = ''
+    let duration
+
     // TOTO: Make this block code shorter (Seem unneccessary ?)
     if (mouseSpeed > MIN_MOUSE_SPEED_TO_MOVE_SLIDE || Math.abs(distRatio) > MIN_DISTANCE_RATIO_TO_MOVE_SLIDE) {
-      if (distRatio < 0) {
-        this.next()
-      }
-      else if (distRatio > 0) {
-        this.prev()
-      }
+      duration = this.opts.duration - Math.abs(distRatio) * this.opts.duration
+
+      if (distRatio < 0) direction = 'next'
+      else if (distRatio > 0) direction = 'prev'
     } else {
+      duration = Math.abs(distRatio) * this.opts.duration
       /**
        * This is a bit tricky
        * In case we have to move the slides to the original position, I change the curr slide index to reuse the 
@@ -145,13 +138,18 @@ class SliderController {
        */
       if (distRatio < 0) {
         this.opts.curr += 1
-        this.prev()
+        direction = 'prev'
       }
       else if (distRatio > 0) {
         this.opts.curr -= 1
-        this.next()
+        direction = 'next'
       }
     }
+
+    // Dummy: the moveSlide() need toIndex as the 2nd argument
+    const toIndex = undefined
+
+    this.moveSlide(direction, toIndex, duration)
   }
 
   /* LOGIC FUNCTION */
@@ -244,30 +242,18 @@ class SliderController {
     }
   }
 
-  getSlideMovementData(direction, currIndex, toIndex) {
-    let nextIndex, nextSlidePos, currSlidePos
-
-    if (direction === "next") {
-      toIndex ? nextIndex = toIndex : nextIndex = currIndex === this.totalSlide - 1 ? 0 : currIndex + 1
-      nextSlidePos = 100
-      currSlidePos = -100
-    } else if (direction === "prev") {
-      // toIndex = 0 is a falsy value
-      (toIndex || toIndex === 0) ? nextIndex = toIndex : nextIndex = currIndex === 0 ? this.totalSlide - 1 : currIndex - 1
-      nextSlidePos = -100
-      currSlidePos = 100
-    }
-
-    return { nextIndex, nextSlidePos, currSlidePos }
-  }
-
-  moveSlide(direction, toIndex) {
-    if (this.slideIsMoving) return
-    this.slideIsMoving = true
-
+  moveSlide(direction, toIndex, customDuration) {
     const currIndex = this.opts.curr
 
-    const { nextIndex, nextSlidePos, currSlidePos } = this.getSlideMovementData(direction, currIndex, toIndex)
+    if (
+      (direction === 'prev' && currIndex === 0 && !this.opts.loop)
+      ||
+      (direction === 'next' && currIndex === (this.totalSlide - 1) && !this.opts.loop)
+    ) return
+
+    this.$el.addClass(turnOffMouseEvent)
+
+    const { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(this, direction, toIndex)
 
     const $curr = this.$slider.children().eq(currIndex)
     const $next = this.$slider.children().eq(nextIndex)
@@ -285,16 +271,16 @@ class SliderController {
     this.updateSliderCtrlStyle(nextIndex)
 
     // Move 2 slide contemporary
-    const { duration } = this.opts
+    let duration = customDuration ? customDuration : this.opts.duration
+
     setTimeout(() => {
       this.translateSlide($curr, currSlidePos, duration)
       this.translateSlide($next, 0, duration)
       // Do stuffs after slides moving complete
       setTimeout(() => {
         this.setAutoPlay()
-
+        this.$el.removeClass(turnOffMouseEvent)
         this.moveByDrag = false
-        this.slideIsMoving = false
       }, duration)
     }, 20)
 
@@ -303,7 +289,7 @@ class SliderController {
     this.udpateActiveSlideStyle()
   }
 
-  translateSlide($slide, toX, duration = 0) {
+  translateSlide($slide, toX, duration) {
     if (duration) {
       $slide.css({ 'transition': `transform ${duration}ms ease-out` })
     } else {

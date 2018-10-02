@@ -1,3 +1,7 @@
+.pf-slider-mouse-event-off {
+  pointer-events: none;
+}
+
 .pf-slider-inner {
   width: 100%;
   overflow: hidden;
@@ -230,8 +234,7 @@
 }
 
 .pf-slider-nav-disabled {
-  pointer-events : none ;
-  opacity : 0.5;
+  pointer-events: none;
 }
 
 
