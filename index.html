@@ -35,28 +35,16 @@
     <div class="">44</div>
   </div>
 
-  <!-- <script>
-    $(test).on('es_dragstart', (e, data) => {
-      console.log('dragStart')
-    })
-    $(test).on('es_dragmove', (e, data) => {
-      console.log('dragMove', data)
-    })
-    $(test).on('es_dragstop', (e, data) => {
-      console.log('dragEnd', data)
-    })
-  </script> -->
-
   <script src="./helpers.js"></script>
   <script src="./draggable.js"></script>
   <script src="./main.js"></script>
   <script>
     $('.test-slider-1').slider({
-      autoPlay: false,
-      duration: 500,
+      autoPlay: true,
+      duration: 1000,
       loop: true,
-      navStyle: 'nav-style-2',
-      paginationStyle: 'pagination-style-1'
+      navStyle: 'nav-style-1',
+      paginationStyle: 'pagination-style-3'
     })
 
     $('.test-slider-2').slider({

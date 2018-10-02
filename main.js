@@ -13,19 +13,19 @@ class SliderController {
     this.opts = Object.assign({}, opts) // Each slider's opts is a specific instance of opts argument
 
     this.autoTimeoutId = ''
-    this.moveLock = false
 
     // Setup DOM + set event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
 
     // Set up drag n drop event
+    this.slideIsMoving = false
     this.moveByDrag = false
-    this.draggable = true
+
     this.sliderWidth = this.$el.width()
 
-    this.$el.on('es_dragmove', this.handleMouseMove.bind(this))
-    this.$el.on('es_dragstop', this.handleMouseUp.bind(this))
+    this.$el.on('es_dragmove', this.handleDragMove.bind(this))
+    this.$el.on('es_dragstop', this.handleDragStop.bind(this))
 
     console.log(this)
   }
@@ -73,6 +73,7 @@ class SliderController {
     this.udpateActiveSlideStyle()
   }
 
+  /* SETUP EVENT DELEGATION */
   handleClick(e) {
     const action = e.target.dataset.action
     switch (action) {
@@ -87,9 +88,11 @@ class SliderController {
     }
   }
 
-  handleMouseMove(e, data) {
+  handleDragMove(e, data) {
     // Dragging .... (If e.buttons = 0 the mouse is just moving not dragging)
-    if (e.buttons === 1 && this.draggable) {
+    if (e.buttons === 1 && !this.slideIsMoving) {
+      this.clearAutoPlay()
+
       const translateRange = (data.moveX / this.sliderWidth) * 100    // -30
       const nextTranslateRange = 100 + translateRange                 // => 70
       const prevTranslateRange = -100 + translateRange                // => -130
@@ -106,8 +109,8 @@ class SliderController {
       const $prev = this.$slider.children().eq(prevIndex)
 
       // Move the next n prev slide to the right n left of the curr slide
-      this.translateSlide($next, 100)
-      this.translateSlide($prev, -100)
+      // this.translateSlide($next, 100)
+      // this.translateSlide($prev, -100)
 
       // The key is: move all 3 slide! Genius!
       this.translateSlide($prev, prevTranslateRange)
@@ -116,9 +119,8 @@ class SliderController {
     }
   }
 
-  handleMouseUp(e, data) {
+  handleDragStop(e, data) {
     // Turn off draggable until slides move completely
-    this.draggable = false
     this.moveByDrag = true
 
     const MIN_MOUSE_SPEED_TO_MOVE_SLIDE = 1
@@ -127,10 +129,8 @@ class SliderController {
     const mouseSpeed = data.velocityX
     const distRatio = data.moveX / this.sliderWidth
 
-    const movable = mouseSpeed > MIN_MOUSE_SPEED_TO_MOVE_SLIDE || Math.abs(distRatio) > MIN_DISTANCE_RATIO_TO_MOVE_SLIDE
-
     // TOTO: Make this block code shorter (Seem unneccessary ?)
-    if (movable) {
+    if (mouseSpeed > MIN_MOUSE_SPEED_TO_MOVE_SLIDE || Math.abs(distRatio) > MIN_DISTANCE_RATIO_TO_MOVE_SLIDE) {
       if (distRatio < 0) {
         this.next()
       }
@@ -262,6 +262,9 @@ class SliderController {
   }
 
   moveSlide(direction, toIndex) {
+    if (this.slideIsMoving) return
+    this.slideIsMoving = true
+
     const currIndex = this.opts.curr
 
     const { nextIndex, nextSlidePos, currSlidePos } = this.getSlideMovementData(direction, currIndex, toIndex)
@@ -286,11 +289,12 @@ class SliderController {
     setTimeout(() => {
       this.translateSlide($curr, currSlidePos, duration)
       this.translateSlide($next, 0, duration)
+      // Do stuffs after slides moving complete
       setTimeout(() => {
         this.setAutoPlay()
-        this.moveLock = false
-        this.draggable = true
+
         this.moveByDrag = false
+        this.slideIsMoving = false
       }, duration)
     }, 20)
 
@@ -309,23 +313,11 @@ class SliderController {
     $slide.css('transform', `translate3d(${toX}%, 0, 0)`)
   }
 
-  next() {
-    if (this.moveLock) return
-    this.clearAutoPlay()
-    this.moveLock = true
-    this.moveSlide("next")
-  }
+  next() { this.moveSlide("next") }
 
-  prev() {
-    if (this.moveLock) return
-    this.clearAutoPlay()
-    this.moveLock = true
-    this.moveSlide("prev")
-  }
+  prev() { this.moveSlide("prev") }
 
   goto(index) {
-    this.clearAutoPlay()
-
     if (index > this.opts.curr) {
       this.moveSlide("next", index)
     } else if (index < this.opts.curr) {
