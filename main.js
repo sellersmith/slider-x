@@ -1,3 +1,6 @@
+import { SliderClasses, getSlideMovementData } from './helpers'
+require('./draggable')
+
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
 class SliderController {

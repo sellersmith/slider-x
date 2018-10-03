@@ -1,0 +1,7 @@
+./node_modules
+./.vscode
+
+package.json
+webpack.config.js
+yarn-error.log
+yarn.lock
