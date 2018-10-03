@@ -1,4 +1,4 @@
-void function ( $, _ ) {
+void function ($) {
 
 	var x, y,
 		deltaX, deltaY,
@@ -191,8 +191,8 @@ void function ( $, _ ) {
 	function createEvent( type, e ) {
 		var options = {};
 		options.originalEvent = e;
-		options.preventDefault = _.bind(e.preventDefault, e);
-		options.stopPropagation = _.bind(e.stopPropagation, e);
+		options.preventDefault = e.preventDefault.bind(e);
+		options.stopPropagation = e.stopPropagation.bind(e);
 		return $.Event(type, options)
 	}
 	function findParentNode( child ) {
@@ -206,4 +206,4 @@ void function ( $, _ ) {
 		return found;
 	}
 
-}(jQuery, _ )
+}(jQuery)
