@@ -1,6 +1,6 @@
 ## Installation
 
-`yarn add pf-slider`
+`yarn add slider-x`
 
 Documentation will update asap!
 
@@ -9,8 +9,8 @@ Documentation will update asap!
 Import pf-slider
 
 ```
-import 'pf-slider'
-import 'pf-slider/dist/pf-slider.css'
+import 'slider-x'
+import 'slider-x/dist/slider-x.css'
 ```
 
 Enjoy :)
