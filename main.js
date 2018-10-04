@@ -1,5 +1,5 @@
-import { SliderClasses, getSlideMovementData } from './helpers'
-require('./draggable')
+// import { SliderClasses, getSlideMovementData } from './helpers'
+// require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
@@ -291,7 +291,7 @@ class SliderController {
         this.$el.removeClass(turnOffMouseEvent)
         this.moveByDrag = false
       }, duration)
-    }, 20)
+    }, 50)
 
     // Update curr index n reset the .active
     this.opts.curr = nextIndex
