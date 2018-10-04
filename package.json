@@ -1,6 +1,6 @@
 {
   "name": "hta-pf-slider",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Slider for PageFly",
   "main": "dist/pf-slider.js",
   "scripts": {
