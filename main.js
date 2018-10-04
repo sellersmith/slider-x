@@ -1,5 +1,5 @@
-import { SliderClasses, getSlideMovementData } from './helpers'
-require('./draggable')
+// import { SliderClasses, getSlideMovementData } from './helpers'
+// require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
@@ -214,6 +214,7 @@ class SliderController {
   }
 
   setAutoPlay() {
+    console.log('run')
     if (this.opts.autoPlay) {
       this.autoPlayTimeoutId = setTimeout(() => {
         this.moveSlide('next')
@@ -227,6 +228,7 @@ class SliderController {
 
   /* CONTROLLER FUNCTIONS */
   destroy() {
+    this.clearAutoPlay()
     // Save all items, remove all classes, inline-style n reverse the original style
     const items = []
     this.$slider.children().each((i, child) => {
@@ -238,7 +240,7 @@ class SliderController {
     // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
     this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
     this.$el.off('click', this.handleClick)
-    this.$el.data('slider', '')
+    this.$el.data('pf-slider-x', '')
     this.$el.empty()
 
     // Append the original item
@@ -249,7 +251,6 @@ class SliderController {
 
   moveSlide(direction, toIndex, customDuration) {
     this.clearAutoPlay()
-
     // Move slide if forbidden in the 1st n last slide if Slider movement is not loop
     const currIndex = this.opts.curr
     if (
@@ -409,13 +410,13 @@ SliderController.styleOptions = {
   ; (function ($) {
     $.fn.slider = function (opts, ...args) {
       return this.each((i, element) => {
-        let instance = $(element).data('slider')
+        let instance = $(element).data('pf-slider-x')
         if (!instance) {
           if (typeof opts === 'string') {
             throw new Error('This element was not initialized as a Slider yet')
           }
           instance = new SliderController(element, opts)
-          $(element).data('slider', instance)
+          $(element).data('pf-slider-x', instance)
         } else {
           if (typeof opts === 'string') {
             instance[opts](...args)
