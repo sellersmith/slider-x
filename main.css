@@ -43,6 +43,13 @@
   color: #fff;
   font-family: FontAwesome;
 }
+.pf-slider-nav.nav-style-1,
+.pf-slider-nav.nav-style-2,
+.pf-slider-nav.nav-style-3,
+.pf-slider-nav.nav-style-4{
+  top: 50%;
+  transform: translateY(-50%);
+}
 
 /* Arrow Style 1 */
 .pf-slider-nav.nav-style-1 {
@@ -54,7 +61,6 @@
   text-align: center;
   background-color: #171717;
   opacity: 0.5;
-  top: 40%;
   border-radius: 100%;
   transition: all .3s;
 }
@@ -80,7 +86,6 @@
 .pf-slider-nav.nav-style-2 {
   width: 46px;
   height: 43px;
-  top: 40%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,7 +126,6 @@
 
 /* Arrow style 3 */
 .pf-slider-nav.nav-style-3 {
-  top: 40%;
   color: #fff;
   padding: 20px;
   text-shadow: 0 0 1px #000;
@@ -160,7 +164,6 @@
 .pf-slider-nav.nav-style-4 {
   width: 46px;
   height: 43px;
-  top: 40%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,7 +206,7 @@
 .pf-slider-nav.nav-style-5 {
   width: 46px;
   height: 43px;
-  bottom: 20px;
+  bottom: 5%;
   right: 20px;
   display: flex;
   align-items: center;
@@ -241,7 +244,7 @@
 /* Pagination */
 .pf-slider-pagination {
   position: absolute;
-  bottom: 25px;
+  bottom: 5%;
   left: 0;
   width: 100%;
   padding: 0;
@@ -254,7 +257,7 @@
 }
 .pf-slider-pagination li {
   display: inline-block;
-  margin: 0 3px !important;
+  margin: 0 5px !important;
   width: 10px !important;
   height: 10px !important;
   border-radius: 50%;
@@ -288,7 +291,7 @@
   position: relative;
   width: 8px !important;
   height: 8px !important;
-  margin: 0 4px !important;
+  margin: 0 6px !important;
   background: transparent;
 }
 .pf-slider-pagination.pagination-style-2 li.active,
@@ -317,7 +320,7 @@
   position: relative;
   width: 16px !important;
   height: 16px !important;
-  margin: 0 4px !important;
+  margin: 0 5px !important;
   border: 2px solid #ffffff;
   background: transparent;
 }
