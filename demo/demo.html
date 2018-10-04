@@ -5,8 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>PF Slider Demo</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="../dist/pf-slider.css">
+  <style>
+    .h-300px { height: 300px; }
+    .h-400px { height: 400px; }
+    .h-500px { height: 500px; }
+    .slide-1 {
+      background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80')
+    }
+
+    .slide-2 {
+      background-image: url('https://images.unsplash.com/photo-1521453159160-6b5c58c24591?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=149a5703e1ecd9f4a6b01c1f8f8280c6&auto=format&fit=crop&w=962&q=80')
+    }
+
+    .slide-3 {
+      background-image: url('https://images.unsplash.com/photo-1520932146956-1ee4b33740fc?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=225333a710e886bf08fc3733772f2de6&auto=format&fit=crop&w=1024&q=80')
+    }
+
+    .slide-4 {
+      background-image: url('https://images.unsplash.com/photo-1536082404951-89620d865bc8?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=708dca90dc95e788aeea39a9f7b8e58e&auto=format&fit=crop&w=1050&q=80')
+    }
+
+    .slide-5 {
+      background-image: url('https://images.unsplash.com/photo-1527234639945-70d78416bd7d?ixlib=rb-0.3.5&s=a9ebd4e986e2f1c37d371c511d9515a4&auto=format&fit=crop&w=1919&q=80')
+    }
+  </style>
 </head>
 <body>
-  
+  <div id="my-slide">
+    <div class="h-300px slide-1"></div>
+    <div class="h-500px slide-2"></div>
+    <div class="h-400px slide-3"></div>
+    <div class="h-400px slide-4"></div>
+    <div class="h-500px slide-5"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="../dist/pf-slider.js"></script>
+  <script>
+    $('#my-slide').slider()
+  </script>
 </body>
 </html>
