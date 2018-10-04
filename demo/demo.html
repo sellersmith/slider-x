@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,18 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="../dist/pf-slider.css">
   <style>
-    .h-300px { height: 300px; }
-    .h-400px { height: 400px; }
-    .h-500px { height: 500px; }
+    .h-300px {
+      height: 300px;
+    }
+
+    .h-400px {
+      height: 400px;
+    }
+
+    .h-500px {
+      height: 500px;
+    }
+
     .slide-1 {
       background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80')
     }
@@ -32,6 +42,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="my-slide">
     <div class="h-300px slide-1"></div>
@@ -45,7 +56,15 @@
     crossorigin="anonymous"></script>
   <script src="../dist/pf-slider.js"></script>
   <script>
-    $('#my-slide').slider()
+    $('#my-slide').slider({
+      autoPlay: true,
+      duration: 400,
+      autoPlayDelay: 2000,
+      loop: true,
+      navStyle: 'nav-style-1',
+      paginationStyle: 'pagination-style-3'
+    })
   </script>
 </body>
+
 </html>
