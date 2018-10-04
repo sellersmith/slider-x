@@ -1,5 +1,5 @@
-// import { SliderClasses, getSlideMovementData } from './helpers'
-// require('./draggable')
+import { SliderClasses, getSlideMovementData } from './helpers'
+require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
@@ -54,8 +54,6 @@ class SliderController {
 
     // Save the inner DOM
     this.$slider = $inner
-    // Set the drag element
-    this.$slider.addClass('jsn-es-draggable')
 
     // Append controllers
     const $nextCtrl = $(`<a data-action='next'></a>`)
@@ -337,9 +335,11 @@ class SliderController {
       $slides.css({ 'height': `${sliderHeight}px` })
     }
 
-    this.$slider.addClass(inner).css({ height: `${sliderHeight}px` })
     $slides.addClass(slide)
     $curr.css('transform', 'translate3d(0, 0, 0)')
+
+    this.$slider.addClass(inner).css({ height: `${sliderHeight}px` })
+    this.opts.draggable ? this.$slider.addClass('jsn-es-draggable') : this.$slider.removeClass('jsn-es-draggable')
 
     const { navStyle } = this.opts
     const { paginationStyle } = this.opts
@@ -388,6 +388,7 @@ SliderController.defaultOptions = {
   autoPlayDelay: 3000,
   duration: 450,
   loop: true,
+  draggable: true,
   paginationStyle: 'pagination-style-1',
   navStyle: 'nav-style-1',
   adaptiveHeight: false,
