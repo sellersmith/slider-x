@@ -6,7 +6,7 @@ Documentation will update asap!
 
 ## Basic Usage
 
-Import pf-slider
+Import slider-x
 
 ```
 import 'slider-x'
