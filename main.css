@@ -1,4 +1,4 @@
-.pf-slider-mouse-event-off {
+.pf-slider-mouse-event-off > * {
   pointer-events: none;
 }
 

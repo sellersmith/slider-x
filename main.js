@@ -24,8 +24,8 @@ class SliderController {
     this.moveByDrag = false
     this.sliderWidth = this.$el.width()
 
-    this.$el.on('es_dragmove', this.handleDragMove.bind(this))
-    this.$el.on('es_dragstop', this.handleDragStop.bind(this))
+    this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
+    this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
 
     console.log(this)
   }
@@ -38,7 +38,7 @@ class SliderController {
   }
 
   setupSliderDOM() {
-    this.$el.addClass(wrapper).addClass('jsn-es-draggable')
+    this.$el.addClass(wrapper)
     // Save original styles
     this.originalStyles.wrapper = this.$el.attr('style') ? this.$el.attr('style') : ''
 
@@ -54,6 +54,8 @@ class SliderController {
 
     // Save the inner DOM
     this.$slider = $inner
+    // Set the drag element
+    this.$slider.addClass('jsn-es-draggable')
 
     // Append controllers
     const $nextCtrl = $(`<a data-action='next'></a>`)
