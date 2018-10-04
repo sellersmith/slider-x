@@ -1,6 +1,6 @@
 {
   "name": "slider-x",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Simple and awesome Slider for PageFly",
   "main": "dist/pf-slider.js",
   "scripts": {
@@ -16,6 +16,9 @@
     "url": "https://github.com/sellersmith/pf-slider/issues"
   },
   "homepage": "https://github.com/sellersmith/pf-slider#readme",
+  "keywords": [
+    "jquery-plugin"
+  ],
   "dependencies": {
     "babel-loader": "^8.0.4",
     "babel-preset-env": "^1.7.0",
