@@ -34,15 +34,16 @@
     <div class="">44</div>
   </div>
 
-  <!-- <script src="./draggable.js"></script> -->
-  <!-- <script src="./helpers.js"></script> -->
-  <!-- <script src="./main.js"></script> -->
-  <script src="./dist/pf-slider.js"></script>
+  <script src="./draggable.js"></script>
+  <script src="./helpers.js"></script>
+  <script src="./main.js"></script>
+  <!-- <script src="./dist/pf-slider.js"></script> -->
   <script>
     $('.test-slider-1').slider({
       autoPlay: true,
       duration: 400,
-      loop: false,
+      autoPlayDelay: 2000,
+      loop: true,
       navStyle: 'nav-style-1',
       paginationStyle: 'pagination-style-3'
     })

@@ -1,5 +1,5 @@
-import { SliderClasses, getSlideMovementData } from './helpers'
-require('./draggable')
+// import { SliderClasses, getSlideMovementData } from './helpers'
+// require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
@@ -14,7 +14,7 @@ class SliderController {
     this.totalSlide = this.$el.children().length
     this.opts = Object.assign({}, opts) // Each slider's opts is a specific instance of opts argument
 
-    this.autoTimeoutId = ''
+    this.autoPlayTimeoutId = ''
 
     // Setup DOM + set event handler
     this.initialize()
@@ -215,18 +215,14 @@ class SliderController {
 
   setAutoPlay() {
     if (this.opts.autoPlay) {
-      const delay = this.opts.autoPlayDelay
-
-      this.clearAutoPlay()
-      this.autoTimeoutId = setTimeout(() => {
+      this.autoPlayTimeoutId = setTimeout(() => {
         this.moveSlide('next')
-        this.setAutoPlay()
-      }, delay)
+      }, (this.opts.autoPlayDelay))
     }
   }
 
   clearAutoPlay() {
-    clearTimeout(this.autoTimeoutId)
+    clearTimeout(this.autoPlayTimeoutId)
   }
 
   /* CONTROLLER FUNCTIONS */
@@ -252,8 +248,10 @@ class SliderController {
   }
 
   moveSlide(direction, toIndex, customDuration) {
-    const currIndex = this.opts.curr
+    this.clearAutoPlay()
 
+    // Move slide if forbidden in the 1st n last slide if Slider movement is not loop
+    const currIndex = this.opts.curr
     if (
       (direction === 'prev' && currIndex === 0 && !this.opts.loop)
       ||
@@ -300,7 +298,7 @@ class SliderController {
 
   translateSlide($slide, toX, duration) {
     if (duration) {
-      $slide.css({ 'transition': `transform ${duration}ms ease` })
+      $slide.css({ 'transition': `transform ${duration}ms linear` })
     } else {
       $slide.css({ 'transition': '' })
     }
