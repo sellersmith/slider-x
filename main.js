@@ -10,6 +10,8 @@ class SliderController {
 
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
+    this.sliderHeight = this.$el.height()
+    this.sliderWidth = this.$el.width()
 
     this.totalSlide = this.$el.children().length
     this.opts = Object.assign({}, opts) // Each slider's opts is a specific instance of opts argument
@@ -22,7 +24,6 @@ class SliderController {
 
     // Set up drag n drop event
     this.moveByDrag = false
-    this.sliderWidth = this.$el.width()
 
     this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
     this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
@@ -71,6 +72,9 @@ class SliderController {
     // Add style for slider
     this.updateSliderStyle()
     this.udpateActiveSlideStyle()
+
+    // Save slider height
+    // this.sliderHeight = this.
   }
 
   /* SETUP EVENT DELEGATION */
@@ -169,6 +173,9 @@ class SliderController {
       }
     })
 
+    // Set the slider height
+    this.opts.height = this.sliderHeight || this.opts.height
+
     // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
 
@@ -214,7 +221,6 @@ class SliderController {
   }
 
   setAutoPlay() {
-    console.log('run')
     if (this.opts.autoPlay) {
       this.autoPlayTimeoutId = setTimeout(() => {
         this.moveSlide('next')
@@ -323,23 +329,38 @@ class SliderController {
   updateSliderStyle() {
     const $slides = this.$slider.children()
     const $curr = $slides.eq(this.opts.curr)
-    let sliderHeight = $curr.height()
 
     const { adaptiveHeight, height } = this.opts
     if (!adaptiveHeight) {
       // Slider height = the highest child in case adaptiveHeight is off
-      for (let i = 0; i < $slides.length; i++) {
-        if ($slides.eq(i).height() > sliderHeight) sliderHeight = $slides.eq(i).height()
-      }
+      // for (let i = 0; i < $slides.length; i++) {
+      //   if ($slides.eq(i).height() > sliderHeight) sliderHeight = $slides.eq(i).height()
+      // }
 
-      // This below line is to stretch all slide height to equal to the heightest slide
-      $slides.css({ 'height': `${sliderHeight}px` })
+      // Stretch all slide height to equal to the heightest slide
+      $slides.css({ 'height': `${this.opts.height}px` })
+      this.$slider.css({
+        'height': `${this.opts.height}px`,
+        'transition': ''
+      })
+      this.$el.css({
+        'height': `${this.opts.height}px`,
+        'transition': ''
+      })
+    } else {
+      $slides.css({ 'height': '' })
+
+      this.$el.css('transition', `height ${this.opts.duration}ms ease-in-out`)
+      this.$slider.css('transition', `height ${this.opts.duration}ms ease-in-out`)
+
+      this.$el.css('height', '')
+      this.$slider.css('height', `${$curr.height()}px`)
     }
 
     $slides.addClass(slide)
     $curr.css('transform', 'translate3d(0, 0, 0)')
 
-    this.$slider.addClass(inner).css({ height: `${sliderHeight}px` })
+    this.$slider.addClass(inner)
     this.opts.draggable ? this.$slider.addClass('jsn-es-draggable') : this.$slider.removeClass('jsn-es-draggable')
 
     const { navStyle } = this.opts
@@ -393,7 +414,7 @@ SliderController.defaultOptions = {
   paginationStyle: 'pagination-style-1',
   navStyle: 'nav-style-1',
   adaptiveHeight: false,
-  height: 350,
+  height: 400,
 }
 
 SliderController.styleOptions = {

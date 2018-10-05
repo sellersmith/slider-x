@@ -18,7 +18,7 @@
 
 <body>
   <h1>Final slider</h1>
-  <div class='test-slider-1' style="font-weight: 300; text-transform: uppercase;">
+  <div class='test-slider-1' style="font-weight: 300; text-transform: uppercase; height: 300px">
     <div class="child-1 h-200px">0</div>
     <div class="child-2 h-400px">1</div>
     <div class="child-3 h-300px" style="font-size: 2em;">2</div>
@@ -26,7 +26,7 @@
     <div class="child-5 h-300px">4</div>
   </div>
   <br><br><br>
-  <div class='test-slider-2 h-300px'>
+  <div class='test-slider-2 h-300px' style="height: 400px;">
     <div class="">00</div>
     <div class="">11</div>
     <div class="">22</div>
@@ -40,10 +40,12 @@
   <!-- <script src="./dist/pf-slider.js"></script> -->
   <script>
     $('.test-slider-1').slider({
-      autoPlay: true,
+      curr: 3,
+      autoPlay: false,
       duration: 400,
       autoPlayDelay: 2000,
       loop: true,
+      adaptiveHeight: false,
       draggable: true,
       navStyle: 'nav-style-1',
       paginationStyle: 'pagination-style-3'
