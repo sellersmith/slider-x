@@ -12,7 +12,7 @@
 .pf-slider-slide {
   will-change: contents;
   width: 100%;
-  position: absolute;
+  position: absolute !important;
   transform: translate3d(100%, 0, 0);
   top: 0;
 }
@@ -20,8 +20,8 @@
 .pf-slider-wrapper {
   overflow: hidden;
   position: relative;
-  /* transition: height 500ms ease-in-out; */
 }
+
 .pf-slider-nav {
   position: absolute;
   z-index: 999;
@@ -30,9 +30,11 @@
   font-size: 18px;
   cursor: pointer;
 }
+
 .pf-slider-nav:focus {
   text-decoration: none;
 }
+
 .pf-slider-nav.nav-style-1::before,
 .pf-slider-nav.nav-style-2::before,
 .pf-slider-nav.nav-style-3::before,
@@ -42,6 +44,7 @@
   color: #fff;
   font-family: FontAwesome;
 }
+
 .pf-slider-nav.nav-style-1,
 .pf-slider-nav.nav-style-2,
 .pf-slider-nav.nav-style-3,

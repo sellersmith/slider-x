@@ -8,6 +8,10 @@ class SliderController {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
 
+    // Create an observer to observe any style's change of slider (this is for updating height)
+    this.styleObserver = new MutationObserver(this.handleStyleChange.bind(this))
+    this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style'] })
+
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
     this.sliderHeight = this.$el.height()
@@ -90,6 +94,15 @@ class SliderController {
         break
       default: console.log('Slider clicked')
     }
+  }
+
+  handleStyleChange(mutations) {
+    mutations.forEach((mut) => {
+      const height = $(mut.target).height()
+      if (height !== this.opts.height) {
+        this.updateOptions({ height })
+      }
+    })
   }
 
   handleDragMove(e, data) {
@@ -446,3 +459,5 @@ SliderController.styleOptions = {
       })
     }
   })(jQuery)
+
+

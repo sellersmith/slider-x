@@ -25,7 +25,7 @@ defaultOptions = {
   paginationStyle: 'pagination-style-1',
   navStyle: 'nav-style-1',
   adaptiveHeight: false,
-  height: 350,
+  height: 400,
 }
 ```
 
