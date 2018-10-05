@@ -355,13 +355,12 @@ class SliderController {
       // }
 
       // Stretch all slide height to equal to the heightest slide
-      $slides.css({ 'height': `${this.opts.height}px` })
+      $slides.css({ 'height': '100%' })
       this.$slider.css({
-        'height': `${this.opts.height}px`,
+        'height': '100%',
         'transition': ''
       })
       this.$el.css({
-        'height': `${this.opts.height}px`,
         'transition': ''
       })
     } else {
