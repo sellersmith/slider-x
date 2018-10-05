@@ -1,5 +1,5 @@
-// import { SliderClasses, getSlideMovementData } from './helpers'
-// require('./draggable')
+import { SliderClasses, getSlideMovementData } from './helpers'
+require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
@@ -10,7 +10,7 @@ class SliderController {
 
     // Create an observer to observe any style's change of slider (this is for updating height)
     this.styleObserver = new MutationObserver(this.handleStyleChange.bind(this))
-    this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style'] })
+    this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
 
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
@@ -97,6 +97,10 @@ class SliderController {
   }
 
   handleStyleChange(mutations) {
+    // Currently: We can only detect the inline style change, if you append a class that have a height property 
+    // the slider height will not update
+    // We will update this bug asap
+
     mutations.forEach((mut) => {
       const height = $(mut.target).height()
       if (height !== this.opts.height) {
@@ -419,7 +423,7 @@ SliderController.constructor.MIN_DRAG_DISTANCE = 5
 
 SliderController.defaultOptions = {
   curr: 0,
-  autoPlay: false,
+  autoPlay: true,
   autoPlayDelay: 3000,
   duration: 450,
   loop: true,

@@ -11,7 +11,7 @@
 }
 
 .h-500px {
-  height: 500px;
+  height: 500px !important;
 }
 
 .test-slider-1 {
