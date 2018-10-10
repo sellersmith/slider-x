@@ -9,8 +9,9 @@ class SliderController {
     this.originalStyles = { wrapper: '', inner: [] }
 
     // Create an observer to observe any style's change of slider (this is for updating height)
-    this.styleObserver = new MutationObserver(this.handleStyleChange.bind(this))
-    this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
+    // NOTE: this doesn't work on IE < 11 
+    // this.styleObserver = new MutationObserver(this.handleStyleChange.bind(this))
+    // this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
 
     this.$el = $(this.el) // The original element
     this.$slider = '' // The .inner div that wrap all slide
@@ -83,13 +84,13 @@ class SliderController {
 
   /* SETUP EVENT DELEGATION */
   handleClick(e) {
-    const action = e.target.dataset.action
+    const action = e.target.getAttribute('data-action')
     switch (action) {
       case 'next': this.next(); break
       case 'prev': this.prev(); break
       case 'goto':
         // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
-        const index = parseInt(e.target.dataset.gotoSlide) || 0
+        const index = parseInt(e.target.getAttribute('data-goto-slide')) || 0
         this.goto(index)
         break
       default: console.log('Slider clicked')
