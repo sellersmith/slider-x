@@ -1,6 +1,6 @@
 {
   "name": "slider-x",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Simple and awesome Slider for PageFly",
   "main": "dist/slider-x.js",
   "scripts": {
