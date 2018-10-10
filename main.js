@@ -184,11 +184,14 @@ class SliderController {
 
   /* LOGIC FUNCTION */
   verifyOptions() {
-    Object.entries(this.constructor.defaultOptions).forEach(([key, value]) => {
+    const defOpts = this.constructor.defaultOptions
+
+    for (let key in defOpts) {
+      const value = defOpts[key]
       if (typeof this.opts[key] !== typeof value) {
         this.opts[key] = value
       }
-    })
+    }
 
     // Set the slider height
     this.opts.height = this.sliderHeight || this.opts.height
