@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="../dist/slider-x.css">
   <style>
-    #my-slide {
+    .my-slide {
       height: 350px;
     }
 
@@ -48,9 +48,12 @@
 </head>
 
 <body>
-  <div id="my-slide">
+  <div class="my-slide">
     <div class="h-300px slide-1"></div>
     <div class="h-500px slide-2"></div>
+  </div>
+  <br><br><br>
+  <div class="my-slide">
     <div class="h-400px slide-3"></div>
     <div class="h-400px slide-4"></div>
     <div class="h-500px slide-5"></div>
@@ -60,14 +63,15 @@
     crossorigin="anonymous"></script>
   <script src="../dist/slider-x.js"></script>
   <script>
-    $('#my-slide').slider({
-      autoPlay: true,
+    $('.my-slide').slider({
+      autoPlay: false,
       duration: 400,
       autoPlayDelay: 2000,
       loop: true,
       navStyle: 'nav-style-1',
       paginationStyle: 'pagination-style-3'
     })
+
   </script>
 </body>
 

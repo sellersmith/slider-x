@@ -18,7 +18,7 @@ class SliderController {
     this.sliderWidth = this.$el.width()
 
     this.totalSlide = this.$el.children().length
-    this.opts = Object.assign({}, opts) // Each slider's opts is a specific instance of opts argument
+    this.opts = $.extend({}, opts) // Each slider's opts is a specific instance of opts argument
 
     this.autoPlayTimeoutId = ''
 
