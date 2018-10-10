@@ -1,6 +1,6 @@
 import { SliderClasses, getSlideMovementData } from './helpers'
 require('./draggable')
-
+const $ = window.jQuery
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
 class SliderController {
