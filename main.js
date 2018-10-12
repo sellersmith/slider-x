@@ -1,8 +1,7 @@
 import { SliderClasses, getSlideMovementData } from './helpers'
 require('./draggable')
-const $ = window.jQuery
+let $ = window.jQuery
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
-const $ = window.jQuery
 
 class SliderController {
   constructor(ele, opts) {
@@ -448,24 +447,29 @@ SliderController.styleOptions = {
   navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5', 'none']
 }
 
-  // Create jquery plugin
-  ; (function ($) {
-    $.fn.slider = function (opts, ...args) {
-      return this.each((i, element) => {
-        let instance = $(element).data('pf-slider-x')
-        if (!instance) {
-          if (typeof opts === 'string') {
-            throw new Error('This element was not initialized as a Slider yet')
-          }
-          instance = new SliderController(element, opts)
-          $(element).data('pf-slider-x', instance)
-        } else {
-          if (typeof opts === 'string') {
-            instance[opts](...args)
-          }
+function init(jQuery) {
+  $ = jQuery
+  jQuery.fn.slider = function (opts, ...args) {
+    return this.each((i, element) => {
+      let instance = jQuery(element).data('pf-slider-x')
+      if (!instance) {
+        if (typeof opts === 'string') {
+          throw new Error('This element was not initialized as a Slider yet')
         }
-      })
-    }
-  })(jQuery)
+        instance = new SliderController(element, opts)
+        jQuery(element).data('pf-slider-x', instance)
+      } else {
+        if (typeof opts === 'string') {
+          instance[opts](...args)
+        }
+      }
+    })
+  }
+}
+
+if (typeof jQuery !== 'undefined') {
+  init(jQuery)
+}
+export default init
 
 

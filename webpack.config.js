@@ -6,6 +6,8 @@ module.exports = {
   entry: './main.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
+    libraryTarget: 'umd',
+    library: 'SliderX',
     filename: 'slider-x.js'
   },
   module: {
