@@ -1,6 +1,5 @@
 node_modules/
 .vscode/
 
-webpack.config.js
 yarn-error.log
 yarn.lock
