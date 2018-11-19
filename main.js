@@ -1,6 +1,7 @@
-import { SliderClasses, getSlideMovementData } from './helpers'
-require('./draggable')
-let $ = window.jQuery
+// import { SliderClasses, getSlideMovementData } from './helpers'
+// require('./draggable')
+// let $ = window.jQuery
+
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
 
 class SliderController {
@@ -23,7 +24,7 @@ class SliderController {
 
     this.autoPlayTimeoutId = ''
 
-    // Setup DOM + set event handler
+    // Setup DOM + event handler
     this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
 
@@ -33,6 +34,7 @@ class SliderController {
     this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
     this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
 
+    // For testing
     console.log(this)
   }
 
@@ -40,6 +42,7 @@ class SliderController {
     this.verifyOptions()
     this.setupSliderDOM()
     this.setAutoPlay()
+    console.log("New Slider initialized!")
     return this
   }
 
@@ -67,8 +70,9 @@ class SliderController {
 
     // Append indicators
     const $indicators = $('<ol>')
-    for (let i = 0; i < this.totalSlide; i++) {
-      const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
+    const { slidesToShow } = this.opts
+    for (let i = 0; i < Math.ceil(this.totalSlide / slidesToShow); i++) {
+      const $indItem = $(`<li data-goto-slide=${i * slidesToShow} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
 
@@ -278,39 +282,54 @@ class SliderController {
 
   moveSlide(direction, toIndex, customDuration) {
     this.clearAutoPlay()
-    // Move slide if forbidden in the 1st n last slide if Slider movement is not loop
     const currIndex = this.opts.curr
+
+    // Move slide is forbidden in the 1st n last slide if Slider movement is not loop
     if (
       (direction === 'prev' && currIndex === 0 && !this.opts.loop)
       ||
       (direction === 'next' && currIndex === (this.totalSlide - 1) && !this.opts.loop)
     ) return
 
+    // Turn off mouse event on moving
     this.$el.addClass(turnOffMouseEvent)
 
-    const { nextIndex, nextSlidePos, currSlidePos } = getSlideMovementData(this, direction, toIndex)
+    const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos, newCurr } = getSlideMovementData(this, direction, toIndex)
+    console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
-    const $curr = this.$slider.children().eq(currIndex)
-    const $next = this.$slider.children().eq(nextIndex)
+    // const $curr = this.$slider.children().eq(currIndex)
+    // const $next = this.$slider.children().eq(nextIndex)
 
-    if (this.opts.adaptiveHeight) {
-      const nextHeight = $next.height()
-      this.$slider.css({ height: `${nextHeight}px` })
-    }
+    // if (this.opts.adaptiveHeight) {
+    //   const nextHeight = $next.height()
+    //   this.$slider.css({ height: `${nextHeight}px` })
+    // }
 
     if (!this.moveByDrag) {
       // Only move the $next slide to the ready-position in case user does not drag
-      this.translateSlide($next, nextSlidePos)
+      for (let slide of nextSlidesReadyPos) {
+        const $slide = this.$slider.children().eq(slide.index)
+        this.translateSlide($slide, slide.readyX)
+      }
     }
 
     this.updateSliderCtrlStyle(nextIndex)
 
-    // Move 2 slide contemporary
+    // Move 2 slides contemporary
     let duration = customDuration ? customDuration : this.opts.duration
 
     setTimeout(() => {
-      this.translateSlide($curr, currSlidePos, duration)
-      this.translateSlide($next, 0, duration)
+      for (let slide of currSlidesNewPos) {
+        const $slide = this.$slider.children().eq(slide.index)
+        this.translateSlide($slide, slide.newX, duration)
+      }
+
+      for (let slide of nextSlidesNewPos) {
+        const $slide = this.$slider.children().eq(slide.index)
+        this.translateSlide($slide, slide.newX, duration)
+      }
+      // this.translateSlide($curr, currSlidePos, duration)
+      // this.translateSlide($next, 0, duration)
       // Do stuffs after slides moving complete
       setTimeout(() => {
         this.setAutoPlay()
@@ -320,7 +339,7 @@ class SliderController {
     }, 50)
 
     // Update curr index n reset the .active
-    this.opts.curr = nextIndex
+    this.opts.curr = newCurr
     this.udpateActiveSlideStyle()
   }
 
@@ -331,7 +350,7 @@ class SliderController {
       $slide.css({ 'transition': '' })
     }
 
-    $slide.css('transform', `translate3d(${toX}%, 0, 0)`)
+    $slide.css('transform', `translate3d(${toX}px, 0, 0)`)
   }
 
   next() { this.moveSlide("next") }
@@ -350,6 +369,7 @@ class SliderController {
   updateSliderStyle() {
     const $slides = this.$slider.children()
     const $curr = $slides.eq(this.opts.curr)
+    const slideWidth = calculateSlideSize(this)
 
     const { adaptiveHeight, height } = this.opts
     if (!adaptiveHeight) {
@@ -359,7 +379,7 @@ class SliderController {
       // }
 
       // Stretch all slide height to equal to the heightest slide
-      $slides.css({ 'height': '100%' })
+      $slides.css({ 'height': '100%', width: `${slideWidth}px` })
       this.$slider.css({
         'height': '100%',
         'transition': ''
@@ -378,11 +398,19 @@ class SliderController {
     }
 
     $slides.addClass(slide)
-    $curr.css('transform', 'translate3d(0, 0, 0)')
+    const { gutter } = this.opts
+
+    for (let i = 0; i < $slides.length; i++) {
+      const slideX = i * (slideWidth + gutter)
+      $slides.eq(i).css({ transform: `translate3d(${slideX}px, 0, 0)` })
+    }
+
+    // $curr.css('transform', 'translate3d(0, 0, 0)')
 
     this.$slider.addClass(inner)
     this.opts.draggable ? this.$slider.addClass('jsn-es-draggable') : this.$slider.removeClass('jsn-es-draggable')
 
+    // Styling for navigators and indicators
     const { navStyle } = this.opts
     const { paginationStyle } = this.opts
 
@@ -415,7 +443,7 @@ class SliderController {
     this.$slider.children().eq(curr).addClass('active')
 
     this.$el.find('li.active').removeClass('active')
-    this.$el.find('ol').children().eq(curr).addClass('active')
+    this.$el.find('ol').find(`li[data-goto-slide="${curr}"]`).addClass('active')
 
     this.updateSliderCtrlStyle(curr)
   }
@@ -426,6 +454,9 @@ SliderController.constructor.MIN_DRAG_DISTANCE = 5
 
 SliderController.defaultOptions = {
   curr: 0,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  gutter: 15,
   autoPlay: true,
   autoPlayDelay: 3000,
   duration: 450,
@@ -470,6 +501,5 @@ function init(jQuery) {
 if (typeof jQuery !== 'undefined') {
   init(jQuery)
 }
-export default init
 
-
+// export default init

@@ -11,9 +11,9 @@
 
 .pf-slider-slide {
   will-change: contents;
-  width: 100%;
+  /* width: 100%; */
   position: absolute !important;
-  transform: translate3d(100%, 0, 0);
+  /* transform: translate3d(100%, 0, 0); */
   top: 0;
 }
 

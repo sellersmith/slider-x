@@ -1,6 +1,6 @@
 const prefix = 'pf'
 
-export const SliderClasses = {
+const SliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
@@ -13,19 +13,57 @@ export const SliderClasses = {
   turnOffMouseEvent: `${prefix}-slider-mouse-event-off`
 }
 
-export const getSlideMovementData = (slider, direction, toIndex) => {
-  let nextIndex, nextSlidePos, currSlidePos
+const getSlideMovementData = (slider, direction, toIndex) => {
+  const { totalSlide, $slider } = slider
+  const sliderWidth = $slider.width()
+  const slideWidth = calculateSlideSize(slider)
+  const { curr, slidesToShow, slidesToScroll, gutter } = slider.opts
+  const slidesMove = toIndex !== undefined ? slidesToShow : slidesToScroll
+
+  let nextIndex, nextSlidePos, currSlidePos, newCurr
+  let nextSlidesReadyPos = [], nextSlidesNewPos = [], currSlidesNewPos = []
 
   if (direction === "next") {
-    toIndex ? nextIndex = toIndex : nextIndex = slider.opts.curr === slider.totalSlide - 1 ? 0 : slider.opts.curr + 1
-    nextSlidePos = 100
-    currSlidePos = -100
+    nextIndex = toIndex ? toIndex : (curr + slidesToShow) % totalSlide
+    newCurr = toIndex ? toIndex : (curr + slidesToScroll) % totalSlide
+
+    // Calculate next slides ready-position - where the next slides stay and be ready to move in
+    for (let i = 0; i < slidesMove; i++) {
+      nextSlidesReadyPos.push({ index: (nextIndex + i) % totalSlide, readyX: (sliderWidth + gutter * (i + 1) + slideWidth * i) })
+      nextSlidesNewPos.push({ index: (nextIndex + i) % totalSlide, newX: ((sliderWidth + gutter * (i + 1) + slideWidth * i)) - ((slideWidth + gutter) * slidesMove) })
+    }
+ 
+    for (let i = 0; i < slidesToShow; i++) {
+      const $slide = slider.$slider.children().eq((curr + i) % totalSlide)
+      const slideX = $slide.position().left
+
+      currSlidesNewPos.push({ index: (curr + i) % totalSlide, newX: slideX - ((slideWidth + gutter) * slidesMove) })
+    }
   } else if (direction === "prev") {
-    // toIndex = 0 is a falsy value
-    (toIndex || toIndex === 0) ? nextIndex = toIndex : nextIndex = slider.opts.curr === 0 ? slider.totalSlide - 1 : slider.opts.curr - 1
-    nextSlidePos = -100
-    currSlidePos = 100
+    nextIndex = toIndex !== undefined ? toIndex : (totalSlide + (curr - slidesToScroll)) % totalSlide
+    newCurr = toIndex !== undefined ? toIndex : nextIndex
+    // Calculate next slides ready-position - where the next slides stay and be ready to move in
+    for (let i = 0; i < slidesMove; i++) {
+      nextSlidesReadyPos.push({ index: (nextIndex + i) % totalSlide, readyX: (0 - (gutter + slideWidth) * (slidesMove - i)) })
+      nextSlidesNewPos.push({ index: (nextIndex + i) % totalSlide, newX: (gutter + slideWidth) * i })
+    }
+
+    for (let i = 0; i < slidesToShow; i++) {
+      const $slide = slider.$slider.children().eq((curr + i) % totalSlide)
+      const slideX = $slide.position().left
+
+      currSlidesNewPos.push({ index: (curr + i) % totalSlide, newX: slideX + (gutter + slideWidth) * slidesMove })
+    }
   }
 
-  return { nextIndex, nextSlidePos, currSlidePos }
+  return { nextIndex, nextSlidePos, currSlidePos, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos, newCurr }
+}
+
+const calculateSlideSize = (slider) => {
+  const { gutter, slidesToShow } = slider.opts
+  const wrapperWidth = slider.$slider.width()
+
+  const slideWidth = (wrapperWidth - gutter * (slidesToShow - 1)) / slidesToShow
+
+  return slideWidth
 }

@@ -12,33 +12,14 @@
   <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
 
-  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="main.css">
   <style>
-    .h-300px {
-      height: 300px;
-    }
-
-    .h-400px {
-      height: 400px;
-    }
-
-    .h-200px {
-      height: 200px;
-    }
-
-    .h-500px {
-      height: 500px;
-    }
-
-    .test-slider-1 {
-      /* background: dodgerblue; */
-      height: 299px;
-    }
-
-    .test-slider-2 {
-      background: lightseagreen;
-    }
+    .h-300px { height: 300px; }
+    .h-400px { height: 400px; }
+    .h-200px { height: 200px; }
+    .h-500px { height: 500px; }
+    .test-slider-1 { height: 299px; }
+    .test-slider-2 { background: lightseagreen; }
 
     .pf-slider-slide {
       display: inline-flex;
@@ -47,25 +28,11 @@
       font-size: 2em;
     }
 
-    .child-1 {
-      background: lightcoral;
-    }
-
-    .child-2 {
-      background: lightseagreen;
-    }
-
-    .child-3 {
-      background: lightgreen;
-    }
-
-    .child-4 {
-      background: lightgray;
-    }
-
-    .child-5 {
-      background: dodgerblue;
-    }
+    .child-1 { background: lightcoral; }
+    .child-2 { background: lightseagreen; }
+    .child-3 { background: lightgreen; }
+    .child-4 { background: lightgray; }
+    .child-5 { background: dodgerblue; }
   </style>
 </head>
 
@@ -77,6 +44,11 @@
     <div class="child-3 h-300px" style="font-size: 2em;">2</div>
     <div class="child-4 h-500px">3</div>
     <div class="child-5 h-300px">4</div>
+    <div class="child-1 h-200px">5</div>
+    <div class="child-2 h-400px">6</div>
+    <div class="child-3 h-300px" style="font-size: 2em;">7</div>
+    <div class="child-4 h-500px">8</div>
+    <div class="child-5 h-300px">9</div>
   </div>
   <br><br><br>
   <div class='test-slider-2 h-300px' style="height: 400px;">
@@ -87,14 +59,16 @@
     <div class="">44</div>
   </div>
 
-  <!-- <script src="./draggable.js"></script>
+  <script src="./draggable.js"></script>
   <script src="./helpers.js"></script>
-  <script src="./main.js"></script> -->
-  <script src="./dist/slider-x.js"></script>
+  <script src="./main.js"></script>
+  <!-- <script src="./dist/slider-x.js"></script> -->
   <script>
     $('.test-slider-1').slider({
       curr: '3',
-      autoPlay: 'false',
+      slidesToShow: 3,
+      slidesToScroll: 2,
+      autoPlay: false,
       duration: '400',
       autoPlayDelay: '2000',
       loop: true,

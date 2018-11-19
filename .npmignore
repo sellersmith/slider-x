@@ -1,3 +1,4 @@
+# Publish only dist/ folder
 /*
 /*/
 !/dist/
