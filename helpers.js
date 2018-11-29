@@ -13,51 +13,105 @@ const SliderClasses = {
   turnOffMouseEvent: `${prefix}-slider-mouse-event-off`
 }
 
+// The logic is compicated! Stay tune before reading this func
 const getSlideMovementData = (slider, direction, toIndex) => {
-  const { totalSlide, $slider } = slider
+  let { totalSlide, $slider } = slider
+  totalSlide *= 3
+
   const sliderWidth = $slider.width()
   const slideWidth = calculateSlideSize(slider)
   const { curr, slidesToShow, slidesToScroll, gutter } = slider.opts
-  const slidesMove = toIndex !== undefined ? slidesToShow : slidesToScroll
 
-  let nextIndex, nextSlidePos, currSlidePos, newCurr
+  // Created this array to check if the next index is in the curr-showing-slides or not
+  const currIndexes = []
+  for (let i = 0; i < slidesToShow; i++) { currIndexes.push((curr + i) % totalSlide) }
+
+  let nextIndex, nextSlidePos, currSlidePos
   let nextSlidesReadyPos = [], nextSlidesNewPos = [], currSlidesNewPos = []
+  let slidesMove
 
   if (direction === "next") {
-    nextIndex = toIndex ? toIndex : (curr + slidesToShow) % totalSlide
-    newCurr = toIndex ? toIndex : (curr + slidesToScroll) % totalSlide
+    // Calculate number of slides to move
+    if (toIndex !== undefined) {
+      if (currIndexes.includes(toIndex)) {
+        slidesMove = currIndexes.indexOf(toIndex) - currIndexes.indexOf(curr)
+      } else slidesMove = slidesToShow
+    } else slidesMove = slidesToScroll
+
+    nextIndex = toIndex !== undefined ? toIndex : (curr + slidesToScroll) % totalSlide
 
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
-    for (let i = 0; i < slidesMove; i++) {
-      nextSlidesReadyPos.push({ index: (nextIndex + i) % totalSlide, readyX: (sliderWidth + gutter * (i + 1) + slideWidth * i) })
-      nextSlidesNewPos.push({ index: (nextIndex + i) % totalSlide, newX: ((sliderWidth + gutter * (i + 1) + slideWidth * i)) - ((slideWidth + gutter) * slidesMove) })
-    }
- 
-    for (let i = 0; i < slidesToShow; i++) {
-      const $slide = slider.$slider.children().eq((curr + i) % totalSlide)
-      const slideX = $slide.position().left
+    let firstX
+    if (currIndexes.includes(nextIndex)) {
+      firstX = slider.$slider.children().eq(nextIndex).position().left
+    } else firstX = sliderWidth + gutter
 
-      currSlidesNewPos.push({ index: (curr + i) % totalSlide, newX: slideX - ((slideWidth + gutter) * slidesMove) })
+    for (let i = 0; i < slidesToShow; i++) {
+      const readyX = firstX + (slideWidth + gutter) * i
+
+      if (!currIndexes.includes((nextIndex + i) % totalSlide)) {
+        nextSlidesReadyPos.push({ index: nextIndex + i, readyX })
+      }
+
+      nextSlidesNewPos.push({ index: nextIndex + i, newX: readyX - (gutter + slideWidth) * slidesMove })
     }
   } else if (direction === "prev") {
+    // Calculate number of slides to move
+    if (toIndex !== undefined) {
+      const lastIndex = (toIndex + slidesToShow - 1) % totalSlide
+      if (currIndexes.includes(lastIndex)) {
+        slidesMove = currIndexes.indexOf((curr + slidesToShow - 1) % totalSlide) - currIndexes.indexOf(lastIndex)
+      } else slidesMove = slidesToShow
+    } else slidesMove = slidesToScroll
+
     nextIndex = toIndex !== undefined ? toIndex : (totalSlide + (curr - slidesToScroll)) % totalSlide
-    newCurr = toIndex !== undefined ? toIndex : nextIndex
+
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
-    for (let i = 0; i < slidesMove; i++) {
-      nextSlidesReadyPos.push({ index: (nextIndex + i) % totalSlide, readyX: (0 - (gutter + slideWidth) * (slidesMove - i)) })
-      nextSlidesNewPos.push({ index: (nextIndex + i) % totalSlide, newX: (gutter + slideWidth) * i })
-    }
+    let firstX // left position of the last slide in next slides
+    if (currIndexes.includes((nextIndex + slidesToShow - 1) % totalSlide)) {
+      firstX = slider.$slider.children().eq((nextIndex + slidesToShow - 1) % totalSlide).position().left
+    } else firstX = -(slideWidth + gutter)
 
     for (let i = 0; i < slidesToShow; i++) {
-      const $slide = slider.$slider.children().eq((curr + i) % totalSlide)
-      const slideX = $slide.position().left
+      const readyX = firstX - (slideWidth + gutter) * (slidesToShow - i - 1)
 
-      currSlidesNewPos.push({ index: (curr + i) % totalSlide, newX: slideX + (gutter + slideWidth) * slidesMove })
+      if (!currIndexes.includes((nextIndex + i) % totalSlide)) {
+        nextSlidesReadyPos.push({ index: nextIndex + i, readyX })
+      }
+
+      nextSlidesNewPos.push({ index: nextIndex + i, newX: readyX + (gutter + slideWidth) * slidesMove })
     }
   }
 
-  return { nextIndex, nextSlidePos, currSlidePos, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos, newCurr }
+  // Calculate new position for curr-showing-slides
+  for (let i = 0; i < slidesToShow; i++) {
+    const $slide = slider.$slider.children().eq((curr + i) % totalSlide)
+    const slideX = $slide.position().left
+
+    let newX
+    if (direction === 'next') newX = slideX - (gutter + slideWidth) * slidesMove
+    else if (direction === 'prev') newX = slideX + (gutter + slideWidth) * slidesMove
+
+    if (slider.moveByDrag) {
+      const currLeft = slider.$slider.children().eq(curr % totalSlide).position().left
+      if (direction === 'prev') newX = slideX + (sliderWidth - currLeft) + gutter
+      else if (direction === 'next') newX = slideX - (sliderWidth + currLeft) - gutter
+    }
+
+    currSlidesNewPos.push({ index: curr + i, newX })
+  }
+  // debugger
+
+  ////////////
+
+  nextSlidesReadyPos = refineArray(nextSlidesReadyPos, totalSlide)
+  nextSlidesNewPos = refineArray(nextSlidesNewPos, totalSlide)
+  currSlidesNewPos = refineArray(currSlidesNewPos, totalSlide)
+
+  return { nextIndex, nextSlidePos, currSlidePos, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
+
+const refineArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
 
 const calculateSlideSize = (slider) => {
   const { gutter, slidesToShow } = slider.opts

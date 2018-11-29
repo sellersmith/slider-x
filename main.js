@@ -15,7 +15,7 @@ class SliderController {
     // this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
 
     this.$el = $(this.el) // The original element
-    this.$slider = '' // The .inner div that wrap all slide
+    this.$slider = '' // The .inner div that wrap all slides
     this.sliderHeight = this.$el.height()
     this.sliderWidth = this.$el.width()
 
@@ -25,24 +25,22 @@ class SliderController {
     this.autoPlayTimeoutId = ''
 
     // Setup DOM + event handler
-    this.initialize()
     this.$el.on('click', this.handleClick.bind(this))
-
-    // Set up drag n drop event
-    this.moveByDrag = false
-
-    this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
-    this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
-
-    // For testing
-    console.log(this)
+    
+    this.initialize()
   }
 
   initialize() {
     this.verifyOptions()
+
     this.setupSliderDOM()
+    // Set up drag n drop event
+    this.moveByDrag = false
+    this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
+    this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
+
     this.setAutoPlay()
-    console.log("New Slider initialized!")
+    console.log("New Slider initialized!!!", this)
     return this
   }
 
@@ -70,13 +68,14 @@ class SliderController {
 
     // Append indicators
     const $indicators = $('<ol>')
-    const { slidesToShow } = this.opts
-    for (let i = 0; i < Math.ceil(this.totalSlide / slidesToShow); i++) {
-      const $indItem = $(`<li data-goto-slide=${i * slidesToShow} data-action='goto'></li>`)
+    for (let i = 0; i < this.totalSlide; i++) {
+      const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
 
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
+
+    this.cloneSlide()
 
     // Add style for slider
     this.updateSliderStyle()
@@ -84,6 +83,19 @@ class SliderController {
 
     // Save slider height
     // this.sliderHeight = this.
+  }
+
+  cloneSlide() {
+    const { length } = this.$slider.children()
+
+    for (let i = 0; i < length; i++) {
+      const $slide = this.$slider.children().eq(i)
+      $slide.clone().attr('data-slide-clone', true).appendTo(this.$slider)
+    }
+    for (let i = 0; i < length; i++) {
+      const $slide = this.$slider.children().eq(i)
+      $slide.clone().attr('data-slide-clone', true).appendTo(this.$slider)
+    }
   }
 
   /* SETUP EVENT DELEGATION */
@@ -118,30 +130,39 @@ class SliderController {
     if (Math.abs(data.moveX) < SliderController.constructor.MIN_DRAG_DISTANCE) return
     this.clearAutoPlay()
 
-    const translateRange = (data.moveX / this.sliderWidth) * 100    // -30
-    const nextTranslateRange = 100 + translateRange                 // => 70
-    const prevTranslateRange = -100 + translateRange                // => -130
+    const translateRange = data.moveX    // -30
+    const { curr, slidesToShow, gutter } = this.opts
 
-    const { curr } = this.opts
-    const $curr = this.$slider.children().eq(curr)
+    const nextIndex = (curr + slidesToShow) % (this.totalSlide * 3)
+    let nextSlidesReadyPos = getSlideMovementData(this, 'next', nextIndex).nextSlidesReadyPos
 
-    let { nextIndex } = getSlideMovementData(this, 'next')
-    const $next = this.$slider.children().eq(nextIndex)
-
+    const currSlidesPos = []
+    const slideWidth = calculateSlideSize(this)
+    for (let i = 0; i < slidesToShow; i++) {
+      currSlidesPos.push({ index: (i + curr) % (this.totalSlide * 3), readyX: (slideWidth + gutter) * i })
+    }
     // TODO: fix this dummy code
     // This is stupid because the getMovementData return the variable name nextIndex
-    nextIndex = getSlideMovementData(this, 'prev').nextIndex
-    const prevIndex = nextIndex
-    const $prev = this.$slider.children().eq(prevIndex)
+    const prevIndex = (this.totalSlide * 3 + (curr - slidesToShow)) % (this.totalSlide * 3)
+    let prevSlidesReadyPos = getSlideMovementData(this, 'prev', prevIndex).nextSlidesReadyPos
 
     // Drag is forbidden in these below cases:
     if (curr === 0 && !this.opts.loop && translateRange > 0) return
-    if (curr === this.totalSlide - 1 && !this.opts.loop && translateRange < 0) return
+    if (curr === this.totalSlide * 3 - 1 && !this.opts.loop && translateRange < 0) return
 
     // The key is: move all 3 slide! Genius!
-    this.translateSlide($prev, prevTranslateRange)
-    this.translateSlide($curr, translateRange)
-    this.translateSlide($next, nextTranslateRange)
+    for (let slide of prevSlidesReadyPos) {
+      const $slide = this.$slider.children().eq(slide.index)
+      this.translateSlide($slide, slide.readyX + translateRange)
+    }
+    for (let slide of currSlidesPos) {
+      const $slide = this.$slider.children().eq(slide.index)
+      this.translateSlide($slide, slide.readyX + translateRange)
+    }
+    for (let slide of nextSlidesReadyPos) {
+      const $slide = this.$slider.children().eq(slide.index)
+      this.translateSlide($slide, slide.readyX + translateRange)
+    }
   }
 
   handleDragStop(e, data) {
@@ -158,13 +179,14 @@ class SliderController {
     let direction = ''
     let duration
 
-    // TOTO: Make this block code shorter (Seem unneccessary ?)
+    // TODO: Make this block code shorter (Seem unneccessary ?)
     if (mouseSpeed > MIN_MOUSE_SPEED_TO_MOVE_SLIDE || Math.abs(distRatio) > MIN_DISTANCE_RATIO_TO_MOVE_SLIDE) {
       duration = this.opts.duration - Math.abs(distRatio) * this.opts.duration
 
       if (distRatio < 0) direction = 'next'
       else if (distRatio > 0) direction = 'prev'
-    } else {
+    }
+    else {
       duration = Math.abs(distRatio) * this.opts.duration
       /**
        * This is a bit tricky
@@ -172,17 +194,29 @@ class SliderController {
        * next() n prev() functions
        */
       if (distRatio < 0) {
-        this.opts.curr += 1
+        this.opts.curr += this.opts.slidesToShow
         direction = 'prev'
       }
       else if (distRatio > 0) {
-        this.opts.curr -= 1
+        this.opts.curr = (this.totalSlide * 3 + (this.opts.curr - this.opts.slidesToShow))
         direction = 'next'
       }
+      this.opts.curr %= (this.totalSlide * 3)
     }
 
     // Dummy: the moveSlide() need toIndex as the 2nd argument
-    const toIndex = undefined
+    const { curr, slidesToShow } = this.opts
+    
+    let toIndex
+    if (direction === 'next') {
+      toIndex = curr + slidesToShow
+    } else {
+      toIndex = (this.totalSlide * 3 + (curr - slidesToShow))
+    }
+
+    toIndex %= (this.totalSlide * 3)
+
+    // debugger
 
     this.moveSlide(direction, toIndex, duration)
   }
@@ -239,10 +273,12 @@ class SliderController {
     if (!this.opts.loop) this.opts.autoPlay = false
 
     // Set the style of slider nav n pagination to legal values
-    this.updateSliderStyle()
+    // this.updateSliderStyle()
 
-    this.updateSliderCtrlStyle(this.opts.curr)
-    this.setAutoPlay()
+    // this.updateSliderCtrlStyle(this.opts.curr)
+    // this.setAutoPlay()
+    this.destroy()
+    this.initialize()
   }
 
   setAutoPlay() {
@@ -260,6 +296,9 @@ class SliderController {
   /* CONTROLLER FUNCTIONS */
   destroy() {
     this.clearAutoPlay()
+    // Remove all cloned slides
+    this.$slider.find('*[data-slide-clone=true]').remove()
+
     // Save all items, remove all classes, inline-style n reverse the original style
     const items = []
     this.$slider.children().each((i, child) => {
@@ -275,9 +314,7 @@ class SliderController {
     this.$el.empty()
 
     // Append the original item
-    for (let item of items) {
-      this.$el.append(item)
-    }
+    for (let item of items) { this.$el.append(item) }
   }
 
   moveSlide(direction, toIndex, customDuration) {
@@ -294,7 +331,8 @@ class SliderController {
     // Turn off mouse event on moving
     this.$el.addClass(turnOffMouseEvent)
 
-    const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos, newCurr } = getSlideMovementData(this, direction, toIndex)
+    // debugger
+    const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos } = getSlideMovementData(this, direction, toIndex)
     console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
     // const $curr = this.$slider.children().eq(currIndex)
@@ -339,7 +377,7 @@ class SliderController {
     }, 50)
 
     // Update curr index n reset the .active
-    this.opts.curr = newCurr
+    this.opts.curr = nextIndex
     this.udpateActiveSlideStyle()
   }
 
@@ -443,7 +481,7 @@ class SliderController {
     this.$slider.children().eq(curr).addClass('active')
 
     this.$el.find('li.active').removeClass('active')
-    this.$el.find('ol').find(`li[data-goto-slide="${curr}"]`).addClass('active')
+    this.$el.find('ol').find(`li[data-goto-slide="${curr % this.totalSlide}"]`).addClass('active')
 
     this.updateSliderCtrlStyle(curr)
   }
