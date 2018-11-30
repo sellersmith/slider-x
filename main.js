@@ -24,14 +24,13 @@ class SliderController {
 
     this.autoPlayTimeoutId = ''
 
-    // Setup DOM + event handler
-    this.$el.on('click', this.handleClick.bind(this))
-    
     this.initialize()
   }
 
   initialize() {
     this.verifyOptions()
+    // Setup DOM + set event handler
+    this.$el.on('mousedown', this.handleMouseDown.bind(this))
 
     this.setupSliderDOM()
     // Set up drag n drop event
@@ -99,7 +98,10 @@ class SliderController {
   }
 
   /* SETUP EVENT DELEGATION */
-  handleClick(e) {
+  handleMouseDown(e) {
+    e.stopPropagation()
+    e.preventDefault()
+
     const action = e.target.getAttribute('data-action')
     switch (action) {
       case 'next': this.next(); break
@@ -238,6 +240,9 @@ class SliderController {
     // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
 
+    // No gutter if only one slide shown in a section
+    if (this.opts.slidesToShow === 1) this.opts.gutter = 0
+
     // Set the style of slider nav n pagination to legal values
     const defPags = this.constructor.styleOptions.paginations
     const defNavs = this.constructor.styleOptions.navs
@@ -309,8 +314,9 @@ class SliderController {
     // Remove class, event handler, data-instance and all children
     // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
     this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
-    this.$el.off('click', this.handleClick)
-    this.$el.data('pf-slider-x', '')
+    this.$el.off('click', this.handleMouseDown)
+    this.$el.data('pf-slider-x', null)
+    this.$el.data('pf-slider-initialized', null)
     this.$el.empty()
 
     // Append the original item
@@ -527,6 +533,7 @@ function init(jQuery) {
         }
         instance = new SliderController(element, opts)
         jQuery(element).data('pf-slider-x', instance)
+        jQuery(element).data('pf-slider-initialized', true)
       } else {
         if (typeof opts === 'string') {
           instance[opts](...args)
