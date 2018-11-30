@@ -25,7 +25,7 @@ class SliderController {
 
     // Setup DOM + set event handler
     this.initialize()
-    this.$el.on('click', this.handleClick.bind(this))
+    this.$el.on('mousedown', this.handleMouseDown.bind(this))
 
     // Set up drag n drop event
     this.moveByDrag = false
@@ -83,7 +83,10 @@ class SliderController {
   }
 
   /* SETUP EVENT DELEGATION */
-  handleClick(e) {
+  handleMouseDown(e) {
+    e.stopPropagation()
+    e.preventDefault()
+
     const action = e.target.getAttribute('data-action')
     switch (action) {
       case 'next': this.next(); break
@@ -266,8 +269,9 @@ class SliderController {
     // Remove class, event handler, data-instance and all children
     // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
     this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
-    this.$el.off('click', this.handleClick)
-    this.$el.data('pf-slider-x', '')
+    this.$el.off('click', this.handleMouseDown)
+    this.$el.data('pf-slider-x', null)
+    this.$el.data('pf-slider-initialized', null)
     this.$el.empty()
 
     // Append the original item
@@ -458,6 +462,7 @@ function init(jQuery) {
         }
         instance = new SliderController(element, opts)
         jQuery(element).data('pf-slider-x', instance)
+        jQuery(element).data('pf-slider-initialized', true)
       } else {
         if (typeof opts === 'string') {
           instance[opts](...args)
