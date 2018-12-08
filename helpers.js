@@ -1,6 +1,6 @@
 const prefix = 'pf'
 
-export const SliderClasses = {
+ const SliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
@@ -13,7 +13,7 @@ export const SliderClasses = {
   turnOffMouseEvent: `${prefix}-slider-mouse-event-off`
 }
 
-export const getSlideMovementData = (slider, direction, toIndex) => {
+ const getSlideMovementData = (slider, direction, toIndex) => {
   let nextIndex, nextSlidePos, currSlidePos
 
   if (direction === "next") {
