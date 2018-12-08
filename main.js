@@ -30,7 +30,7 @@ class SliderController {
   initialize() {
     this.verifyOptions()
     // Setup DOM + set event handler
-    this.$el.on('mousedown', this.handleMouseDown.bind(this))
+    this.$el.on('click', this.handleClick.bind(this))
 
     this.setupSliderDOM()
     // Set up drag n drop event
@@ -39,6 +39,7 @@ class SliderController {
     this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
 
     this.setAutoPlay()
+    $(window).resize((e) => this.handleResize(e))
     console.log("New Slider initialized!!!", this)
     return this
   }
@@ -98,7 +99,27 @@ class SliderController {
   }
 
   /* SETUP EVENT DELEGATION */
-  handleMouseDown(e) {
+  handleResize(e) {
+    const { curr, slidesToShow, gutter } = this.opts
+    let { totalSlide } = this
+    totalSlide *= 3
+
+    const newSlideWidth = calculateSlideSize(this)
+    const $slides = this.$slider.children()
+    $slides.css({ width: `${newSlideWidth}px`, transition: '' })
+
+    $slides.eq((curr + slidesToShow) % totalSlide).css({ transform: `translate3d(${this.$slider.width()}px, 0, 0)` })
+    $slides.eq((totalSlide + (curr - 1)) % totalSlide).css({ transform: `translate3d(${- newSlideWidth - gutter}px, 0, 0)` })
+
+    for (let i = curr; i < curr + slidesToShow; i++) {
+      const $slide = $slides.eq(i % totalSlide)
+      $slide.css({ transform: `translate3d(${(newSlideWidth + gutter) * (i - curr)}px, 0, 0)` })
+    }
+
+    this.sliderWidth = this.$el.width()
+  }
+
+  handleClick(e) {
     e.stopPropagation()
     e.preventDefault()
 
@@ -314,7 +335,7 @@ class SliderController {
     // Remove class, event handler, data-instance and all children
     // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
     this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
-    this.$el.off('click', this.handleMouseDown)
+    this.$el.off('click', this.handleClick)
     this.$el.data('pf-slider-x', null)
     this.$el.data('pf-slider-initialized', null)
     this.$el.empty()
@@ -337,12 +358,8 @@ class SliderController {
     // Turn off mouse event on moving
     this.$el.addClass(turnOffMouseEvent)
 
-    // debugger
     const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos } = getSlideMovementData(this, direction, toIndex)
-    console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
-
-    // const $curr = this.$slider.children().eq(currIndex)
-    // const $next = this.$slider.children().eq(nextIndex)
+    // console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
     // if (this.opts.adaptiveHeight) {
     //   const nextHeight = $next.height()
@@ -372,8 +389,7 @@ class SliderController {
         const $slide = this.$slider.children().eq(slide.index)
         this.translateSlide($slide, slide.newX, duration)
       }
-      // this.translateSlide($curr, currSlidePos, duration)
-      // this.translateSlide($next, 0, duration)
+      
       // Do stuffs after slides moving complete
       setTimeout(() => {
         this.setAutoPlay()
