@@ -1,4 +1,7 @@
 const prefix = 'pf'
+const refineArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
+
+// Export all these following stuff before publish
 
 const SliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
@@ -110,8 +113,6 @@ const getSlideMovementData = (slider, direction, toIndex) => {
 
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
-
-const refineArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
 
 const calculateSlideSize = (slider) => {
   const { gutter, slidesToShow } = slider.opts
