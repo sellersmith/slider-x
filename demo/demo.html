@@ -51,6 +51,9 @@
   <div class="my-slide">
     <div class="h-300px slide-1"></div>
     <div class="h-500px slide-2"></div>
+    <div class="h-500px slide-1"></div>
+    <div class="h-500px slide-2"></div>
+    <div class="h-500px slide-1"></div>
   </div>
   <br><br><br>
   <div class="my-slide">
@@ -64,10 +67,12 @@
   <script src="../dist/slider-x.js"></script>
   <script>
     $('.my-slide').slider({
+      slidesToShow: 3,
+      gutter: 0,
       autoPlay: false,
       duration: '400',
       autoPlayDelay: 2000,
-      loop: true,
+      loop: false,
       navStyle: 'nav-style-111',
       paginationStyle: 'pagination-style-3'
     })
