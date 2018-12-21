@@ -15,7 +15,7 @@ class SliderController {
     // this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
 
     this.$el = $(this.el) // The original element
-    this.$slider = '' // The .inner div that wrap all slides
+    this.$slider = null // The .inner div that wrap all slides
     this.sliderHeight = this.$el.height()
     this.sliderWidth = this.$el.width()
 
@@ -28,13 +28,17 @@ class SliderController {
   }
 
   initialize() {
+    this.opts.curr = 0
     this.verifyOptions()
+
     // Setup DOM + set event handler
     this.$el.on('click', this.handleClick.bind(this))
 
     this.setupSliderDOM()
+
     // Set up drag n drop event
     this.moveByDrag = false
+    this.missingSlidesOnDrag = false
     this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
     this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
 
@@ -72,7 +76,6 @@ class SliderController {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
-
     this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
 
     this.cloneSlide()
@@ -120,9 +123,6 @@ class SliderController {
   }
 
   handleClick(e) {
-    e.stopPropagation()
-    e.preventDefault()
-
     const action = e.target.getAttribute('data-action')
     switch (action) {
       case 'next': this.next(); break
@@ -154,10 +154,11 @@ class SliderController {
     this.clearAutoPlay()
 
     const translateRange = data.moveX    // -30
-    const { curr, slidesToShow, gutter } = this.opts
+    const { curr, slidesToShow, gutter, loop } = this.opts
 
     const nextIndex = (curr + slidesToShow) % (this.totalSlide * 3)
     let nextSlidesReadyPos = getSlideMovementData(this, 'next', nextIndex).nextSlidesReadyPos
+    if (!loop) nextSlidesReadyPos = nextSlidesReadyPos.filter(obj => obj.index < this.totalSlide)
 
     const currSlidesPos = []
     const slideWidth = calculateSlideSize(this)
@@ -168,10 +169,12 @@ class SliderController {
     // This is stupid because the getMovementData return the variable name nextIndex
     const prevIndex = (this.totalSlide * 3 + (curr - slidesToShow)) % (this.totalSlide * 3)
     let prevSlidesReadyPos = getSlideMovementData(this, 'prev', prevIndex).nextSlidesReadyPos
+    if (!loop) prevSlidesReadyPos = prevSlidesReadyPos.filter(obj => obj.index < this.totalSlide)
 
     // Drag is forbidden in these below cases:
     if (curr === 0 && !this.opts.loop && translateRange > 0) return
-    if (curr === this.totalSlide * 3 - 1 && !this.opts.loop && translateRange < 0) return
+    if (curr + slidesToShow >= this.totalSlide && !this.opts.loop && translateRange < 0) return
+
 
     // The key is: move all 3 slide! Genius!
     for (let slide of prevSlidesReadyPos) {
@@ -194,54 +197,71 @@ class SliderController {
     this.moveByDrag = true
 
     const MIN_MOUSE_SPEED_TO_MOVE_SLIDE = 1
-    const MIN_DISTANCE_RATIO_TO_MOVE_SLIDE = 0.3  // 30%
+    const MIN_DISTANCE_RATIO_TO_MOVE_SLIDE = 0.3 // 30%
 
     const mouseSpeed = data.velocityX
     const distRatio = data.moveX / this.sliderWidth
-
-    let direction = ''
-    let duration
+    
+    let direction = '', toIndex
+    const { totalSlide } = this
+    const { loop, curr, slidesToShow, duration } = this.opts
+    let customDuration = Math.abs(distRatio) * duration
 
     // TODO: Make this block code shorter (Seem unneccessary ?)
-    if (mouseSpeed > MIN_MOUSE_SPEED_TO_MOVE_SLIDE || Math.abs(distRatio) > MIN_DISTANCE_RATIO_TO_MOVE_SLIDE) {
-      duration = this.opts.duration - Math.abs(distRatio) * this.opts.duration
+    // debugger
+    if (mouseSpeed > MIN_MOUSE_SPEED_TO_MOVE_SLIDE || Math.abs(distRatio) > MIN_DISTANCE_RATIO_TO_MOVE_SLIDE) { // Move slides to new position
+      /**
+       * The 2 following cases a special so we have to manually handle them
+       * Drag slides with (loop = false) and the last slides are't enough for the window
+       * So we left a blank at the last/first
+       */
+      if (!loop) {
+        if (distRatio < 0 && curr + 2 * slidesToShow > totalSlide) {
+          direction = 'prev'
+          toIndex = totalSlide - slidesToShow
+          this.missingSlidesOnDrag = true
+          this.moveSlide(direction, toIndex, customDuration)
+          return
+
+        }
+        else if (distRatio > 0 && curr - slidesToShow < 0) {
+          direction = 'next'
+          toIndex = 0
+          this.missingSlidesOnDrag = true
+          this.moveSlide(direction, toIndex, customDuration)
+          return
+        }
+      }
+
+      customDuration = duration - customDuration
 
       if (distRatio < 0) direction = 'next'
       else if (distRatio > 0) direction = 'prev'
     }
-    else {
-      duration = Math.abs(distRatio) * this.opts.duration
+    else { // Revert slides to original position
       /**
        * This is a bit tricky
        * In case we have to move the slides to the original position, I change the curr slide index to reuse the 
        * next() n prev() functions
        */
       if (distRatio < 0) {
-        this.opts.curr += this.opts.slidesToShow
+        this.opts.curr += slidesToShow
         direction = 'prev'
       }
       else if (distRatio > 0) {
-        this.opts.curr = (this.totalSlide * 3 + (this.opts.curr - this.opts.slidesToShow))
+        this.opts.curr = (totalSlide * 3 + (curr - slidesToShow))
         direction = 'next'
       }
-      this.opts.curr %= (this.totalSlide * 3)
+      this.opts.curr %= (totalSlide * 3)
     }
 
     // Dummy: the moveSlide() need toIndex as the 2nd argument
-    const { curr, slidesToShow } = this.opts
-    
-    let toIndex
-    if (direction === 'next') {
-      toIndex = curr + slidesToShow
-    } else {
-      toIndex = (this.totalSlide * 3 + (curr - slidesToShow))
-    }
-
-    toIndex %= (this.totalSlide * 3)
-
+    if (direction === 'next') toIndex = this.opts.curr + slidesToShow 
+    else toIndex = (totalSlide * 3 + (this.opts.curr - slidesToShow))
+    toIndex %= (totalSlide * 3)
     // debugger
 
-    this.moveSlide(direction, toIndex, duration)
+    this.moveSlide(direction, toIndex, customDuration)
   }
 
   /* LOGIC FUNCTION */
@@ -335,7 +355,7 @@ class SliderController {
     // Remove class, event handler, data-instance and all children
     // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
     this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
-    this.$el.off('click', this.handleClick)
+    this.$el.off('click')
     this.$el.data('pf-slider-x', null)
     this.$el.data('pf-slider-initialized', null)
     this.$el.empty()
@@ -346,14 +366,22 @@ class SliderController {
 
   moveSlide(direction, toIndex, customDuration) {
     this.clearAutoPlay()
-    const currIndex = this.opts.curr
+    const { curr, slidesToShow, loop } = this.opts
 
     // Move slide is forbidden in the 1st n last slide if Slider movement is not loop
-    if (
-      (direction === 'prev' && currIndex === 0 && !this.opts.loop)
-      ||
-      (direction === 'next' && currIndex === (this.totalSlide - 1) && !this.opts.loop)
-    ) return
+    // debugger
+    if (!loop && !this.moveByDrag) {
+      if (
+        (direction === 'prev' && curr === 0)
+        ||
+        (direction === 'next' && curr + slidesToShow - 1 >= (this.totalSlide - 1))
+        ||
+        (direction === 'next' && toIndex + slidesToShow - 1 > (this.totalSlide - 1))
+      ) {
+        this.moveByDrag = false
+        return
+      }
+    }
 
     // Turn off mouse event on moving
     this.$el.addClass(turnOffMouseEvent)
@@ -380,21 +408,28 @@ class SliderController {
     let duration = customDuration ? customDuration : this.opts.duration
 
     setTimeout(() => {
-      for (let slide of currSlidesNewPos) {
-        const $slide = this.$slider.children().eq(slide.index)
-        this.translateSlide($slide, slide.newX, duration)
+      /**
+       * Tricky: when move slides in a special case - drag but missing slides (loop = false)
+       * The curr slides is out of window so just don't move them
+       */
+      if (!this.missingSlidesOnDrag) {
+        for (let slide of currSlidesNewPos) {
+          const $slide = this.$slider.children().eq(slide.index)
+          this.translateSlide($slide, slide.newX, duration)
+        }
       }
 
       for (let slide of nextSlidesNewPos) {
         const $slide = this.$slider.children().eq(slide.index)
         this.translateSlide($slide, slide.newX, duration)
       }
-      
+
       // Do stuffs after slides moving complete
       setTimeout(() => {
         this.setAutoPlay()
         this.$el.removeClass(turnOffMouseEvent)
         this.moveByDrag = false
+        this.missingSlidesOnDrag = false
       }, duration)
     }, 50)
 
@@ -413,9 +448,28 @@ class SliderController {
     $slide.css('transform', `translate3d(${toX}px, 0, 0)`)
   }
 
-  next() { this.moveSlide("next") }
+  next() {
+    const { curr, loop, slidesToScroll, slidesToShow } = this.opts
+    const { totalSlide } = this
 
-  prev() { this.moveSlide("prev") }
+    if (!loop) {
+      if (curr + slidesToScroll + slidesToShow >= totalSlide) {
+        this.goto(totalSlide - slidesToShow)
+      } else this.moveSlide("next")
+    }
+    else this.moveSlide("next")
+  }
+
+  prev() {
+    const { curr, loop, slidesToScroll } = this.opts
+
+    if (!loop) {
+      if (curr - slidesToScroll <= 0) {
+        this.goto(0)
+      } else this.moveSlide("prev")
+    }
+    else this.moveSlide("prev")
+  }
 
   goto(index) {
     if (index > this.opts.curr) {
@@ -440,13 +494,8 @@ class SliderController {
 
       // Stretch all slide height to equal to the heightest slide
       $slides.css({ 'height': '100%', width: `${slideWidth}px` })
-      this.$slider.css({
-        'height': '100%',
-        'transition': ''
-      })
-      this.$el.css({
-        'transition': ''
-      })
+      this.$slider.css({ 'height': '100%', 'transition': '' })
+      this.$el.css({ 'transition': '' })
     } else {
       $slides.css({ 'height': '' })
 

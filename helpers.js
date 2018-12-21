@@ -26,7 +26,7 @@ const getSlideMovementData = (slider, direction, toIndex) => {
   const currIndexes = []
   for (let i = 0; i < slidesToShow; i++) { currIndexes.push((curr + i) % totalSlide) }
 
-  let nextIndex, nextSlidePos, currSlidePos
+  let nextIndex
   let nextSlidesReadyPos = [], nextSlidesNewPos = [], currSlidesNewPos = []
   let slidesMove
 
@@ -108,7 +108,7 @@ const getSlideMovementData = (slider, direction, toIndex) => {
   nextSlidesNewPos = refineArray(nextSlidesNewPos, totalSlide)
   currSlidesNewPos = refineArray(currSlidesNewPos, totalSlide)
 
-  return { nextIndex, nextSlidePos, currSlidePos, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
+  return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
 const refineArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
