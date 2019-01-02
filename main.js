@@ -368,6 +368,8 @@ class SliderController {
 
     // Append the original item
     for (let item of items) { this.$el.append(item) }
+
+    console.log('Removed slider-x !!')
   }
 
   moveSlide(direction, toIndex, customDuration) {
