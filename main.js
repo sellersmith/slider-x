@@ -44,6 +44,9 @@ class SliderController {
 
     this.setAutoPlay()
     $(window).resize((e) => this.handleResize(e))
+
+    // Set slider-instance data
+    this.$el.data('pf-slider-x', this)
     console.log("New Slider initialized!!!", this)
     return this
   }
