@@ -114,7 +114,7 @@ export const getSlideMovementData = (slider, direction, toIndex) => {
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
-const calculateSlideSize = (slider) => {
+export const calculateSlideSize = (slider) => {
   const { gutter, slidesToShow } = slider.opts
   const wrapperWidth = slider.$slider.width()
 
