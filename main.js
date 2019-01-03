@@ -44,6 +44,11 @@ class SliderController {
 
     this.setAutoPlay()
     $(window).resize((e) => this.handleResize(e))
+
+    // Set slider-instance data
+    this.$el.data('pf-slider-x', this)
+    this.$el.attr('data-slider-x-init', 'init-ed')
+
     console.log("New Slider initialized!!!", this)
     return this
   }
@@ -356,12 +361,15 @@ class SliderController {
     // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
     this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
     this.$el.off('click')
+    this.$el.attr('data-slider-x-init', null)
     this.$el.data('pf-slider-x', null)
     this.$el.data('pf-slider-initialized', null)
     this.$el.empty()
 
     // Append the original item
     for (let item of items) { this.$el.append(item) }
+
+    console.log('Removed slider-x !!')
   }
 
   moveSlide(direction, toIndex, customDuration) {
@@ -597,6 +605,7 @@ function init(jQuery) {
           throw new Error('This element was not initialized as a Slider yet')
         }
         instance = new SliderController(element, opts)
+        jQuery(element).attr('data-slider-x-init', 'init-ed')
         jQuery(element).data('pf-slider-x', instance)
         jQuery(element).data('pf-slider-initialized', true)
       } else {
