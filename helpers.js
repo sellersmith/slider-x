@@ -1,5 +1,5 @@
 const prefix = 'pf'
-const refineArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
+const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
 
 // Export all these following stuff before publish
 
@@ -17,12 +17,12 @@ const SliderClasses = {
 }
 
 // The logic is compicated! Stay tune before reading this func
-const getSlideMovementData = (slider, direction, toIndex) => {
+const getPFSlideMovementData = (slider, direction, toIndex) => {
   let { totalSlide, $slider } = slider
   totalSlide *= 3
 
   const sliderWidth = $slider.width()
-  const slideWidth = calculateSlideSize(slider)
+  const slideWidth = calculatePFSlideSize(slider)
   const { curr, slidesToShow, slidesToScroll, gutter } = slider.opts
 
   // Created this array to check if the next index is in the curr-showing-slides or not
@@ -107,14 +107,14 @@ const getSlideMovementData = (slider, direction, toIndex) => {
 
   ////////////
 
-  nextSlidesReadyPos = refineArray(nextSlidesReadyPos, totalSlide)
-  nextSlidesNewPos = refineArray(nextSlidesNewPos, totalSlide)
-  currSlidesNewPos = refineArray(currSlidesNewPos, totalSlide)
+  nextSlidesReadyPos = refinePFSliderArray(nextSlidesReadyPos, totalSlide)
+  nextSlidesNewPos = refinePFSliderArray(nextSlidesNewPos, totalSlide)
+  currSlidesNewPos = refinePFSliderArray(currSlidesNewPos, totalSlide)
 
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
-const calculateSlideSize = (slider) => {
+const calculatePFSlideSize = (slider) => {
   const { gutter, slidesToShow } = slider.opts
   const wrapperWidth = slider.$slider.width()
 
