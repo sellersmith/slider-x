@@ -18,7 +18,10 @@
     .h-400px { height: 400px; }
     .h-200px { height: 200px; }
     .h-500px { height: 500px; }
-    .test-slider-1 { height: 299px; }
+    .test-slider-1 { 
+      height: 299px;
+      /* background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80') */
+    }
     .test-slider-2 { background: lightseagreen; }
 
     .pf-slider-slide {
@@ -44,20 +47,20 @@
     <div class="child-3 h-300px" style="font-size: 2em;">2</div>
     <div class="child-4 h-500px">3</div>
     <div class="child-5 h-300px">4</div>
-    <div class="child-1 h-200px">5</div>
+    <!-- <div class="child-1 h-200px">5</div>
     <div class="child-2 h-400px">6</div>
     <div class="child-3 h-300px" style="font-size: 2em;">7</div>
     <div class="child-4 h-500px">8</div>
-    <div class="child-5 h-300px">9</div>
+    <div class="child-5 h-300px">9</div> -->
   </div>
   <br><br><br>
-  <div class='test-slider-2 h-300px' style="height: 400px;">
+  <!-- <div class='test-slider-2 h-300px' style="height: 400px;">
     <div class="">00</div>
     <div class="">11</div>
     <div class="">22</div>
     <div class="">33</div>
     <div class="">44</div>
-  </div>
+  </div> -->
 
   <script src="./draggable.js"></script>
   <script src="./helpers.js"></script>
@@ -66,8 +69,8 @@
   <script>
     $('.test-slider-1').pageflySlider({
       curr: 3,
-      slidesToShow: 3,
-      slidesToScroll: 2,
+      slidesToShow: 1,
+      slidesToScroll: 1,
       autoPlay: false,
       duration: 400,
       autoPlayDelay: '2000',
@@ -78,14 +81,14 @@
       paginationStyle: 'pagination-style-3'
     })
 
-    $('.test-slider-2').pageflySlider({
-      autoPlay: false,
-      autoPlayDelay: 3000,
-      duration: "sample-text-to-test-default-opts",
-      loop: true,
-      navStyle: 'nav-style-3',
-      paginationStyle: 'pagination-style-2'
-    })
+    // $('.test-slider-2').pageflySlider({
+    //   autoPlay: false,
+    //   autoPlayDelay: 3000,
+    //   duration: "sample-text-to-test-default-opts",
+    //   loop: true,
+    //   navStyle: 'nav-style-3',
+    //   paginationStyle: 'pagination-style-2'
+    // })
   </script>
 </body>
 
