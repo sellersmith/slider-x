@@ -114,11 +114,10 @@ const getPFSlideMovementData = (slider, direction, toIndex) => {
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
-const calculatePFSlideSize = (slider) => {
+const calculatePFSlideSize = slider => {
   const { gutter, slidesToShow } = slider.opts
-  const wrapperWidth = slider.$slider.width()
+  const wrapperWidth = slider.sliderWidth
 
   const slideWidth = (wrapperWidth - gutter * (slidesToShow - 1)) / slidesToShow
-
   return slideWidth
 }

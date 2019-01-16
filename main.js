@@ -17,7 +17,7 @@ class PageFlySliderController {
     this.$el = $(this.el) // The original element
     this.$slider = null // The .inner div that wrap all slides
     this.sliderHeight = this.$el.height()
-    this.sliderWidth = this.$el.width()
+    this.sliderWidth = null
 
     this.totalSlide = this.$el.children().length
     this.opts = $.extend({}, opts) // Each slider's opts is a specific instance of opts argument
@@ -25,6 +25,22 @@ class PageFlySliderController {
     this.autoPlayTimeoutId = ''
 
     this.initialize()
+  }
+
+  getWrapperWidthThenInit() {
+    // Remove string url("")
+    const { $el } = this
+    const sliderBackgroundImg = $el.css('background-image').slice(4, -1).replace(/"/g, "")
+    let wrapperWidth
+
+    const tempImg = new Image()
+    tempImg.src = sliderBackgroundImg
+    tempImg.onload = () => {
+      wrapperWidth = $el.width()
+      this.sliderWidth = wrapperWidth
+      this.initialize()
+      console.log(9696, this.sliderWidth)
+    }
   }
 
   initialize() {
@@ -38,7 +54,7 @@ class PageFlySliderController {
 
     // Set up drag n drop event
     this.moveByDrag = false
-    this.missingSlidesOnDrag = false
+    this.missingSlidesOnDrag = false // For dragging multiple slides
     this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
     this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
 
@@ -49,18 +65,20 @@ class PageFlySliderController {
     this.$el.data('pf-slider-x', this)
     this.$el.attr('data-slider-x-init', 'init-ed')
 
-    console.log("New PageFly Slider initialized!!!", this)
+    console.info("New PageFly Slider initialized!!!", this)
     return this
   }
 
   setupSliderDOM() {
-    this.$el.addClass(wrapper)
+    const { $el } = this
+
+    $el.addClass(wrapper)
     // Save original styles
-    this.originalStyles.wrapper = this.$el.attr('style') ? this.$el.attr('style') : ''
+    this.originalStyles.wrapper = $el.attr('style') ? $el.attr('style') : ''
 
     // Create an inner div to wrap all slide item
     const $inner = $(`<div></div>`)
-    this.$el.children().each((i, child) => {
+    $el.children().each((i, child) => {
       // Save original styles
       const childStyles = $(child).attr('style') ? $(child).attr('style') : ''
       this.originalStyles.inner.push(childStyles)
@@ -81,13 +99,29 @@ class PageFlySliderController {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
-    this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
+    $el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
 
     this.cloneSlide()
 
-    // Add style for slider
-    this.updateSliderStyle()
-    this.udpateActiveSlideStyle()
+    // Wait for the background image load complete then update the Slider style
+    // Remove string url("")
+    const sliderBackgroundImg = $el.css('background-image').slice(4, -1).replace(/"/g, "")
+    if (!sliderBackgroundImg) {
+      this.sliderWidth = $el.width()
+      // Add style for slider
+      this.updateSliderStyle()
+      this.udpateActiveSlideStyle()
+    }
+    else {
+      const tempImg = new Image()
+      tempImg.src = sliderBackgroundImg
+      tempImg.onload = () => {
+        this.sliderWidth = $el.width()
+        // Add style for slider
+        this.updateSliderStyle()
+        this.udpateActiveSlideStyle()
+      }
+    }
 
     // Save slider height
     // this.sliderHeight = this.
@@ -206,7 +240,7 @@ class PageFlySliderController {
 
     const mouseSpeed = data.velocityX
     const distRatio = data.moveX / this.sliderWidth
-    
+
     let direction = '', toIndex
     const { totalSlide } = this
     const { loop, curr, slidesToShow, duration } = this.opts
@@ -261,7 +295,7 @@ class PageFlySliderController {
     }
 
     // Dummy: the moveSlide() need toIndex as the 2nd argument
-    if (direction === 'next') toIndex = this.opts.curr + slidesToShow 
+    if (direction === 'next') toIndex = this.opts.curr + slidesToShow
     else toIndex = (totalSlide * 3 + (this.opts.curr - slidesToShow))
     toIndex %= (totalSlide * 3)
     // debugger
