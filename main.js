@@ -1,10 +1,10 @@
-import { SliderClasses, getSlideMovementData, calculateSlideSize } from './helpers'
+import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
 require('./draggable')
 let $ = window.jQuery
 
-const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = SliderClasses
+const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-class SliderController {
+class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
@@ -17,7 +17,7 @@ class SliderController {
     this.$el = $(this.el) // The original element
     this.$slider = null // The .inner div that wrap all slides
     this.sliderHeight = this.$el.height()
-    this.sliderWidth = this.$el.width()
+    this.sliderWidth = null
 
     this.totalSlide = this.$el.children().length
     this.opts = $.extend({}, opts) // Each slider's opts is a specific instance of opts argument
@@ -25,6 +25,22 @@ class SliderController {
     this.autoPlayTimeoutId = ''
 
     this.initialize()
+  }
+
+  getWrapperWidthThenInit() {
+    // Remove string url("")
+    const { $el } = this
+    const sliderBackgroundImg = $el.css('background-image').slice(4, -1).replace(/"/g, "")
+    let wrapperWidth
+
+    const tempImg = new Image()
+    tempImg.src = sliderBackgroundImg
+    tempImg.onload = () => {
+      wrapperWidth = $el.width()
+      this.sliderWidth = wrapperWidth
+      this.initialize()
+      console.log(9696, this.sliderWidth)
+    }
   }
 
   initialize() {
@@ -38,7 +54,7 @@ class SliderController {
 
     // Set up drag n drop event
     this.moveByDrag = false
-    this.missingSlidesOnDrag = false
+    this.missingSlidesOnDrag = false // For dragging multiple slides
     this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
     this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
 
@@ -49,18 +65,20 @@ class SliderController {
     this.$el.data('pf-slider-x', this)
     this.$el.attr('data-slider-x-init', 'init-ed')
 
-    console.log("New Slider initialized!!!", this)
+    console.info("New PageFly Slider initialized!!!", this)
     return this
   }
 
   setupSliderDOM() {
-    this.$el.addClass(wrapper)
+    const { $el } = this
+
+    $el.addClass(wrapper)
     // Save original styles
-    this.originalStyles.wrapper = this.$el.attr('style') ? this.$el.attr('style') : ''
+    this.originalStyles.wrapper = $el.attr('style') ? $el.attr('style') : ''
 
     // Create an inner div to wrap all slide item
     const $inner = $(`<div></div>`)
-    this.$el.children().each((i, child) => {
+    $el.children().each((i, child) => {
       // Save original styles
       const childStyles = $(child).attr('style') ? $(child).attr('style') : ''
       this.originalStyles.inner.push(childStyles)
@@ -81,13 +99,29 @@ class SliderController {
       const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
-    this.$el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
+    $el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
 
     this.cloneSlide()
 
-    // Add style for slider
-    this.updateSliderStyle()
-    this.udpateActiveSlideStyle()
+    // Wait for the background image load complete then update the Slider style
+    // Remove string url("")
+    const sliderBackgroundImg = $el.css('background-image').slice(4, -1).replace(/"/g, "")
+    if (!sliderBackgroundImg) {
+      this.sliderWidth = $el.width()
+      // Add style for slider
+      this.updateSliderStyle()
+      this.udpateActiveSlideStyle()
+    }
+    else {
+      const tempImg = new Image()
+      tempImg.src = sliderBackgroundImg
+      tempImg.onload = () => {
+        this.sliderWidth = $el.width()
+        // Add style for slider
+        this.updateSliderStyle()
+        this.udpateActiveSlideStyle()
+      }
+    }
 
     // Save slider height
     // this.sliderHeight = this.
@@ -112,7 +146,7 @@ class SliderController {
     let { totalSlide } = this
     totalSlide *= 3
 
-    const newSlideWidth = calculateSlideSize(this)
+    const newSlideWidth = calculatePFSlideSize(this)
     const $slides = this.$slider.children()
     $slides.css({ width: `${newSlideWidth}px`, transition: '' })
 
@@ -155,25 +189,25 @@ class SliderController {
   }
 
   handleDragMove(e, data) {
-    if (Math.abs(data.moveX) < SliderController.constructor.MIN_DRAG_DISTANCE) return
+    if (Math.abs(data.moveX) < PageFlySliderController.constructor.MIN_DRAG_DISTANCE) return
     this.clearAutoPlay()
 
     const translateRange = data.moveX    // -30
     const { curr, slidesToShow, gutter, loop } = this.opts
 
     const nextIndex = (curr + slidesToShow) % (this.totalSlide * 3)
-    let nextSlidesReadyPos = getSlideMovementData(this, 'next', nextIndex).nextSlidesReadyPos
+    let nextSlidesReadyPos = getPFSlideMovementData(this, 'next', nextIndex).nextSlidesReadyPos
     if (!loop) nextSlidesReadyPos = nextSlidesReadyPos.filter(obj => obj.index < this.totalSlide)
 
     const currSlidesPos = []
-    const slideWidth = calculateSlideSize(this)
+    const slideWidth = calculatePFSlideSize(this)
     for (let i = 0; i < slidesToShow; i++) {
       currSlidesPos.push({ index: (i + curr) % (this.totalSlide * 3), readyX: (slideWidth + gutter) * i })
     }
     // TODO: fix this dummy code
     // This is stupid because the getMovementData return the variable name nextIndex
     const prevIndex = (this.totalSlide * 3 + (curr - slidesToShow)) % (this.totalSlide * 3)
-    let prevSlidesReadyPos = getSlideMovementData(this, 'prev', prevIndex).nextSlidesReadyPos
+    let prevSlidesReadyPos = getPFSlideMovementData(this, 'prev', prevIndex).nextSlidesReadyPos
     if (!loop) prevSlidesReadyPos = prevSlidesReadyPos.filter(obj => obj.index < this.totalSlide)
 
     // Drag is forbidden in these below cases:
@@ -197,7 +231,7 @@ class SliderController {
   }
 
   handleDragStop(e, data) {
-    if (Math.abs(data.moveX) < SliderController.constructor.MIN_DRAG_DISTANCE) return
+    if (Math.abs(data.moveX) < PageFlySliderController.constructor.MIN_DRAG_DISTANCE) return
     // Turn off draggable until slides move completely
     this.moveByDrag = true
 
@@ -206,7 +240,7 @@ class SliderController {
 
     const mouseSpeed = data.velocityX
     const distRatio = data.moveX / this.sliderWidth
-    
+
     let direction = '', toIndex
     const { totalSlide } = this
     const { loop, curr, slidesToShow, duration } = this.opts
@@ -261,7 +295,7 @@ class SliderController {
     }
 
     // Dummy: the moveSlide() need toIndex as the 2nd argument
-    if (direction === 'next') toIndex = this.opts.curr + slidesToShow 
+    if (direction === 'next') toIndex = this.opts.curr + slidesToShow
     else toIndex = (totalSlide * 3 + (this.opts.curr - slidesToShow))
     toIndex %= (totalSlide * 3)
     // debugger
@@ -394,7 +428,7 @@ class SliderController {
     // Turn off mouse event on moving
     this.$el.addClass(turnOffMouseEvent)
 
-    const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos } = getSlideMovementData(this, direction, toIndex)
+    const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos } = getPFSlideMovementData(this, direction, toIndex)
     // console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
     // if (this.opts.adaptiveHeight) {
@@ -491,7 +525,7 @@ class SliderController {
   updateSliderStyle() {
     const $slides = this.$slider.children()
     const $curr = $slides.eq(this.opts.curr)
-    const slideWidth = calculateSlideSize(this)
+    const slideWidth = calculatePFSlideSize(this)
 
     const { adaptiveHeight, height } = this.opts
     if (!adaptiveHeight) {
@@ -567,9 +601,9 @@ class SliderController {
 }
 
 // Class properties
-SliderController.constructor.MIN_DRAG_DISTANCE = 5
+PageFlySliderController.constructor.MIN_DRAG_DISTANCE = 5
 
-SliderController.defaultOptions = {
+PageFlySliderController.defaultOptions = {
   curr: 0,
   slidesToShow: 1,
   slidesToScroll: 1,
@@ -585,7 +619,7 @@ SliderController.defaultOptions = {
   height: 400,
 }
 
-SliderController.styleOptions = {
+PageFlySliderController.styleOptions = {
   /**
    * The default style is the first array element
    * Add more style (class name) for pagination or nav to these below arrays
@@ -597,14 +631,14 @@ SliderController.styleOptions = {
 
 function init(jQuery) {
   $ = jQuery
-  jQuery.fn.slider = function (opts, ...args) {
+  jQuery.fn.pageflySlider = function (opts, ...args) {
     return this.each((i, element) => {
       let instance = jQuery(element).data('pf-slider-x')
       if (!instance) {
         if (typeof opts === 'string') {
           throw new Error('This element was not initialized as a Slider yet')
         }
-        instance = new SliderController(element, opts)
+        instance = new PageFlySliderController(element, opts)
         jQuery(element).attr('data-slider-x-init', 'init-ed')
         jQuery(element).data('pf-slider-x', instance)
         jQuery(element).data('pf-slider-initialized', true)
