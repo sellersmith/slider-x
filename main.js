@@ -4,7 +4,7 @@ let $ = window.jQuery
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-class PageFlySliderController {
+export class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
@@ -16,7 +16,8 @@ class PageFlySliderController {
 
     this.$el = $(this.el) // The original element
     this.$slider = null // The .inner div that wrap all slides
-    this.sliderHeight = this.$el.height()
+    this.sliderHeight = this.$el.get(0).offsetHeight
+    console.log('this.$el',this.$el.get(0).offsetHeight)
     this.sliderWidth = null
 
     this.totalSlide = this.$el.children().length
@@ -36,7 +37,7 @@ class PageFlySliderController {
     const tempImg = new Image()
     tempImg.src = sliderBackgroundImg
     tempImg.onload = () => {
-      wrapperWidth = $el.width()
+      wrapperWidth = $el.get(0).offsetWidth
       this.sliderWidth = wrapperWidth
       this.initialize()
       console.log(9696, this.sliderWidth)
@@ -70,6 +71,7 @@ class PageFlySliderController {
   }
 
   setupSliderDOM() {
+    // console.log('aaaa -> setup slider dom')
     const { $el } = this
 
     $el.addClass(wrapper)
@@ -106,20 +108,25 @@ class PageFlySliderController {
     // Wait for the background image load complete then update the Slider style
     // Remove string url("")
     const sliderBackgroundImg = $el.css('background-image').slice(4, -1).replace(/"/g, "")
+    const waitForWidth = () => {
+      this.sliderWidth = $el.get(0).offsetWidth
+      if (this.sliderWidth) {
+        // console.log('aaaa --> width is greater than zero', this.sliderWidth)
+        this.updateSliderStyle()
+        this.udpateActiveSlideStyle()
+      } else {
+        // console.log('aaaa --> width is zero waiting for width to change', this.sliderWidth)
+        setTimeout(waitForWidth, 100)
+      }
+    }
     if (!sliderBackgroundImg) {
-      this.sliderWidth = $el.width()
-      // Add style for slider
-      this.updateSliderStyle()
-      this.udpateActiveSlideStyle()
+      waitForWidth()
     }
     else {
       const tempImg = new Image()
       tempImg.src = sliderBackgroundImg
       tempImg.onload = () => {
-        this.sliderWidth = $el.width()
-        // Add style for slider
-        this.updateSliderStyle()
-        this.udpateActiveSlideStyle()
+        waitForWidth()
       }
     }
 
@@ -158,7 +165,7 @@ class PageFlySliderController {
       $slide.css({ transform: `translate3d(${(newSlideWidth + gutter) * (i - curr)}px, 0, 0)` })
     }
 
-    this.sliderWidth = this.$el.width()
+    this.sliderWidth = this.$el.get(0).offsetWidth
   }
 
   handleClick(e) {
@@ -181,7 +188,7 @@ class PageFlySliderController {
     // We will update this bug asap
 
     mutations.forEach((mut) => {
-      const height = $(mut.target).height()
+      const height = $(mut.target).get(0).offsetHeight()
       if (height !== this.opts.height) {
         this.updateOptions({ height })
       }
@@ -380,6 +387,7 @@ class PageFlySliderController {
 
   /* CONTROLLER FUNCTIONS */
   destroy() {
+    console.log('333 destroy' )
     this.clearAutoPlay()
     // Remove all cloned slides
     this.$slider.find('*[data-slide-clone=true]').remove()
@@ -527,6 +535,7 @@ class PageFlySliderController {
     const $curr = $slides.eq(this.opts.curr)
     const slideWidth = calculatePFSlideSize(this)
 
+    console.log('aaaa', this.sliderWidth, slideWidth)
     const { adaptiveHeight, height } = this.opts
     if (!adaptiveHeight) {
       // Slider height = the highest child in case adaptiveHeight is off
@@ -634,6 +643,7 @@ function init(jQuery) {
   jQuery.fn.pageflySlider = function (opts, ...args) {
     return this.each((i, element) => {
       let instance = jQuery(element).data('pf-slider-x')
+      console.log('aaaa ---> instance', instance)
       if (!instance) {
         if (typeof opts === 'string') {
           throw new Error('This element was not initialized as a Slider yet')
@@ -654,5 +664,4 @@ function init(jQuery) {
 if (typeof jQuery !== 'undefined') {
   init(jQuery)
 }
-
 export default init
