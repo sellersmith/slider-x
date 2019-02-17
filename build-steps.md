@@ -6,6 +6,7 @@
  5. Uncomment the first and last line in `main.js` (Remember to `import` func in the first line if you export new in `helper.js`)
  6. Bundle all stuff using: `yarn webpack`
  7. Check to confirm everything work fine by open `demo/demo.html`
- 8. Update new versioning in `package.json`
+ 8. Update new version in `package.json`
  9. Publish using: `npm publish`
- 10. Prepare your self for the bug list from customer/team lead/pm/co-worker
+ 10. Checkout to `master`, keep a copy of release
+ 11. Prepare your self for the bug list from customer/team lead/pm/co-worker
