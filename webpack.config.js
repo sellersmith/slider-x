@@ -1,4 +1,5 @@
 const path = require('path')
+// const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
   // devtool: 'eval',
@@ -22,5 +23,15 @@ module.exports = {
       }
     ]
   },
-  watch : true
+  // optimization: {
+  //   minimizer: [
+  //     new TerserPlugin({
+  //       cache: true,
+  //       parallel: true,
+  //       sourceMap: true, // Must be set to true if using source-maps in production
+  //     }),
+  //   ],
+  // },
+  mode: 'production',
+  watch : true,
 }

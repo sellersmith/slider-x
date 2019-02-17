@@ -3,7 +3,7 @@ const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, ind
 
 // Export all these FOLLOWING stuff before publish
 
- const PageFlySliderClasses = {
+export const PageFlySliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
@@ -17,7 +17,7 @@ const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, ind
 }
 
 // The logic is compicated! Stay tune before reading this func
- const getPFSlideMovementData = (slider, direction, toIndex) => {
+export const getPFSlideMovementData = (slider, direction, toIndex) => {
   let { totalSlide, $slider } = slider
   totalSlide *= 3
 
@@ -114,7 +114,7 @@ const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, ind
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
- const calculatePFSlideSize = slider => {
+export const calculatePFSlideSize = slider => {
   const { gutter, slidesToShow } = slider.opts
   const wrapperWidth = slider.sliderWidth
 

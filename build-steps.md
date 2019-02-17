@@ -8,5 +8,4 @@
  7. Check to confirm everything work fine by open `demo/demo.html`
  8. Update new versioning in `package.json`
  9. Publish using: `npm publish`
- 10. Enjoy the beautiful time after you created something valueable for human 😎
- 11. Prepare your self for the bug list from customer/team lead/pm/co-worker
+ 10. Prepare your self for the bug list from customer/team lead/pm/co-worker

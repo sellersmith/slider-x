@@ -1,6 +1,6 @@
-// import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
-// require('./draggable')
-// let $ = window.jQuery
+import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+require('./draggable')
+let $ = window.jQuery
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
@@ -657,4 +657,4 @@ function init(jQuery) {
 if (typeof jQuery !== 'undefined') {
   init(jQuery)
 }
-// export default init
+export default init
