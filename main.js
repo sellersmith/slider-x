@@ -1,23 +1,22 @@
-import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
-require('./draggable')
-let $ = window.jQuery
+// import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+// require('./draggable')
+// let $ = window.jQuery
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-export class PageFlySliderController {
+ class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
 
     // Create an observer to observe any style's change of slider (this is for updating height)
     // NOTE: this doesn't work on IE < 11 
-    // this.styleObserver = new MutationObserver(this.handleStyleChange.bind(this))
-    // this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
+    this.styleObserver = new MutationObserver(this.handleStyleChange.bind(this))
+    this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
 
     this.$el = $(this.el) // The original element
     this.$slider = null // The .inner div that wrap all slides
     this.sliderHeight = this.$el.get(0).offsetHeight
-    console.log('this.$el',this.$el.get(0).offsetHeight)
     this.sliderWidth = null
 
     this.totalSlide = this.$el.children().length
@@ -40,7 +39,6 @@ export class PageFlySliderController {
       wrapperWidth = $el.get(0).offsetWidth
       this.sliderWidth = wrapperWidth
       this.initialize()
-      console.log(9696, this.sliderWidth)
     }
   }
 
@@ -71,7 +69,6 @@ export class PageFlySliderController {
   }
 
   setupSliderDOM() {
-    // console.log('aaaa -> setup slider dom')
     const { $el } = this
 
     $el.addClass(wrapper)
@@ -111,11 +108,9 @@ export class PageFlySliderController {
     const waitForWidth = () => {
       this.sliderWidth = $el.get(0).offsetWidth
       if (this.sliderWidth) {
-        // console.log('aaaa --> width is greater than zero', this.sliderWidth)
         this.updateSliderStyle()
         this.udpateActiveSlideStyle()
       } else {
-        // console.log('aaaa --> width is zero waiting for width to change', this.sliderWidth)
         setTimeout(waitForWidth, 100)
       }
     }
@@ -164,7 +159,6 @@ export class PageFlySliderController {
       const $slide = $slides.eq(i % totalSlide)
       $slide.css({ transform: `translate3d(${(newSlideWidth + gutter) * (i - curr)}px, 0, 0)` })
     }
-
     this.sliderWidth = this.$el.get(0).offsetWidth
   }
 
@@ -188,9 +182,10 @@ export class PageFlySliderController {
     // We will update this bug asap
 
     mutations.forEach((mut) => {
-      const height = $(mut.target).get(0).offsetHeight()
-      if (height !== this.opts.height) {
-        this.updateOptions({ height })
+      const width = $(mut.target).eq(0).width()
+      if (width !== this.sliderWidth) {
+        this.sliderWidth = width
+        this.handleResize()
       }
     })
   }
@@ -535,7 +530,6 @@ export class PageFlySliderController {
     const $curr = $slides.eq(this.opts.curr)
     const slideWidth = calculatePFSlideSize(this)
 
-    console.log('aaaa', this.sliderWidth, slideWidth)
     const { adaptiveHeight, height } = this.opts
     if (!adaptiveHeight) {
       // Slider height = the highest child in case adaptiveHeight is off
@@ -643,7 +637,6 @@ function init(jQuery) {
   jQuery.fn.pageflySlider = function (opts, ...args) {
     return this.each((i, element) => {
       let instance = jQuery(element).data('pf-slider-x')
-      console.log('aaaa ---> instance', instance)
       if (!instance) {
         if (typeof opts === 'string') {
           throw new Error('This element was not initialized as a Slider yet')
@@ -664,4 +657,4 @@ function init(jQuery) {
 if (typeof jQuery !== 'undefined') {
   init(jQuery)
 }
-export default init
+// export default init
