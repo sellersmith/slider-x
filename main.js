@@ -382,7 +382,6 @@ export class PageFlySliderController {
 
   /* CONTROLLER FUNCTIONS */
   destroy() {
-    console.log('333 destroy' )
     this.clearAutoPlay()
     // Remove all cloned slides
     this.$slider.find('*[data-slide-clone=true]').remove()
