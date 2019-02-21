@@ -1,4 +1,5 @@
 import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+import DOMObserver from './observer'
 require('./draggable')
 let $ = window.jQuery
 
@@ -11,8 +12,8 @@ export class PageFlySliderController {
 
     // Create an observer to observe any style's change of slider (this is for updating height)
     // NOTE: this doesn't work on IE < 11 
-    this.styleObserver = new MutationObserver(this.handleStyleChange.bind(this))
-    this.styleObserver.observe(this.el, { attributes: true, attributeFilter: ['style', 'class'] })
+    this.observer = new DOMObserver()
+    this.observer.observe(this.el, this.handleStyleChange.bind(this))
 
     this.$el = $(this.el) // The original element
     this.$slider = null // The .inner div that wrap all slides
@@ -58,7 +59,7 @@ export class PageFlySliderController {
     this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
 
     this.setAutoPlay()
-    $(window).resize((e) => this.handleResize(e))
+    // $(window).resize((e) => this.handleResize(e))
 
     // Set slider-instance data
     this.$el.data('pf-slider-x', this)
@@ -176,18 +177,10 @@ export class PageFlySliderController {
     }
   }
 
-  handleStyleChange(mutations) {
-    // Currently: We can only detect the inline style change, if you append a class that have a height property 
-    // the slider height will not update
-    // We will update this bug asap
-
-    mutations.forEach((mut) => {
-      const width = $(mut.target).eq(0).width()
-      if (width !== this.sliderWidth) {
-        this.sliderWidth = width
-        this.handleResize()
-      }
-    })
+  handleStyleChange() {
+    const width = this.$el.width()
+    this.sliderWidth = width
+    this.handleResize()
   }
 
   handleDragMove(e, data) {
