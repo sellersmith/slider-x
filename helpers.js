@@ -3,6 +3,13 @@ const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, ind
 
 // Export all these FOLLOWING stuff before publish
 
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function(item) {
+    return this.indexOf(item) !== -1
+  }
+}
+
+
  const PageFlySliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
