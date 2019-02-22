@@ -1,11 +1,11 @@
-// import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
-// import DOMObserver from './observer'
-// require('./draggable')
-// let $ = window.jQuery
+import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+import DOMObserver from './observer'
+require('./draggable')
+let $ = window.jQuery
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-class PageFlySliderController {
+export class PageFlySliderController {
 // export class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
@@ -666,4 +666,4 @@ function init(jQuery) {
 if (typeof jQuery !== 'undefined') {
   init(jQuery)
 }
-// export default init
+export default init
