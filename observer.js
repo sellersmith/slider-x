@@ -1,4 +1,5 @@
-export default class DOMObserver {
+class DOMObserver {
+// export default class DOMObserver {
   constructor() {
     this.elems = new Map();
     this.watch();

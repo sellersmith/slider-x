@@ -1,11 +1,12 @@
-import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
-import DOMObserver from './observer'
-require('./draggable')
-let $ = window.jQuery
+// import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+// import DOMObserver from './observer'
+// require('./draggable')
+// let $ = window.jQuery
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-export class PageFlySliderController {
+class PageFlySliderController {
+// export class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
@@ -95,8 +96,8 @@ export class PageFlySliderController {
 
     // Append indicators
     const $indicators = $('<ol>')
-    for (let i = 0; i < this.totalSlide; i++) {
-      const $indItem = $(`<li data-goto-slide=${i} data-action='goto'></li>`)
+    for (let i = 0; i < Math.ceil(this.totalSlide / this.opts.slidesToShow); i++) {
+      const $indItem = $(`<li data-goto-slide=${i * this.opts.slidesToShow} data-action='goto'></li>`)
       $indicators.append($indItem)
     }
     $el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
@@ -509,9 +510,18 @@ export class PageFlySliderController {
   }
 
   goto(index) {
-    if (index > this.opts.curr) {
+    const { curr, loop, slidesToShow } = this.opts
+    const { totalSlide } = this
+
+    if (index > curr) {
+      if (!loop) {
+        if (index + slidesToShow > totalSlide) {
+          this.moveSlide("next", totalSlide - slidesToShow)
+          return
+        }
+      }
       this.moveSlide("next", index)
-    } else if (index < this.opts.curr) {
+    } else if (index < curr) {
       this.moveSlide("prev", index)
     }
   }
@@ -576,20 +586,27 @@ export class PageFlySliderController {
     if (index === 0 && !this.opts.loop) {
       this.$el.find(`.${prevCtrl}`).addClass(disabledCtrl)
     }
-    else if (index === this.totalSlide - 1 && !this.opts.loop) {
+    else if (index === this.totalSlide - this.opts.slidesToShow && !this.opts.loop) {
       this.$el.find(`.${nextCtrl}`).addClass(disabledCtrl)
     }
   }
 
   udpateActiveSlideStyle() {
     // Add class .active for current active slide n indicator
-    const curr = this.opts.curr
+    const { curr, slidesToShow, loop } = this.opts
 
     this.$slider.children(`.${slide}.active`).removeClass('active')
     this.$slider.children().eq(curr).addClass('active')
 
+    let activeSlide = Math.floor((curr % (this.totalSlide)) / slidesToShow) * slidesToShow
+    if (!loop) {
+      if (curr + slidesToShow === this.totalSlide) {
+        activeSlide = Math.floor((this.totalSlide - 1) / slidesToShow) * slidesToShow
+      }
+    }
+
     this.$el.find('li.active').removeClass('active')
-    this.$el.find('ol').find(`li[data-goto-slide="${curr % this.totalSlide}"]`).addClass('active')
+    this.$el.find('ol').find(`li[data-goto-slide="${activeSlide}"]`).addClass('active')
 
     this.updateSliderCtrlStyle(curr)
   }
@@ -649,4 +666,4 @@ function init(jQuery) {
 if (typeof jQuery !== 'undefined') {
   init(jQuery)
 }
-export default init
+// export default init
