@@ -1,6 +1,12 @@
 const prefix = 'pf'
 const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
 
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function(item) {
+    return this.indexOf(item) !== -1
+  }
+}
+
 // Export all these FOLLOWING stuff before publish
 
 export const PageFlySliderClasses = {
