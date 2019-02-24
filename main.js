@@ -147,21 +147,21 @@ class PageFlySliderController {
   /* SETUP EVENT DELEGATION */
   handleResize(e) {
     const { curr, slidesToShow, gutter } = this.opts
-    let { totalSlide } = this
+    let { totalSlide, sliderWidth } = this
     totalSlide *= 3
 
     const newSlideWidth = calculatePFSlideSize(this)
     const $slides = this.$slider.children()
     $slides.css({ width: `${newSlideWidth}px`, transition: '' })
 
-    $slides.eq((curr + slidesToShow) % totalSlide).css({ transform: `translate3d(${this.$slider.width()}px, 0, 0)` })
-    $slides.eq((totalSlide + (curr - 1)) % totalSlide).css({ transform: `translate3d(${- newSlideWidth - gutter}px, 0, 0)` })
-
-    for (let i = curr; i < curr + slidesToShow; i++) {
-      const $slide = $slides.eq(i % totalSlide)
-      $slide.css({ transform: `translate3d(${(newSlideWidth + gutter) * (i - curr)}px, 0, 0)` })
+    for (let i = 0; i < totalSlide; i++) {
+      const $slide = $slides.eq(i)
+      if (i >= curr && i < curr + slidesToShow) {
+        $slide.css({ transform: `translate3d(${(newSlideWidth + gutter) * (i - curr)}px, 0, 0)` })
+      } else {
+        $slide.css({ transform: `translate3d(${sliderWidth + gutter}px, 0, 0)` })
+      }
     }
-    this.sliderWidth = this.$el.get(0).offsetWidth
   }
 
   handleClick(e) {
