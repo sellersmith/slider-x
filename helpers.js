@@ -3,7 +3,14 @@ const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, ind
 
 // Export all these FOLLOWING stuff before publish
 
-export const PageFlySliderClasses = {
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function(item) {
+    return this.indexOf(item) !== -1
+  }
+}
+
+
+ const PageFlySliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
@@ -17,11 +24,10 @@ export const PageFlySliderClasses = {
 }
 
 // The logic is compicated! Stay tune before reading this func
-export const getPFSlideMovementData = (slider, direction, toIndex) => {
-  let { totalSlide, $slider } = slider
+ const getPFSlideMovementData = (slider, direction, toIndex) => {
+  let { totalSlide, sliderWidth, $slides } = slider
   totalSlide *= 3
 
-  const sliderWidth = $slider.width()
   const slideWidth = calculatePFSlideSize(slider)
   const { curr, slidesToShow, slidesToScroll, gutter } = slider.opts
 
@@ -46,7 +52,8 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
     let firstX
     if (currIndexes.includes(nextIndex)) {
-      firstX = slider.$slider.children().eq(nextIndex).position().left
+      ///// Pausing here
+      firstX = $slides.item(nextIndex).position().left
     } else firstX = sliderWidth + gutter
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -72,7 +79,7 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
     let firstX // left position of the last slide in next slides
     if (currIndexes.includes((nextIndex + slidesToShow - 1) % totalSlide)) {
-      firstX = slider.$slider.children().eq((nextIndex + slidesToShow - 1) % totalSlide).position().left
+      firstX = $slides.item((nextIndex + slidesToShow - 1) % totalSlide).position().left
     } else firstX = -(slideWidth + gutter)
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -114,7 +121,7 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
-export const calculatePFSlideSize = slider => {
+ const calculatePFSlideSize = slider => {
   const { gutter, slidesToShow } = slider.opts
   const wrapperWidth = slider.sliderWidth
 
