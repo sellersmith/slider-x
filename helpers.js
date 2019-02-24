@@ -53,7 +53,7 @@ if (!Array.prototype.includes) {
     let firstX
     if (currIndexes.includes(nextIndex)) {
       ///// Pausing here
-      firstX = $slides.item(nextIndex).position().left
+      firstX = $slides.item(nextIndex).getBoundingClientRect().x
     } else firstX = sliderWidth + gutter
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -79,7 +79,7 @@ if (!Array.prototype.includes) {
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
     let firstX // left position of the last slide in next slides
     if (currIndexes.includes((nextIndex + slidesToShow - 1) % totalSlide)) {
-      firstX = $slides.item((nextIndex + slidesToShow - 1) % totalSlide).position().left
+      firstX = $slides.item((nextIndex + slidesToShow - 1) % totalSlide).getBoundingClientRect().x
     } else firstX = -(slideWidth + gutter)
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -95,15 +95,14 @@ if (!Array.prototype.includes) {
 
   // Calculate new position for curr-showing-slides
   for (let i = 0; i < slidesToShow; i++) {
-    const $slide = slider.$slider.children().eq((curr + i) % totalSlide)
-    const slideX = $slide.position().left
+    const slideX = $slides.item((curr + i) % totalSlide).getBoundingClientRect().x
 
     let newX
     if (direction === 'next') newX = slideX - (gutter + slideWidth) * slidesMove
     else if (direction === 'prev') newX = slideX + (gutter + slideWidth) * slidesMove
 
     if (slider.moveByDrag) {
-      const currLeft = slider.$slider.children().eq(curr % totalSlide).position().left
+      const currLeft = $slides.item(curr % totalSlide).getBoundingClientRect().x
       if (direction === 'prev') newX = slideX + (sliderWidth - currLeft) + gutter
       else if (direction === 'next') newX = slideX - (sliderWidth + currLeft) - gutter
     }
