@@ -10,7 +10,7 @@ if (!Array.prototype.includes) {
 }
 
 
- const PageFlySliderClasses = {
+export const PageFlySliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
@@ -24,7 +24,7 @@ if (!Array.prototype.includes) {
 }
 
 // The logic is compicated! Stay tune before reading this func
- const getPFSlideMovementData = (slider, direction, toIndex) => {
+ export const getPFSlideMovementData = (slider, direction, toIndex) => {
   let { totalSlide, $slider } = slider
   totalSlide *= 3
 
@@ -121,7 +121,7 @@ if (!Array.prototype.includes) {
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
- const calculatePFSlideSize = slider => {
+export const calculatePFSlideSize = slider => {
   const { gutter, slidesToShow } = slider.opts
   const wrapperWidth = slider.sliderWidth
 
