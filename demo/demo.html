@@ -69,22 +69,22 @@
     <div class="h-500px slide-5"></div>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
   <script src="../dist/slider-x.js"></script>
   <script>
-    $('.my-slide').pageflySlider({
-      slidesToShow: 3,
-      slidesToScroll: 1,
-      gutter: 15,
-      autoPlay: false,
-      duration: '400',
-      autoPlayDelay: 2000,
-      loop: true,
-      navStyle: 'nav-style-111',
-      paginationStyle: 'pagination-style-3'
+    const $slides = document.querySelectorAll('.my-slide')
+    $slides.forEach($s => {
+      new PageFlySliderController($s, {
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        gutter: 15,
+        autoPlay: false,
+        duration: '400',
+        autoPlayDelay: 2000,
+        loop: true,
+        navStyle: 'nav-style-111',
+        paginationStyle: 'pagination-style-3'
+      })
     })
-
   </script>
 </body>
 

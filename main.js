@@ -1,11 +1,10 @@
-// import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
-// import DOMObserver from './observer'
-// require('./draggable')
-// let $ = window.jQuery
+import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+import DOMObserver from './observer'
+require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-class PageFlySliderController {
+export class PageFlySliderController {
   // export class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
@@ -635,3 +634,6 @@ PageFlySliderController.styleOptions = {
   paginations: ['pagination-style-1', 'pagination-style-2', 'pagination-style-3', 'none'],
   navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5', 'none']
 }
+
+// Comment this line before bundling
+// window.PageFlySliderController = PageFlySliderController
