@@ -6,7 +6,7 @@ let $ = window.jQuery
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
 export class PageFlySliderController {
-// export class PageFlySliderController {
+  // export class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
@@ -212,15 +212,18 @@ export class PageFlySliderController {
 
 
     // The key is: move all 3 slide! Genius!
-    for (let slide of prevSlidesReadyPos) {
+    for (let i = 0; i < prevSlidesReadyPos.length; i++) {
+      const slide = prevSlidesReadyPos[i]
       const $slide = this.$slider.children().eq(slide.index)
       this.translateSlide($slide, slide.readyX + translateRange)
     }
-    for (let slide of currSlidesPos) {
+    for (let i = 0; i < currSlidesPos.length; i++) {
+      const slide = currSlidesPos[i]
       const $slide = this.$slider.children().eq(slide.index)
       this.translateSlide($slide, slide.readyX + translateRange)
     }
-    for (let slide of nextSlidesReadyPos) {
+    for (let i = 0; i < nextSlidesReadyPos.length; i++) {
+      const slide = nextSlidesReadyPos[i]
       const $slide = this.$slider.children().eq(slide.index)
       this.translateSlide($slide, slide.readyX + translateRange)
     }
@@ -397,7 +400,7 @@ export class PageFlySliderController {
     this.$el.empty()
 
     // Append the original item
-    for (let item of items) { this.$el.append(item) }
+    for (let i = 0; i < items.length; i++) { this.$el.append(items[i]) }
 
     console.log('Removed slider-x !!')
   }
@@ -434,7 +437,8 @@ export class PageFlySliderController {
 
     if (!this.moveByDrag) {
       // Only move the $next slide to the ready-position in case user does not drag
-      for (let slide of nextSlidesReadyPos) {
+      for (let i = 0; i < nextSlidesReadyPos.length; i++) {
+        const slide = nextSlidesReadyPos[i]
         const $slide = this.$slider.children().eq(slide.index)
         this.translateSlide($slide, slide.readyX)
       }
@@ -451,13 +455,15 @@ export class PageFlySliderController {
        * The curr slides is out of window so just don't move them
        */
       if (!this.missingSlidesOnDrag) {
-        for (let slide of currSlidesNewPos) {
+        for (let i = 0; i < currSlidesNewPos.length; i++) {
+          const slide = currSlidesNewPos[i]
           const $slide = this.$slider.children().eq(slide.index)
           this.translateSlide($slide, slide.newX, duration)
         }
       }
 
-      for (let slide of nextSlidesNewPos) {
+      for (let i = 0; i < nextSlidesNewPos.length; i++) {
+        const slide = nextSlidesNewPos[i]
         const $slide = this.$slider.children().eq(slide.index)
         this.translateSlide($slide, slide.newX, duration)
       }
