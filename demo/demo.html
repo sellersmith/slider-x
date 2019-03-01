@@ -66,7 +66,6 @@
   <div class="my-slide">
     <div class="h-400px slide-3"></div>
     <div class="h-400px slide-4"></div>
-    <div class="h-500px slide-5"></div>
   </div>
 
   <script src="../dist/slider-x.js"></script>
@@ -74,13 +73,13 @@
     const $slides = document.querySelectorAll('.my-slide')
     $slides.forEach($s => {
       new PageFlySliderController($s, {
-        slidesToShow: 3,
+        slidesToShow: 1,
         slidesToScroll: 1,
         gutter: 15,
         autoPlay: false,
         duration: '400',
         autoPlayDelay: 2000,
-        loop: true,
+        loop: false,
         navStyle: 'nav-style-111',
         paginationStyle: 'pagination-style-3'
       })

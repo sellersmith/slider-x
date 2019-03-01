@@ -638,4 +638,4 @@ PageFlySliderController.styleOptions = {
 }
 
 // Comment this line before bundling for 
-// window.PageFlySliderController = PageFlySliderController
+window.PageFlySliderController = PageFlySliderController
