@@ -566,12 +566,12 @@ class PageFlySliderController {
     const navDisplay = navStyle === 'none' ? 'none' : 'flex'
     const paginationDisplay = paginationStyle === 'none' ? 'none' : 'block'
 
-    el.querySelector('a').style.display = navDisplay
-    el.querySelector('ol').style.display = paginationDisplay
+    el.querySelector('a.pf-slider-nav').style.display = navDisplay
+    el.querySelector('ol.pf-slider-pagination').style.display = paginationDisplay
   }
 
   updateSliderCtrlStyle(index) {
-    this.el.querySelector('a').classList.remove(disabledCtrl)
+    this.el.querySelector('a.pf-slider-nav').classList.remove(disabledCtrl)
 
     if (index === 0 && !this.opts.loop) {
       this.el.querySelector(`.${prevCtrl}`).classList.add(disabledCtrl)
@@ -598,7 +598,7 @@ class PageFlySliderController {
       }
     }
 
-    const $currLi = this.el.querySelector('li.active')
+    const $currLi = this.el.querySelector('ol.pf-slider-pagination li.active')
     $currLi ? $currLi.classList.remove('active') : null
 
     this.el.querySelector(`li[data-goto-slide="${activeSlide}"]`).classList.add('active')
