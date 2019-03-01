@@ -566,12 +566,14 @@ class PageFlySliderController {
     const navDisplay = navStyle === 'none' ? 'none' : 'flex'
     const paginationDisplay = paginationStyle === 'none' ? 'none' : 'block'
 
-    el.querySelector('a.pf-slider-nav').style.display = navDisplay
+    el.querySelector('a[data-action="next"]').style.display = navDisplay
+    el.querySelector('a[data-action="prev"]').style.display = navDisplay
     el.querySelector('ol.pf-slider-pagination').style.display = paginationDisplay
   }
 
   updateSliderCtrlStyle(index) {
-    this.el.querySelector('a.pf-slider-nav').classList.remove(disabledCtrl)
+    const $navs = this.el.querySelectorAll('a.pf-slider-nav')
+    $navs.forEach($nav => $nav.classList.remove(disabledCtrl))
 
     if (index === 0 && !this.opts.loop) {
       this.el.querySelector(`.${prevCtrl}`).classList.add(disabledCtrl)
