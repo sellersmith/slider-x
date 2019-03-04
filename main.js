@@ -11,30 +11,27 @@ class PageFlySliderController {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
 
-    // Create an observer to observe any style's change of slider (this is for updating height)
-    // NOTE: this doesn't work on IE < 11 
     this.observer = new DOMObserver()
     this.observer.observe(this.el, this.handleStyleChange.bind(this))
 
     this.$slider = null // The .inner div that wrap all slides
-    this.$slides = this.el.children
     this.sliderHeight = this.el.offsetHeight
     this.sliderWidth = this.el.offsetWidth
 
     this.totalSlide = this.el.children.length
     this.opts = Object.create(opts || {}) // Each slider's opts is a specific instance of opts argument
+    this.opts.curr = 0
 
     this.autoPlayTimeoutId = ''
-
     this.initialize()
   }
 
   initialize() {
-    this.opts.curr = 0
+    this.$slides = this.el.children
     this.verifyOptions()
 
     // Setup DOM + set event handler
-    this.el.addEventListener('click', this.handleClick.bind(this))
+    this.el.addEventListener('click', this.handleClick)
 
     this.setupSliderDOM()
 
@@ -50,8 +47,7 @@ class PageFlySliderController {
     // set a data to detect slider-x
     this.el.dataset.pfSliderXInited = true
 
-    console.info("New PageFly Slider initialized!!!", this)
-    return this
+    console.log("New PageFly Slider initialized!!!", this)
   }
 
   setupSliderDOM() {
@@ -155,7 +151,7 @@ class PageFlySliderController {
     }
   }
 
-  handleClick(e) {
+  handleClick = e => {
     const { action } = e.target.dataset
     switch (action) {
       case 'next': this.next(); break
@@ -345,9 +341,8 @@ class PageFlySliderController {
     // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
 
-    // Set the style of slider nav n pagination to legal values
+    // Set the style of slider nav n pagination to valid values
     // this.updateSliderStyle()
-
     // this.updateSliderCtrlStyle(this.opts.curr)
     // this.setAutoPlay()
     this.destroy()
@@ -373,7 +368,7 @@ class PageFlySliderController {
 
     // Save all items, remove all classes, inline-style n reverse the original style
     const items = []
-    this.$slides = this.$slider.children
+    // this.$slides = this.$slider.children
     for (let i = 0; i < this.totalSlide; i++) {
       const $slide = this.$slides.item(i)
       $slide.classList.remove(slide)
@@ -387,6 +382,10 @@ class PageFlySliderController {
     el.style = this.originalStyles.wrapper
     el.removeEventListener('click', this.handleClick)
     delete el.dataset['pfSliderXInited']
+
+    delete this.$slider
+    delete this.$slides
+    this.observer.unobserve(el)
 
     while (el.firstChild) { el.removeChild(el.firstChild) }
 
