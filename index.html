@@ -12,15 +12,34 @@
 
   <link rel="stylesheet" href="main.css">
   <style>
-    .h-300px { height: 300px; }
-    .h-400px { height: 400px; }
-    .h-200px { height: 200px; }
-    .h-500px { height: 500px; }
-    .test-slider-1 { 
+    body {
+      padding: 0px 200px;
+    }
+
+    .h-300px {
+      height: 300px;
+    }
+
+    .h-400px {
+      height: 400px;
+    }
+
+    .h-200px {
+      height: 200px;
+    }
+
+    .h-500px {
+      height: 500px;
+    }
+
+    .test-slider-1 {
       height: 299px;
       /* background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80') */
     }
-    .test-slider-2 { background: lightseagreen; }
+
+    .test-slider-2 {
+      background: lightseagreen;
+    }
 
     .pf-slider-slide {
       display: inline-flex;
@@ -29,11 +48,25 @@
       font-size: 2em;
     }
 
-    .child-1 { background: lightcoral; }
-    .child-2 { background: lightseagreen; }
-    .child-3 { background: lightgreen; }
-    .child-4 { background: lightgray; }
-    .child-5 { background: dodgerblue; }
+    .child-1 {
+      background: lightcoral;
+    }
+
+    .child-2 {
+      background: lightseagreen;
+    }
+
+    .child-3 {
+      background: lightgreen;
+    }
+
+    .child-4 {
+      background: lightgray;
+    }
+
+    .child-5 {
+      background: dodgerblue;
+    }
   </style>
 </head>
 
@@ -59,7 +92,8 @@
     <div class="">33</div>
     <div class="">44</div>
   </div> -->
-
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous"></script>
   <script src="./observer.js"></script>
   <script src="./draggable.js"></script>
   <script src="./helpers.js"></script>
@@ -67,17 +101,17 @@
   <script>
     const mySlider = document.querySelector('.test-slider-1')
     new PageFlySliderController(mySlider, {
-      // curr: 0,
-      // slidesToShow: 1,
-      // slidesToScroll: 1,
-      // autoPlay: false,
-      // duration: 400,
-      // autoPlayDelay: '2000',
-      // loop: false,
-      // adaptiveHeight: false,
-      // draggable: true,
-      // navStyle: 'nav-style-11111',
-      // paginationStyle: 'pagination-style-3'
+      curr: 0,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoPlay: false,
+      duration: 400,
+      autoPlayDelay: '2000',
+      loop: true,
+      adaptiveHeight: false,
+      draggable: true,
+      navStyle: 'nav-style-11111',
+      paginationStyle: 'pagination-style-3'
     })
     // $('.test-slider-2').pageflySlider({
     //   autoPlay: false,

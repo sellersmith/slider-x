@@ -19,7 +19,6 @@ export class PageFlySliderController {
 
     this.totalSlide = this.el.children.length
     this.opts = Object.create(opts || {}) // Each slider's opts is a specific instance of opts argument
-    this.opts.curr = 0
 
     this.autoPlayTimeoutId = ''
     this.initialize()
@@ -27,6 +26,7 @@ export class PageFlySliderController {
 
   initialize() {
     this.$slides = this.el.children
+    this.opts.curr = 0
     this.verifyOptions()
 
     // Setup DOM + set event handler
@@ -198,15 +198,18 @@ export class PageFlySliderController {
 
 
     // The key is: move all 3 slide! Genius!
-    for (let slide of prevSlidesReadyPos) {
+    for (let i = 0; i < prevSlidesReadyPos.length; i++) {
+      const slide = prevSlidesReadyPos[i]
       const $slide = this.$slides.item(slide.index)
       this.translateSlide($slide, slide.readyX + translateRange)
     }
-    for (let slide of currSlidesPos) {
+    for (let i = 0; i < currSlidesPos.length; i++) {
+      const slide = currSlidesPos[i]
       const $slide = this.$slides.item(slide.index)
       this.translateSlide($slide, slide.readyX + translateRange)
     }
-    for (let slide of nextSlidesReadyPos) {
+    for (let i = 0; i < nextSlidesReadyPos.length; i++) {
+      const slide = nextSlidesReadyPos[i]
       const $slide = this.$slides.item(slide.index)
       this.translateSlide($slide, slide.readyX + translateRange)
     }
@@ -389,7 +392,7 @@ export class PageFlySliderController {
     while (el.firstChild) { el.removeChild(el.firstChild) }
 
     // Append the original item
-    for (let item of items) { el.appendChild(item) }
+    for (let i = 0; i < items.length; i++) { el.appendChild(items[i]) }
 
     console.log('Removed slider-x !!')
   }
@@ -426,7 +429,8 @@ export class PageFlySliderController {
 
     if (!this.moveByDrag) {
       // Only move the $next slide to the ready-position in case user does not drag
-      for (let slide of nextSlidesReadyPos) {
+      for (let i = 0; i < nextSlidesReadyPos.length; i++) {
+        const slide = nextSlidesReadyPos[i]
         const $slide = this.$slides.item(slide.index)
         this.translateSlide($slide, slide.readyX)
       }
@@ -443,13 +447,15 @@ export class PageFlySliderController {
        * The curr slides is out of window so just don't move them
        */
       if (!this.missingSlidesOnDrag) {
-        for (let slide of currSlidesNewPos) {
+        for (let i = 0; i < currSlidesNewPos.length; i++) {
+          const slide = currSlidesNewPos[i]
           const $slide = this.$slides.item(slide.index)
           this.translateSlide($slide, slide.newX, duration)
         }
       }
 
-      for (let slide of nextSlidesNewPos) {
+      for (let i = 0; i < nextSlidesNewPos.length; i++) {
+        const slide = nextSlidesNewPos[i]
         const $slide = this.$slides.item(slide.index)
         this.translateSlide($slide, slide.newX, duration)
       }

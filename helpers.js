@@ -52,7 +52,7 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
     let firstX
     if (currIndexes.includes(nextIndex)) {
       ///// Pausing here
-      firstX = $slides.item(nextIndex).getBoundingClientRect().x
+      firstX = $slides.item(nextIndex).offsetLeft
     } else firstX = sliderWidth + gutter
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -78,7 +78,7 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
     let firstX // left position of the last slide in next slides
     if (currIndexes.includes((nextIndex + slidesToShow - 1) % totalSlide)) {
-      firstX = $slides.item((nextIndex + slidesToShow - 1) % totalSlide).getBoundingClientRect().x
+      firstX = $slides.item((nextIndex + slidesToShow - 1) % totalSlide).offsetLeft
     } else firstX = -(slideWidth + gutter)
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -94,14 +94,14 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
 
   // Calculate new position for curr-showing-slides
   for (let i = 0; i < slidesToShow; i++) {
-    const slideX = $slides.item((curr + i) % totalSlide).getBoundingClientRect().x
+    const slideX = $slides.item((curr + i) % totalSlide).offsetLeft
 
     let newX
     if (direction === 'next') newX = slideX - (gutter + slideWidth) * slidesMove
     else if (direction === 'prev') newX = slideX + (gutter + slideWidth) * slidesMove
 
     if (slider.moveByDrag) {
-      const currLeft = $slides.item(curr % totalSlide).getBoundingClientRect().x
+      const currLeft = $slides.item(curr % totalSlide).offsetLeft
       if (direction === 'prev') newX = slideX + (sliderWidth - currLeft) + gutter
       else if (direction === 'next') newX = slideX - (sliderWidth + currLeft) - gutter
     }
@@ -115,6 +115,8 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
   nextSlidesReadyPos = refinePFSliderArray(nextSlidesReadyPos, totalSlide)
   nextSlidesNewPos = refinePFSliderArray(nextSlidesNewPos, totalSlide)
   currSlidesNewPos = refinePFSliderArray(currSlidesNewPos, totalSlide)
+
+  // console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
