@@ -75,14 +75,14 @@
   <div class='test-slider-1' style="text-decoration: underline;">
     <div class="child-1 h-200px">0</div>
     <div class="child-2 h-400px">1</div>
-    <!-- <div class="child-3 h-300px" style="font-size: 2em;">2</div>
+    <div class="child-3 h-300px" style="font-size: 2em;">2</div>
     <div class="child-4 h-500px">3</div>
     <div class="child-5 h-300px">4</div>
     <div class="child-1 h-200px">5</div>
     <div class="child-2 h-400px">6</div>
     <div class="child-3 h-300px" style="font-size: 2em;">7</div>
     <div class="child-4 h-500px">8</div>
-    <div class="child-5 h-300px">9</div> -->
+    <div class="child-5 h-300px">9</div>
   </div>
   <br><br><br>
   <!-- <div class='test-slider-1 h-300px' style="height: 400px;">
@@ -102,13 +102,14 @@
     const mySlider = document.querySelector('.test-slider-1')
     new PageFlySliderController(mySlider, {
       curr: 0,
-      slidesToShow: 1,
+      slidesToShow: 3,
       slidesToScroll: 1,
       autoPlay: false,
       duration: 400,
       autoPlayDelay: '2000',
       loop: true,
       adaptiveHeight: false,
+      gutter: 15,
       draggable: true,
       navStyle: 'nav-style-11111',
       paginationStyle: 'pagination-style-3'
