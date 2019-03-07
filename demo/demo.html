@@ -9,6 +9,12 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="../dist/slider-x.css">
   <style>
+    body {
+      padding: 0px 20px;
+      max-width: 80%;
+      margin: 0 auto;
+    }
+
     .my-slide {
       height: 350px;
       /* background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80') */
@@ -53,14 +59,14 @@
     <div class="h-300px slide-1"></div>
     <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
-    <div class="h-500px slide-2"></div>
+    <!-- <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
-    <div class="h-500px slide-1"></div>
+    <div class="h-500px slide-1"></div> -->
   </div>
   <br><br><br>
   <!-- <div class="my-slide">
@@ -70,10 +76,11 @@
 
   <script src="../dist/slider-x.js"></script>
   <script>
-    const $slides = document.querySelectorAll('.my-slide')
-    $slides.forEach($s => {
+    var $slides = document.querySelectorAll('.my-slide')
+    for (let i = 0; i < $slides.length; i++) {
+      var $s = $slides.item(i)
       new PageFlySliderController($s, {
-        slidesToShow: 3,
+        slidesToShow: 1,
         slidesToScroll: 1,
         gutter: 15,
         autoPlay: false,
@@ -83,7 +90,7 @@
         navStyle: 'nav-style-111',
         paginationStyle: 'pagination-style-3'
       })
-    })
+    }
   </script>
 </body>
 
