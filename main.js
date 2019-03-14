@@ -125,6 +125,8 @@ export class PageFlySliderController {
   cloneSlide() {
     const { totalSlide, $slides, $slider } = this
 
+    console.log(6969, $slides)
+
     for (let i = 0; i < totalSlide * 2; i++) {
       const $slide = $slides[i % totalSlide]
       const $cloneSlide = $slide.cloneNode(true)
