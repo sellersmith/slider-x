@@ -135,6 +135,7 @@ export class PageFlySliderController {
 
   /* SETUP EVENT DELEGATION */
   handleResize(e) {
+    console.log('PF Slider: style changed')
     const { curr, slidesToShow, gutter } = this.opts
     let { totalSlide, $slides, sliderWidth } = this
     totalSlide *= 3
