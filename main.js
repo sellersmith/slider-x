@@ -59,8 +59,8 @@ class PageFlySliderController {
 
     // Create an inner div to wrap all slide item
     const $inner = document.createElement('div')
-    while ($slides.item(0)) {
-      const $slide = $slides.item(0)
+    while ($slides[0]) {
+      const $slide = $slides[0]
       // Save original styles
       const childStyles = $slide.getAttribute('style') ? $slide.getAttribute('style') : ''
       this.originalStyles.inner.push(childStyles)
@@ -126,8 +126,10 @@ class PageFlySliderController {
   cloneSlide() {
     const { totalSlide, $slides, $slider } = this
 
+    console.log(6969, $slides)
+
     for (let i = 0; i < totalSlide * 2; i++) {
-      const $slide = $slides.item(i % totalSlide)
+      const $slide = $slides[i % totalSlide]
       const $cloneSlide = $slide.cloneNode(true)
       $cloneSlide.dataset.slideClone = true
       $slider.appendChild($cloneSlide)
@@ -143,7 +145,7 @@ class PageFlySliderController {
     const newSlideWidth = calculatePFSlideSize(this)
 
     for (let i = 0; i < totalSlide; i++) {
-      const $slide = $slides.item(i)
+      const $slide = $slides[i]
       $slide.style.width = `${newSlideWidth}px`
       $slide.style.transition = ''
 
@@ -202,17 +204,17 @@ class PageFlySliderController {
     // The key is: move all 3 slide! Genius!
     for (let i = 0; i < prevSlidesReadyPos.length; i++) {
       const slide = prevSlidesReadyPos[i]
-      const $slide = this.$slides.item(slide.index)
+      const $slide = this.$slides[slide.index]
       this.translateSlide($slide, slide.readyX + translateRange)
     }
     for (let i = 0; i < currSlidesPos.length; i++) {
       const slide = currSlidesPos[i]
-      const $slide = this.$slides.item(slide.index)
+      const $slide = this.$slides[slide.index]
       this.translateSlide($slide, slide.readyX + translateRange)
     }
     for (let i = 0; i < nextSlidesReadyPos.length; i++) {
       const slide = nextSlidesReadyPos[i]
-      const $slide = this.$slides.item(slide.index)
+      const $slide = this.$slides[slide.index]
       this.translateSlide($slide, slide.readyX + translateRange)
     }
   }
@@ -374,7 +376,7 @@ class PageFlySliderController {
     const items = []
     // this.$slides = this.$slider.children
     for (let i = 0; i < this.totalSlide; i++) {
-      const $slide = this.$slides.item(i)
+      const $slide = this.$slides[i]
       $slide.classList.remove(slide)
       $slide.classList.remove('active')
       $slide.style = this.originalStyles.inner[i]
@@ -433,7 +435,7 @@ class PageFlySliderController {
       // Only move the $next slide to the ready-position in case user does not drag
       for (let i = 0; i < nextSlidesReadyPos.length; i++) {
         const slide = nextSlidesReadyPos[i]
-        const $slide = this.$slides.item(slide.index)
+        const $slide = this.$slides[slide.index]
         this.translateSlide($slide, slide.readyX)
       }
     }
@@ -451,14 +453,14 @@ class PageFlySliderController {
       if (!this.missingSlidesOnDrag) {
         for (let i = 0; i < currSlidesNewPos.length; i++) {
           const slide = currSlidesNewPos[i]
-          const $slide = this.$slides.item(slide.index)
+          const $slide = this.$slides[slide.index]
           this.translateSlide($slide, slide.newX, duration)
         }
       }
 
       for (let i = 0; i < nextSlidesNewPos.length; i++) {
         const slide = nextSlidesNewPos[i]
-        const $slide = this.$slides.item(slide.index)
+        const $slide = this.$slides[slide.index]
         this.translateSlide($slide, slide.newX, duration)
       }
 
@@ -525,7 +527,7 @@ class PageFlySliderController {
   /* STYLE FUNCTIONS */
   updateSliderStyle() {
     const { $slider, $slides, el, opts } = this
-    const $curr = $slides.item(this.opts.curr)
+    const $curr = $slides[this.opts.curr]
     const slideWidth = calculatePFSlideSize(this)
 
     const { adaptiveHeight, height } = opts
@@ -536,11 +538,11 @@ class PageFlySliderController {
       // }
 
       // Stretch all slide height to equal to the heightest slide
-      for (let i = 0; i < $slides.length; i++) { $slides.item(i).style.cssText += `height: 100%; width: ${slideWidth}px;` }
+      for (let i = 0; i < $slides.length; i++) { $slides[i].style.cssText += `height: 100%; width: ${slideWidth}px;` }
       $slider.style.cssText = `height: 100%; transition: '';`
       el.style.transition = ''
     } else {
-      for (let i = 0; i < $slides.length; i++) { $slides.item(i).style.height = '' }
+      for (let i = 0; i < $slides.length; i++) { $slides[i].style.height = '' }
       el.style.transition = `height ${opts.duration}ms ease-in-out`
       $slider.style.transition = `height ${opts.duration}ms ease-in-out`
 
@@ -548,12 +550,12 @@ class PageFlySliderController {
       $slider.style.height = `${$curr.height()}px`
     }
 
-    for (let i = 0; i < $slides.length; i++) { $slides.item(i).classList.add(slide) }
+    for (let i = 0; i < $slides.length; i++) { $slides[i].classList.add(slide) }
     const { gutter } = opts
 
     for (let i = 0; i < $slides.length; i++) {
       const slideX = i * (slideWidth + gutter)
-      $slides.item(i).style.transform = `translate3d(${slideX}px, 0, 0)`
+      $slides[i].style.transform = `translate3d(${slideX}px, 0, 0)`
     }
 
     // $curr.css('transform', 'translate3d(0, 0, 0)')
@@ -596,7 +598,7 @@ class PageFlySliderController {
     const $currSlide = this.$slider.querySelector(`.${slide}.active`)
     $currSlide ? $currSlide.classList.remove('active') : null
 
-    this.$slides.item(curr).classList.add('active')
+    this.$slides[curr].classList.add('active')
 
     let activeSlide = Math.floor((curr % (this.totalSlide)) / slidesToShow) * slidesToShow
 
