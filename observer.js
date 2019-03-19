@@ -10,6 +10,7 @@ export default class DOMObserver {
     }
     const rect = elem.getBoundingClientRect();
     this.elems.set(elem, { rect, callback });
+    callback()
   }
   unobserve(elem) {
     this.elems.delete(elem);

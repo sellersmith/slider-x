@@ -82,8 +82,7 @@ void function () {
 	}
 
 	function drag(e) {
-		if (!tapped)
-			return;
+		if (!tapped) return;
 		switch (e.type) {
 			case 'mousemove':
 				if (isTouchDevice)
@@ -134,7 +133,6 @@ void function () {
 			target.classList.add('jsn-es-draggable-dragging')
 		}
 		if (dragging) {
-
 			timeStop = Date.now();
 			calculateVelocity();
 			timeStart = Date.now();
@@ -192,7 +190,13 @@ void function () {
 			return element.attachEvent(event, handler, capture);
 	}
 	function createEvent(type, e) {
-		const event = new Event(type)
+		let event
+		if (typeof(Event) === 'function') {
+			event = new Event(type)
+		} else {
+			event = document.createEvent('Event')
+			event.initEvent(type, true, true)
+		}
 		event.originalEvent = e
 		event.preventDefault = e.preventDefault.bind(e)
 		event.stopPropagation = e.stopPropagation.bind(e)

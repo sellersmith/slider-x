@@ -1,6 +1,6 @@
 {
   "name": "slider-x",
-  "version": "15.2.1",
+  "version": "15.4.2",
   "description": "Simple and awesome Slider for PageFly",
   "main": "dist/slider-x.js",
   "scripts": {
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "lodash": "^4.17.11",
     "terser-webpack-plugin": "^1.2.2"
   }
 }

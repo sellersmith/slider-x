@@ -11,7 +11,6 @@ export class PageFlySliderController {
     this.originalStyles = { wrapper: '', inner: [] }
 
     this.observer = new DOMObserver()
-    this.observer.observe(this.el, this.handleStyleChange.bind(this))
 
     this.$slider = null // The .inner div that wrap all slides
     this.sliderHeight = this.el.offsetHeight
@@ -25,13 +24,11 @@ export class PageFlySliderController {
   }
 
   initialize() {
-    this.$slides = this.el.children
     this.opts.curr = 0
     this.verifyOptions()
 
     // Setup DOM + set event handler
     this.el.addEventListener('click', this.handleClick)
-
     this.setupSliderDOM()
 
     // Set up drag n drop event
@@ -43,14 +40,18 @@ export class PageFlySliderController {
 
     this.setAutoPlay()
 
-    // set a data to detect slider-x
+    // Set data to detect slider-x
     this.el.dataset.pfSliderXInited = true
+    this.observer.observe(this.el, this.handleStyleChange.bind(this))
 
     console.log("New PageFly Slider initialized!!!", this)
   }
 
+  get $slides() { return this.$slider ? this.$slider.children : [] }
+
   setupSliderDOM() {
-    const { el, $slides } = this
+    const { el } = this
+    const $slides = this.el.children
 
     el.classList.add(wrapper)
     // Save original styles
@@ -69,7 +70,6 @@ export class PageFlySliderController {
 
     // Save the inner DOM
     this.$slider = $inner
-    this.$slides = $inner.children
 
     // Append controllers
     const $nextCtrl = document.createElement('a')
@@ -92,40 +92,13 @@ export class PageFlySliderController {
     el.appendChild($nextCtrl)
 
     this.cloneSlide()
-    
+
     this.updateSliderStyle()
     this.udpateActiveSlideStyle()
-
-    // Wait for the background image load complete then update the Slider style
-    // Remove string url("")
-    // const sliderBackgroundImg = el.style.backgroundImage.slice(4, -1).replace(/"/g, "")
-
-    // const waitForWidth = () => {
-    //   this.sliderWidth = el.offsetWidth
-    //   if (this.sliderWidth) {
-    //     this.updateSliderStyle()
-    //     this.udpateActiveSlideStyle()
-    //   } else {
-    //     setTimeout(waitForWidth, 100)
-    //   }
-    // }
-
-    // if (!sliderBackgroundImg) {
-    //   waitForWidth()
-    // }
-    // else {
-    //   const tempImg = new Image()
-    //   tempImg.src = sliderBackgroundImg
-    //   tempImg.onload = () => {
-    //     waitForWidth()
-    //   }
-    // }
   }
 
   cloneSlide() {
-    const { totalSlide, $slides, $slider } = this
-
-    console.log(6969, $slides)
+    const { totalSlide, $slider, $slides } = this
 
     for (let i = 0; i < totalSlide * 2; i++) {
       const $slide = $slides[i % totalSlide]
@@ -580,7 +553,10 @@ export class PageFlySliderController {
 
   updateSliderCtrlStyle(index) {
     const $navs = this.el.querySelectorAll('a.pf-slider-nav')
-    $navs.forEach($nav => $nav.classList.remove(disabledCtrl))
+    for (let i = 0; i < $navs.length; i++) {
+      const $nav = $navs[i]
+      $nav.classList.remove(disabledCtrl)
+    }
 
     if (index === 0 && !this.opts.loop) {
       this.el.querySelector(`.${prevCtrl}`).classList.add(disabledCtrl)
