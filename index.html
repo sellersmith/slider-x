@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Final slider</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-    crossorigin="anonymous">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <link rel="stylesheet" href="main.css">
@@ -108,18 +106,18 @@
   <script>
     const mySlider = document.querySelector('.test-slider-1')
     new PageFlySliderController(mySlider, {
-      curr: 0,
-      slidesToShow: 1,
+      curr: 3,
+      slidesToShow: 3,
       slidesToScroll: 1,
       autoPlay: false,
       duration: 400,
       autoPlayDelay: '2000',
-      loop: true,
+      loop: false,
       adaptiveHeight: false,
       gutter: 15,
       draggable: true,
       navStyle: 'nav-style-11111',
-      paginationStyle: 'pagination-style-3'
+      paginationStyle: 'pagination-style-2'
     })
     // $('.test-slider-2').pageflySlider({
     //   autoPlay: false,

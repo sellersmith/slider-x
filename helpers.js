@@ -10,7 +10,7 @@ if (!Array.prototype.includes) {
 }
 
 
-export const PageFlySliderClasses = {
+ const PageFlySliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
@@ -23,7 +23,7 @@ export const PageFlySliderClasses = {
 }
 
 // The logic is compicated! Stay tune before reading this func
-export const getPFSlideMovementData = (slider, direction, toIndex) => {
+ const getPFSlideMovementData = (slider, direction, toIndex) => {
   let { totalSlide, sliderWidth, $slides } = slider
   totalSlide *= 3
   const sliderOffsetLeft = slider.el.getBoundingClientRect().left
@@ -121,7 +121,7 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
-export const calculatePFSlideSize = slider => {
+ const calculatePFSlideSize = slider => {
   const { gutter, slidesToShow } = slider.opts
   const wrapperWidth = slider.sliderWidth
 

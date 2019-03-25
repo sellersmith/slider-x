@@ -11,9 +11,10 @@
 
 .pf-slider-slide {
   will-change: contents;
-  /* width: 100%; */
+  width: 100%;
   position: absolute !important;
-  /* transform: translate3d(100%, 0, 0); */
+  transform: translate3d(100%, 0, 0);
+  overflow: hidden;
   top: 0;
 }
 
@@ -315,6 +316,7 @@
   background: transparent;
   border: 1px solid #212121;
   border-radius: 50%;
+  box-sizing: border-box;
 }
 
 /* Pagination style 3 */

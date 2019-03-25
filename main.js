@@ -1,10 +1,10 @@
-import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
-import DOMObserver from './observer'
-require('./draggable')
+// import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+// import DOMObserver from './observer'
+// require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-export class PageFlySliderController {
+class PageFlySliderController {
   // export class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
@@ -24,7 +24,7 @@ export class PageFlySliderController {
   }
 
   initialize() {
-    this.opts.curr = 0
+    // this.opts.curr = 0
     this.verifyOptions()
 
     // Setup DOM + set event handler
@@ -279,13 +279,10 @@ export class PageFlySliderController {
     // Set the slider height
     this.opts.height = this.sliderHeight || this.opts.height
 
-    // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
-
-    // No gutter if only one slide shown in a section
     if (this.opts.slidesToShow === 1) this.opts.gutter = 0
 
-    // Set the style of slider nav n pagination to legal values
+    // Set the style of slider nav n pagination to valid values
     const defPags = this.constructor.styleOptions.paginations
     const defNavs = this.constructor.styleOptions.navs
 
@@ -529,8 +526,6 @@ export class PageFlySliderController {
       const slideX = i * (slideWidth + gutter)
       $slides[i].style.transform = `translate3d(${slideX}px, 0, 0)`
     }
-
-    // $curr.css('transform', 'translate3d(0, 0, 0)')
 
     $slider.classList.add(inner)
     opts.draggable ? $slider.classList.add('jsn-es-draggable') : $slider.classList.remove('jsn-es-draggable')
