@@ -1,11 +1,11 @@
-// import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
-// import DOMObserver from './observer'
-// require('./draggable')
+import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+import DOMObserver from './observer'
+require('./draggable')
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
-class PageFlySliderController {
-  // export class PageFlySliderController {
+export class PageFlySliderController {
+// class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
