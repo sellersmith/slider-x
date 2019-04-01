@@ -73,15 +73,15 @@ export class PageFlySliderController {
 
     // Append controllers
     const $nextCtrl = document.createElement('a')
-    $nextCtrl.dataset.action = 'next'
+    $nextCtrl.dataset.sliderxAction = 'next'
     const $prevCtrl = document.createElement('a')
-    $prevCtrl.dataset.action = 'prev'
+    $prevCtrl.dataset.sliderxAction = 'prev'
 
     // Append indicators
     const $indicators = document.createElement('ol')
     for (let i = 0; i < Math.ceil(this.totalSlide / this.opts.slidesToShow); i++) {
       const $indItem = document.createElement('li')
-      $indItem.dataset.action = 'goto'
+      $indItem.dataset.sliderxAction = 'goto'
       $indItem.dataset.gotoSlide = i * this.opts.slidesToShow
       $indicators.appendChild($indItem)
     }
@@ -110,7 +110,6 @@ export class PageFlySliderController {
 
   /* SETUP EVENT DELEGATION */
   handleResize(e) {
-    console.log('PF Slider: style changed')
     const { curr, slidesToShow, gutter } = this.opts
     let { totalSlide, $slides, sliderWidth } = this
     totalSlide *= 3
@@ -127,7 +126,7 @@ export class PageFlySliderController {
   }
 
   handleClick = e => {
-    const { action } = e.target.dataset
+    const action = e.target.dataset.sliderxAction
     switch (action) {
       case 'next': this.next(); break
       case 'prev': this.prev(); break
@@ -448,7 +447,7 @@ export class PageFlySliderController {
   }
 
   translateSlide($slide, toX, duration) {
-    const transition = duration ? `transform ${duration}ms linear` : ''
+    const transition = duration ? `transform ${duration}ms ease` : ''
     $slide.style.transition = transition
     $slide.style.transform = `translate3d(${toX}px, 0, 0)`
   }
@@ -533,16 +532,16 @@ export class PageFlySliderController {
     // Styling for navigators and indicators
     const { navStyle, paginationStyle } = opts
 
-    el.querySelector('a[data-action="next"]').setAttribute('class', `${nextCtrl} ${controller} ${navStyle}`)
-    el.querySelector('a[data-action="prev"]').setAttribute('class', `${prevCtrl} ${controller} ${navStyle}`)
+    el.querySelector('a[data-sliderx-action="next"]').setAttribute('class', `${nextCtrl} ${controller} ${navStyle}`)
+    el.querySelector('a[data-sliderx-action="prev"]').setAttribute('class', `${prevCtrl} ${controller} ${navStyle}`)
     el.querySelector('ol').setAttribute('class', `${indicators} ${paginationStyle}`)
 
     // Toggle show/hide nav/pagination
     const navDisplay = navStyle === 'none' ? 'none' : 'flex'
     const paginationDisplay = paginationStyle === 'none' ? 'none' : 'block'
 
-    el.querySelector('a[data-action="next"]').style.display = navDisplay
-    el.querySelector('a[data-action="prev"]').style.display = navDisplay
+    el.querySelector('a[data-sliderx-action="next"]').style.display = navDisplay
+    el.querySelector('a[data-sliderx-action="prev"]').style.display = navDisplay
     el.querySelector('ol.pf-slider-pagination').style.display = paginationDisplay
   }
 
@@ -597,7 +596,7 @@ PageFlySliderController.defaultOptions = {
   gutter: 15,
   autoPlay: true,
   autoPlayDelay: 3000,
-  duration: 450,
+  duration: 400,
   loop: true,
   draggable: true,
   paginationStyle: 'pagination-style-1',
