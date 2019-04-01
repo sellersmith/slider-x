@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="main.css">
   <style>
     body {
-      padding: 0px 200px;
+      /* padding: 0px 200px; */
     }
 
     .h-300px {
@@ -90,13 +90,13 @@
   </section>
 
   <br><br><br>
-  <!-- <div class='test-slider-1 h-300px' style="height: 400px;">
-    <div class="">00</div>
-    <div class="">11</div>
-    <div class="">22</div>
-    <div class="">33</div>
-    <div class="">44</div>
-  </div> -->
+  <div class='test-slider-2 h-300px' style="height: 400px;">
+    <div class="child-1">00</div>
+    <div class="child-2">11</div>
+    <div class="child-3">22</div>
+    <div class="child-4">33</div>
+    <div class="child-5">44</div>
+  </div>
   <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
     crossorigin="anonymous"></script>
   <script src="./observer.js"></script>
@@ -104,9 +104,9 @@
   <script src="./helpers.js"></script>
   <script src="./main.js"></script>
   <script>
-    const mySlider = document.querySelector('.test-slider-1')
-    new PageFlySliderController(mySlider, {
-      curr: 3,
+    const mySlider1 = document.querySelector('.test-slider-1')
+    new PageFlySliderController(mySlider1, {
+      curr: 7,
       slidesToShow: 3,
       slidesToScroll: 1,
       autoPlay: false,
@@ -119,14 +119,17 @@
       navStyle: 'nav-style-11111',
       paginationStyle: 'pagination-style-2'
     })
-    // $('.test-slider-2').pageflySlider({
-    //   autoPlay: false,
-    //   autoPlayDelay: 3000,
-    //   duration: "sample-text-to-test-default-opts",
-    //   loop: true,
-    //   navStyle: 'nav-style-3',
-    //   paginationStyle: 'pagination-style-2'
-    // })
+
+    const mySlider2 = document.querySelector('.test-slider-2')
+    new PageFlySliderController(mySlider2, {
+      autoPlay: false,
+      autoPlayDelay: 3000,
+      duration: 300,
+      duration: "sample-text-to-test-default-opts",
+      loop: true,
+      navStyle: 'nav-style-3',
+      paginationStyle: 'pagination-style-2'
+    })
   </script>
 </body>
 
