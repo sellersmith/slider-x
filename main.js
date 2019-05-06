@@ -24,7 +24,6 @@ export class PageFlySliderController {
   }
 
   initialize() {
-    // this.opts.curr = 0
     this.verifyOptions()
 
     // Setup DOM + set event handler
@@ -616,4 +615,4 @@ PageFlySliderController.styleOptions = {
 }
 
 // Comment this line before bundling for production version
-window.PageFlySliderController = PageFlySliderController
+// window.PageFlySliderController = PageFlySliderController
