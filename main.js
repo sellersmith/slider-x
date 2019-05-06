@@ -127,9 +127,17 @@ export class PageFlySliderController {
   handleClick = e => {
     const action = e.target.dataset.sliderxAction
     switch (action) {
-      case 'next': this.next(); break
-      case 'prev': this.prev(); break
+      case 'next': 
+        e.stopPropagation()
+        e.preventDefault()
+        this.next(); break
+      case 'prev': 
+        e.stopPropagation()
+        e.preventDefault()
+        this.prev(); break
       case 'goto':
+        e.stopPropagation()
+        e.preventDefault()
         // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
         const index = parseInt(e.target.dataset.gotoSlide) || 0
         this.goto(index)
