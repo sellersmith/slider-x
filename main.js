@@ -623,4 +623,4 @@ PageFlySliderController.styleOptions = {
 }
 
 // Comment this line before bundling for production version
-// window.PageFlySliderController = PageFlySliderController
+window.PageFlySliderController = PageFlySliderController
