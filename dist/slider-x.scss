@@ -30,10 +30,13 @@
   text-decoration: none;
   font-size: 18px;
   cursor: pointer;
+  border: unset;
+  background: unset;
 }
 
 .pf-slider-nav:focus {
   text-decoration: none;
+  outline: unset;
 }
 
 .pf-slider-nav.nav-style-1::before,
