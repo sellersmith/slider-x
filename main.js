@@ -71,9 +71,9 @@ class PageFlySliderController {
     this.$slider = $inner
 
     // Append controllers
-    const $nextCtrl = document.createElement('a')
+    const $nextCtrl = document.createElement('button')
     $nextCtrl.dataset.sliderxAction = 'next'
-    const $prevCtrl = document.createElement('a')
+    const $prevCtrl = document.createElement('button')
     $prevCtrl.dataset.sliderxAction = 'prev'
 
     // Append indicators
@@ -127,17 +127,9 @@ class PageFlySliderController {
   handleClick = e => {
     const action = e.target.dataset.sliderxAction
     switch (action) {
-      case 'next': 
-        e.stopPropagation()
-        e.preventDefault()
-        this.next(); break
-      case 'prev': 
-        e.stopPropagation()
-        e.preventDefault()
-        this.prev(); break
+      case 'next': this.next(); break
+      case 'prev': this.prev(); break
       case 'goto':
-        e.stopPropagation()
-        e.preventDefault()
         // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
         const index = parseInt(e.target.dataset.gotoSlide) || 0
         this.goto(index)
@@ -539,32 +531,31 @@ class PageFlySliderController {
     // Styling for navigators and indicators
     const { navStyle, paginationStyle } = opts
 
-    el.querySelector('a[data-sliderx-action="next"]').setAttribute('class', `${nextCtrl} ${controller} ${navStyle}`)
-    el.querySelector('a[data-sliderx-action="prev"]').setAttribute('class', `${prevCtrl} ${controller} ${navStyle}`)
+    el.querySelector('[data-sliderx-action="next"]').setAttribute('class', `${nextCtrl} ${controller} ${navStyle}`)
+    el.querySelector('[data-sliderx-action="prev"]').setAttribute('class', `${prevCtrl} ${controller} ${navStyle}`)
     el.querySelector('ol').setAttribute('class', `${indicators} ${paginationStyle}`)
 
     // Toggle show/hide nav/pagination
     const navDisplay = navStyle === 'none' ? 'none' : 'flex'
     const paginationDisplay = paginationStyle === 'none' ? 'none' : 'block'
 
-    el.querySelector('a[data-sliderx-action="next"]').style.display = navDisplay
-    el.querySelector('a[data-sliderx-action="prev"]').style.display = navDisplay
+    el.querySelector('[data-sliderx-action="next"]').style.display = navDisplay
+    el.querySelector('[data-sliderx-action="prev"]').style.display = navDisplay
     el.querySelector('ol.pf-slider-pagination').style.display = paginationDisplay
   }
 
   updateSliderCtrlStyle(index) {
-    const $navs = this.el.querySelectorAll('a.pf-slider-nav')
-    for (let i = 0; i < $navs.length; i++) {
-      const $nav = $navs[i]
-      $nav.classList.remove(disabledCtrl)
-    }
+    const { totalSlide, opts, el } = this
+    const { loop, slidesToShow } = opts
 
-    if (index === 0 && !this.opts.loop) {
-      this.el.querySelector(`.${prevCtrl}`).classList.add(disabledCtrl)
-    }
-    else if (index === this.totalSlide - this.opts.slidesToShow && !this.opts.loop) {
-      this.el.querySelector(`.${nextCtrl}`).classList.add(disabledCtrl)
-    }
+    const $next = el.querySelectorAll('.pf-next-nav')
+    const $prev = el.querySelectorAll('.pf-prev-nav')
+
+    $next.classList.remove(disabledCtrl)
+    $prev.classList.remove(disabledCtrl)
+
+    if (index === 0 && !loop) $prev.classList.add(disabledCtrl)
+    else if (index === totalSlide - slidesToShow && !loop) $next.classList.add(disabledCtrl)
   }
 
   udpateActiveSlideStyle() {
