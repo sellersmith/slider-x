@@ -548,8 +548,8 @@ export class PageFlySliderController {
     const { totalSlide, opts, el } = this
     const { loop, slidesToShow } = opts
 
-    const $next = el.querySelectorAll('.pf-next-nav')
-    const $prev = el.querySelectorAll('.pf-prev-nav')
+    const $next = el.querySelector('.pf-next-nav')
+    const $prev = el.querySelector('.pf-prev-nav')
 
     $next.classList.remove(disabledCtrl)
     $prev.classList.remove(disabledCtrl)
