@@ -8,50 +8,7 @@
   <title>PF Slider Demo</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="../dist/slider-x.css">
-  <style>
-    body {
-      padding: 0px 20px;
-      max-width: 80%;
-      margin: 0 auto;
-    }
-
-    .my-slide {
-      height: 350px;
-      /* background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80') */
-    }
-
-    .h-300px {
-      height: 300px;
-    }
-
-    .h-400px {
-      height: 400px;
-    }
-
-    .h-500px {
-      height: 500px;
-    }
-
-    .slide-1 {
-      background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80')
-    }
-
-    .slide-2 {
-      background-image: url('https://images.unsplash.com/photo-1521453159160-6b5c58c24591?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=149a5703e1ecd9f4a6b01c1f8f8280c6&auto=format&fit=crop&w=962&q=80')
-    }
-
-    .slide-3 {
-      background-image: url('https://images.unsplash.com/photo-1520932146956-1ee4b33740fc?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=225333a710e886bf08fc3733772f2de6&auto=format&fit=crop&w=1024&q=80')
-    }
-
-    .slide-4 {
-      background-image: url('https://images.unsplash.com/photo-1536082404951-89620d865bc8?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=708dca90dc95e788aeea39a9f7b8e58e&auto=format&fit=crop&w=1050&q=80')
-    }
-
-    .slide-5 {
-      background-image: url('https://images.unsplash.com/photo-1527234639945-70d78416bd7d?ixlib=rb-0.3.5&s=a9ebd4e986e2f1c37d371c511d9515a4&auto=format&fit=crop&w=1919&q=80')
-    }
-  </style>
+  <link rel="stylesheet" href="./demo.css">
 </head>
 
 <body>
@@ -73,6 +30,50 @@
     <div class="h-400px slide-3"></div>
     <div class="h-400px slide-4"></div>
   </div> -->
+  <section>
+    <div>
+      <div>
+        <div class='test-slider-1' style="text-decoration: underline;">
+          <div class="child-1 h-200px">
+            <select name="123">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+            0
+          </div>
+          <div class="child-2 h-400px">1</div>
+          <div class="child-3 h-300px" style="font-size: 2em;">2</div>
+          <div class="child-4 h-500px">3</div>
+          <div class="child-5 h-300px">4</div>
+          <div class="child-1 h-200px">5</div>
+          <div class="child-2 h-400px">6</div>
+          <div class="child-3 h-300px" style="font-size: 2em;">7</div>
+          <div class="child-4 h-500px">8</div>
+          <div class="child-5 h-300px">9</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <br><br><br>
+  <div class='test-slider-2 h-300px' style="height: 400px;">
+    <div class="child-1">
+      <select name="123">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+      00
+      <button onclick="console.log('hello world')">Click</button>
+    </div>
+    <div class="child-2">11</div>
+    <div class="child-3">22</div>
+    <div class="child-4">33</div>
+    <div class="child-5">44</div>
+  </div>
 
   <script src="../dist/slider-x.js"></script>
   <script>
@@ -92,6 +93,33 @@
         paginationStyle: 'pagination-style-3'
       })
     }
+
+    const mySlider1 = document.querySelector('.test-slider-1')
+    new PageFlySliderController(mySlider1, {
+      curr: 7,
+      slidesToShow: 3,
+      slidesToScroll: 1,
+      autoPlay: false,
+      duration: 400,
+      autoPlayDelay: '2000',
+      loop: false,
+      adaptiveHeight: false,
+      gutter: 15,
+      draggable: true,
+      navStyle: 'nav-style-11111',
+      paginationStyle: 'pagination-style-2'
+    })
+
+    const mySlider2 = document.querySelector('.test-slider-2')
+    new PageFlySliderController(mySlider2, {
+      autoPlay: false,
+      autoPlayDelay: 3000,
+      duration: 300,
+      duration: "sample-text-to-test-default-opts",
+      loop: true,
+      navStyle: 'nav-style-3',
+      paginationStyle: 'pagination-style-2'
+    })
   </script>
 </body>
 
