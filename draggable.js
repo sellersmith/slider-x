@@ -60,7 +60,6 @@ void function () {
 					return;
 				x = e.pageX;
 				y = e.pageY;
-				e.preventDefault();
 				break;
 			case 'touchstart':
 				if (e.touches.length != 1)
