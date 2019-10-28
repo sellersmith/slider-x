@@ -82,22 +82,13 @@
     for (var i = 0; i < $slides.length; i++) {
       var $s = $slides.item(i);
       new PageFlySliderController($s, {
-<<<<<<< HEAD
-        curr: 1,
-        slidesToShow: 3,
-        slidesToScroll: 3,
-        // gutter: 15,
-        autoPlay: false,
-        duration: '400',
-=======
         slidesToShow: 5,
         slidesToScroll: 1,
         gutter: 15,
-        autoPlay: true,
+        autoPlay: true, 
         duration: 200,
->>>>>>> 2107da4d8acb976db26617aebcd45a8b3b1c247a
         autoPlayDelay: 2000,
-        loop: false,
+        loop: true,
         navStyle: 'nav-style-111',
         paginationStyle: 'pagination-style-3'
       })
@@ -108,10 +99,10 @@
       curr: 7,
       slidesToShow: 3,
       slidesToScroll: 1,
-      autoPlay: false,
+      autoPlay: true,
       duration: 400,
       autoPlayDelay: '2000',
-      loop: false,
+      loop: true,
       adaptiveHeight: false,
       gutter: 15,
       draggable: true,
@@ -121,7 +112,7 @@
 
     const mySlider2 = document.querySelector('.test-slider-2')
     new PageFlySliderController(mySlider2, {
-      autoPlay: false,
+      autoPlay: true,
       autoPlayDelay: 3000,
       duration: 300,
       duration: "sample-text-to-test-default-opts",

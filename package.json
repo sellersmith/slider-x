@@ -24,6 +24,7 @@
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-es2017": "^7.0.0-beta.53",
     "babel-loader": "^8.0.4",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.7.0",
     "global": "^4.3.2",
     "webpack": "^4.20.2",
