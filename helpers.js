@@ -1,5 +1,5 @@
 const prefix = 'pf'
-const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
+const refinePos = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
 
 // Export all these FOLLOWING stuff before publish
 
@@ -9,7 +9,8 @@ if (!Array.prototype.includes) {
   }
 }
 
-export const PageFlySliderClasses = {
+
+export const SliderXClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
@@ -18,16 +19,16 @@ export const PageFlySliderClasses = {
   disabledCtrl: `${prefix}-slider-nav-disabled`,
   nextCtrl: `${prefix}-next-nav`,
   prevCtrl: `${prefix}-prev-nav`,
-  turnOffMouseEvent: `${prefix}-slider-mouse-event-off`
+  mouseEventOff: `${prefix}-slider-mouse-event-off`
 }
 
 // The logic is compicated! Stay tune before reading this func
-export const getPFSlideMovementData = (slider, direction, toIndex) => {
+export const getSlidingData = (slider, direction, toIndex) => {
   let { totalSlide, sliderWidth, $slides } = slider
   totalSlide *= 3
   const sliderOffsetLeft = slider.el.getBoundingClientRect().left
 
-  const slideWidth = calculatePFSlideSize(slider)
+  const slideWidth = getSlideWidth(slider)
   const { curr, slidesToShow, slidesToScroll, gutter } = slider.opts
 
   // Created this array to check if the next index is in the curr-showing-slides or not
@@ -111,16 +112,16 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
 
   ////////////
 
-  nextSlidesReadyPos = refinePFSliderArray(nextSlidesReadyPos, totalSlide)
-  nextSlidesNewPos = refinePFSliderArray(nextSlidesNewPos, totalSlide)
-  currSlidesNewPos = refinePFSliderArray(currSlidesNewPos, totalSlide)
+  nextSlidesReadyPos = refinePos(nextSlidesReadyPos, totalSlide)
+  nextSlidesNewPos = refinePos(nextSlidesNewPos, totalSlide)
+  currSlidesNewPos = refinePos(currSlidesNewPos, totalSlide)
 
   // console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }
 
-export const calculatePFSlideSize = slider => {
+export const getSlideWidth = slider => {
   const { gutter, slidesToShow } = slider.opts
   const wrapperWidth = slider.sliderWidth
 

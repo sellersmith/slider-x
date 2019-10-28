@@ -1,11 +1,11 @@
-import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
+import { SliderXClasses, getSlidingData, getSlideWidth } from './helpers'
 import DOMObserver from './observer'
 require('./draggable')
 
-const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
+const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, mouseEventOff } = SliderXClasses
 
-export class PageFlySliderController {
-// class PageFlySliderController {
+export class SliderX {
+  // export class SliderX {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
@@ -21,10 +21,10 @@ export class PageFlySliderController {
 
     this.autoPlayTimeoutId = ''
     this.paused = false
-    this.initialize()
+    this.init()
   }
 
-  initialize() {
+  init() {
     this.verifyOptions()
 
     // Setup DOM + set event handler
@@ -116,7 +116,7 @@ export class PageFlySliderController {
     const { curr, slidesToShow, gutter } = this.opts
     let { totalSlide, $slides, sliderWidth } = this
     totalSlide *= 3
-    const newSlideWidth = calculatePFSlideSize(this)
+    const newSlideWidth = getSlideWidth(this)
 
     for (let i = 0; i < totalSlide; i++) {
       const $slide = $slides[i]
@@ -149,25 +149,25 @@ export class PageFlySliderController {
 
   handleDragMove(e) {
     const data = e.data
-    if (Math.abs(data.moveX) < PageFlySliderController.constructor.MIN_DRAG_DISTANCE) return
+    if (Math.abs(data.moveX) < SliderX.constructor.MIN_DRAG_DISTANCE) return
     this.clearAutoPlay()
 
     const translateRange = data.moveX    // -30
     const { curr, slidesToShow, gutter, loop } = this.opts
 
     const nextIndex = (curr + slidesToShow) % (this.totalSlide * 3)
-    let nextSlidesReadyPos = getPFSlideMovementData(this, 'next', nextIndex).nextSlidesReadyPos
+    let nextSlidesReadyPos = getSlidingData(this, 'next', nextIndex).nextSlidesReadyPos
     if (!loop) nextSlidesReadyPos = nextSlidesReadyPos.filter(obj => obj.index < this.totalSlide)
 
     const currSlidesPos = []
-    const slideWidth = calculatePFSlideSize(this)
+    const slideWidth = getSlideWidth(this)
     for (let i = 0; i < slidesToShow; i++) {
       currSlidesPos.push({ index: (i + curr) % (this.totalSlide * 3), readyX: (slideWidth + gutter) * i })
     }
     // TODO: fix this dummy code
     // This is stupid because the getMovementData return the variable name nextIndex
     const prevIndex = (this.totalSlide * 3 + (curr - slidesToShow)) % (this.totalSlide * 3)
-    let prevSlidesReadyPos = getPFSlideMovementData(this, 'prev', prevIndex).nextSlidesReadyPos
+    let prevSlidesReadyPos = getSlidingData(this, 'prev', prevIndex).nextSlidesReadyPos
     if (!loop) prevSlidesReadyPos = prevSlidesReadyPos.filter(obj => obj.index < this.totalSlide)
 
     // Drag is forbidden in these below cases:
@@ -195,7 +195,7 @@ export class PageFlySliderController {
 
   handleDragStop(e) {
     const data = e.data
-    if (Math.abs(data.moveX) < PageFlySliderController.constructor.MIN_DRAG_DISTANCE) return
+    if (Math.abs(data.moveX) < SliderX.constructor.MIN_DRAG_DISTANCE) return
     // Turn off draggable until slides move completely
     this.moveByDrag = true
 
@@ -323,7 +323,7 @@ export class PageFlySliderController {
     // this.updateSliderCtrlStyle(this.opts.curr)
     // this.setAutoPlay()
     this.destroy()
-    this.initialize()
+    this.init()
   }
 
   setAutoPlay() {
@@ -404,9 +404,9 @@ export class PageFlySliderController {
     }
 
     // Turn off mouse event on moving
-    this.el.classList.add(turnOffMouseEvent)
+    this.el.classList.add(mouseEventOff)
 
-    const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos } = getPFSlideMovementData(this, direction, toIndex)
+    const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos } = getSlidingData(this, direction, toIndex)
     // console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
     // if (this.opts.adaptiveHeight) {
@@ -450,7 +450,7 @@ export class PageFlySliderController {
       // Do stuffs after slides moving complete
       setTimeout(() => {
         this.setAutoPlay()
-        this.el.classList.remove(turnOffMouseEvent)
+        this.el.classList.remove(mouseEventOff)
         this.moveByDrag = false
         this.missingSlidesOnDrag = false
       }, duration)
@@ -511,7 +511,7 @@ export class PageFlySliderController {
   updateSliderStyle() {
     const { $slider, $slides, el, opts } = this
     const $curr = $slides[this.opts.curr]
-    const slideWidth = calculatePFSlideSize(this)
+    const slideWidth = getSlideWidth(this)
 
     const { adaptiveHeight, height } = opts
     if (!adaptiveHeight) {
@@ -601,9 +601,9 @@ export class PageFlySliderController {
 }
 
 // Class properties
-PageFlySliderController.constructor.MIN_DRAG_DISTANCE = 5
+SliderX.constructor.MIN_DRAG_DISTANCE = 5
 
-PageFlySliderController.defaultOptions = {
+SliderX.defaultOptions = {
   curr: 0,
   slidesToShow: 1,
   slidesToScroll: 1,
@@ -619,7 +619,7 @@ PageFlySliderController.defaultOptions = {
   height: 400,
 }
 
-PageFlySliderController.styleOptions = {
+SliderX.styleOptions = {
   /**
    * The default style is the first array element
    * Add more style (class name) for pagination or nav to these below arrays
@@ -630,4 +630,4 @@ PageFlySliderController.styleOptions = {
 }
 
 // Comment this line before bundling for production version
-window.PageFlySliderController = PageFlySliderController
+window.PageFlySliderController = SliderX
