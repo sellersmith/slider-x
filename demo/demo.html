@@ -60,17 +60,17 @@
 
 <body>
   <div class="my-slide">
-    <div class="h-300px slide-1"></div>
-    <div class="h-500px slide-2"></div>
-    <div class="h-500px slide-1"></div>
-    <!-- <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
-    <div class="h-500px slide-1"></div> -->
+    <div class="h-500px slide-1"></div>
+    <div class="h-500px slide-2"></div>
+    <div class="h-500px slide-1"></div>
+    <div class="h-500px slide-2"></div>
+    <div class="h-500px slide-1"></div>
   </div>
   <br><br><br>
   <!-- <div class="my-slide">
@@ -85,11 +85,11 @@
     for (var i = 0; i < $slides.length; i++) {
       var $s = $slides.item(i);
       new PageFlySliderController($s, {
-        slidesToShow: 1,
+        slidesToShow: 5,
         slidesToScroll: 1,
         gutter: 15,
-        autoPlay: false,
-        duration: '400',
+        autoPlay: true,
+        duration: 200,
         autoPlayDelay: 2000,
         loop: true,
         navStyle: 'nav-style-111',
