@@ -13,7 +13,7 @@
 
 <body>
   <div class="my-slide">
-    <div class="h-300px slide-1"></div>
+    <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
     <div class="h-500px slide-1"></div>
     <div class="h-500px slide-2"></div>
@@ -75,18 +75,27 @@
     <div class="child-5">44</div>
   </div>
 
+  <script src="./script.js"></script>
   <script src="../dist/slider-x.js"></script>
   <script>
     var $slides = document.querySelectorAll('.my-slide');
     for (var i = 0; i < $slides.length; i++) {
       var $s = $slides.item(i);
       new PageFlySliderController($s, {
+<<<<<<< HEAD
         curr: 1,
         slidesToShow: 3,
         slidesToScroll: 3,
         // gutter: 15,
         autoPlay: false,
         duration: '400',
+=======
+        slidesToShow: 5,
+        slidesToScroll: 1,
+        gutter: 15,
+        autoPlay: true,
+        duration: 200,
+>>>>>>> 2107da4d8acb976db26617aebcd45a8b3b1c247a
         autoPlayDelay: 2000,
         loop: false,
         navStyle: 'nav-style-111',

@@ -20,6 +20,7 @@ export class PageFlySliderController {
     this.opts = Object.create(opts || {}) // Each slider's opts is a specific instance of opts argument
 
     this.autoPlayTimeoutId = ''
+    this.paused = false
     this.initialize()
   }
 
@@ -42,6 +43,9 @@ export class PageFlySliderController {
     // Set data to detect slider-x
     this.el.dataset.pfSliderXInited = true
     this.observer.observe(this.el, this.handleStyleChange.bind(this))
+
+    window.addEventListener('blur', this.pause)
+    window.addEventListener('focus', this.play)
 
     console.log("New PageFly Slider initialized!!!", this)
   }
@@ -323,7 +327,7 @@ export class PageFlySliderController {
   }
 
   setAutoPlay() {
-    if (this.opts.autoPlay) {
+    if (this.opts.autoPlay && !this.paused) {
       this.autoPlayTimeoutId = setTimeout(() => {
         this.moveSlide('next')
       }, (this.opts.autoPlayDelay))
@@ -332,6 +336,16 @@ export class PageFlySliderController {
 
   clearAutoPlay() {
     clearTimeout(this.autoPlayTimeoutId)
+  }
+
+  pause = () => {
+    this.paused = true
+    this.clearAutoPlay()
+  }
+
+  play = () => {
+    this.paused = false
+    this.setAutoPlay()
   }
 
   /* CONTROLLER FUNCTIONS */
@@ -359,6 +373,8 @@ export class PageFlySliderController {
     delete this.$slider
     delete this.$slides
     this.observer.unobserve(el)
+    window.removeEventListener('blur', this.pause)
+    window.removeEventListener('focus', this.play)
 
     while (el.firstChild) { el.removeChild(el.firstChild) }
 

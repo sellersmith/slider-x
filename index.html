@@ -98,7 +98,7 @@
   </section>
 
   <br><br><br>
-  <div class='test-slider-2 h-300px' style="height: 400px;">
+  <!-- <div class='test-slider-2 h-300px' style="height: 400px;">
     <div class="child-1">
       <select name="123">
         <option value="1">1</option>
@@ -113,7 +113,7 @@
     <div class="child-3">22</div>
     <div class="child-4">33</div>
     <div class="child-5">44</div>
-  </div>
+  </div> -->
   <script src="./observer.js"></script>
   <script src="./draggable.js"></script>
   <script src="./helpers.js"></script>
@@ -121,13 +121,13 @@
   <script>
     const mySlider1 = document.querySelector('.test-slider-1')
     new PageFlySliderController(mySlider1, {
-      curr: 7,
-      slidesToShow: 3,
+      curr: 0,
+      slidesToShow: 5,
       slidesToScroll: 1,
-      autoPlay: false,
-      duration: 400,
-      autoPlayDelay: '2000',
-      loop: false,
+      autoPlay: true,
+      duration: 300,
+      autoPlayDelay: 1000,
+      loop: true,
       adaptiveHeight: false,
       gutter: 15,
       draggable: true,
@@ -136,15 +136,15 @@
     })
 
     const mySlider2 = document.querySelector('.test-slider-2')
-    new PageFlySliderController(mySlider2, {
-      autoPlay: false,
-      autoPlayDelay: 3000,
-      duration: 300,
-      duration: "sample-text-to-test-default-opts",
-      loop: true,
-      navStyle: 'nav-style-3',
-      paginationStyle: 'pagination-style-2'
-    })
+    // new PageFlySliderController(mySlider2, {
+    //   autoPlay: false,
+    //   autoPlayDelay: 3000,
+    //   duration: 300,
+    //   duration: "sample-text-to-test-default-opts",
+    //   loop: true,
+    //   navStyle: 'nav-style-3',
+    //   paginationStyle: 'pagination-style-2'
+    // })
   </script>
 </body>
 
