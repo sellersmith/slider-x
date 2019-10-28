@@ -6,23 +6,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Final slider</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-    crossorigin="anonymous">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
 
   <link rel="stylesheet" href="main.css">
   <style>
-    .h-300px { height: 300px; }
-    .h-400px { height: 400px; }
-    .h-200px { height: 200px; }
-    .h-500px { height: 500px; }
-    .test-slider-1 { 
+    body {
+      /* padding: 0px 200px; */
+    }
+
+    .h-300px {
+      height: 300px;
+    }
+
+    .h-400px {
+      height: 400px;
+    }
+
+    .h-200px {
+      height: 200px;
+    }
+
+    .h-500px {
+      height: 500px;
+    }
+
+    .test-slider-1 {
       height: 299px;
       /* background-image: url('https://images.unsplash.com/photo-1496325823264-7cdf2ea4f0a7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=33dfefa08907444084b32551bcd6bef7&auto=format&fit=crop&w=1088&q=80') */
     }
-    .test-slider-2 { background: lightseagreen; }
+
+    .test-slider-2 {
+      background: lightseagreen;
+    }
 
     .pf-slider-slide {
       display: inline-flex;
@@ -31,63 +46,105 @@
       font-size: 2em;
     }
 
-    .child-1 { background: lightcoral; }
-    .child-2 { background: lightseagreen; }
-    .child-3 { background: lightgreen; }
-    .child-4 { background: lightgray; }
-    .child-5 { background: dodgerblue; }
+    .child-1 {
+      background: lightcoral;
+    }
+
+    .child-2 {
+      background: lightseagreen;
+    }
+
+    .child-3 {
+      background: lightgreen;
+    }
+
+    .child-4 {
+      background: lightgray;
+    }
+
+    .child-5 {
+      background: dodgerblue;
+    }
   </style>
 </head>
 
 <body>
   <h1>Final slider</h1>
-  <div class='test-slider-1'>
-    <div class="child-1 h-200px">0</div>
-    <div class="child-2 h-400px">1</div>
-    <div class="child-3 h-300px" style="font-size: 2em;">2</div>
-    <div class="child-4 h-500px">3</div>
-    <div class="child-5 h-300px">4</div>
-    <div class="child-1 h-200px">5</div>
-    <div class="child-2 h-400px">6</div>
-    <div class="child-3 h-300px" style="font-size: 2em;">7</div>
-    <div class="child-4 h-500px">8</div>
-    <div class="child-5 h-300px">9</div>
-  </div>
+  <section>
+    <div>
+      <div>
+        <div class='test-slider-1' style="text-decoration: underline;">
+          <div class="child-1 h-200px">
+            <select name="123">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+            0
+          </div>
+          <div class="child-2 h-400px">1</div>
+          <div class="child-3 h-300px" style="font-size: 2em;">2</div>
+          <div class="child-4 h-500px">3</div>
+          <div class="child-5 h-300px">4</div>
+          <div class="child-1 h-200px">5</div>
+          <div class="child-2 h-400px">6</div>
+          <div class="child-3 h-300px" style="font-size: 2em;">7</div>
+          <div class="child-4 h-500px">8</div>
+          <div class="child-5 h-300px">9</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <br><br><br>
-  <div class='test-slider-2 h-300px' style="height: 400px;">
-    <div class="child-1">00</div>
+  <!-- <div class='test-slider-2 h-300px' style="height: 400px;">
+    <div class="child-1">
+      <select name="123">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+      00
+      <button onclick="console.log('hello world')">Click</button>
+    </div>
     <div class="child-2">11</div>
     <div class="child-3">22</div>
     <div class="child-4">33</div>
-  </div>
-
+    <div class="child-5">44</div>
+  </div> -->
   <script src="./observer.js"></script>
   <script src="./draggable.js"></script>
   <script src="./helpers.js"></script>
   <script src="./main.js"></script>
   <script>
-    $('.test-slider-1').pageflySlider({
-      curr: 3,
-      slidesToShow: 3,
+    const mySlider1 = document.querySelector('.test-slider-1')
+    new PageFlySliderController(mySlider1, {
+      curr: 0,
+      slidesToShow: 5,
       slidesToScroll: 1,
-      autoPlay: false,
-      duration: 400,
-      autoPlayDelay: '2000',
-      loop: false,
+      autoPlay: true,
+      duration: 300,
+      autoPlayDelay: 1000,
+      loop: true,
       adaptiveHeight: false,
+      gutter: 15,
       draggable: true,
       navStyle: 'nav-style-11111',
-      paginationStyle: 'pagination-style-3'
-    })
-
-    $('.test-slider-2').pageflySlider({
-      autoPlay: false,
-      autoPlayDelay: 3000,
-      duration: "sample-text-to-test-default-opts",
-      loop: true,
-      navStyle: 'nav-style-3',
       paginationStyle: 'pagination-style-2'
     })
+
+    const mySlider2 = document.querySelector('.test-slider-2')
+    // new PageFlySliderController(mySlider2, {
+    //   autoPlay: false,
+    //   autoPlayDelay: 3000,
+    //   duration: 300,
+    //   duration: "sample-text-to-test-default-opts",
+    //   loop: true,
+    //   navStyle: 'nav-style-3',
+    //   paginationStyle: 'pagination-style-2'
+    // })
   </script>
 </body>
 

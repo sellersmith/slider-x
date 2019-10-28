@@ -1,4 +1,4 @@
-void function () {
+void function ($) {
 
 	var x, y,
 		deltaX, deltaY,
@@ -12,13 +12,11 @@ void function () {
 		isTouchDevice, now,
 		DRAG_DATA;
 
-	function handleTouchStart(e) {
+	$(window).one('touchstart', function ( e ) {
 		isTouchDevice = true;
-		window.removeEventListener('touchstart', handleTouchStart)
-	}
-	window.addEventListener('touchstart', handleTouchStart)
+	})
+	$(document).ready(function () {
 
-	window.addEventListener('load', function () {
 		bindEvent(document.body, 'touchstart', tap);
 		bindEvent(document.body, 'touchmove', drag);
 		bindEvent(document.body, 'touchend', release);
@@ -29,43 +27,44 @@ void function () {
 		bindEvent(document.body, 'mouseup', release);
 		bindEvent(document.body, 'blur', release);
 
-		window.addEventListener('mouseout', function (e) {
+		$(window).on('mouseout', function ( e ) {
 			e.toElement || release(e);
 		});
 	})
 
-	function tap(e) {
+	function tap ( e ) {
 		if (e.target.classList.contains('jsn-es-draggable')) {
-			target = e.target;
+			target = $(e.target);
 		}
 		else {
 			var parent = findParentNode(e.target);
 			if (parent) {
-				target = parent;
+				target = $(parent);
 			}
 			else {
 				return;
 			}
 		}
 
-		if (tapped)
+		if ( tapped )
 			return;
 
 		now = timeStart = Date.now();
 		DRAG_DATA = {};
 
-		switch (e.type) {
+		switch ( e.type ) {
 			case 'mousedown':
 				if (isTouchDevice)
 					return;
 				x = e.pageX;
 				y = e.pageY;
+				e.preventDefault();
 				break;
 			case 'touchstart':
-				if (e.touches.length != 1)
+				if ( e.touches.length != 1 )
 					return;
-				x = e.touches[0].clientX;
-				y = e.touches[0].clientY;
+				x = e.touches[ 0 ].clientX;
+				y = e.touches[ 0 ].clientY;
 				break;
 		}
 		deltaX = 0;
@@ -80,9 +79,10 @@ void function () {
 		tapped = true;
 	}
 
-	function drag(e) {
-		if (!tapped) return;
-		switch (e.type) {
+	function drag ( e ) {
+		if (!tapped)
+			return;
+		switch ( e.type ) {
 			case 'mousemove':
 				if (isTouchDevice)
 					return;
@@ -91,10 +91,10 @@ void function () {
 				e.preventDefault();
 				break;
 			case 'touchmove':
-				if (e.touches.length != 1)
+				if ( e.touches.length != 1 )
 					return;
-				var pageX = e.touches[0].clientX;
-				var pageY = e.touches[0].clientY;
+				var pageX = e.touches[ 0 ].clientX;
+				var pageY = e.touches[ 0 ].clientY;
 				break;
 		}
 		now = Date.now();
@@ -106,60 +106,60 @@ void function () {
 		x = pageX;
 		y = pageY;
 
-		if (!foundAxis) {
-			if (Math.abs(offsetX) > Math.abs(offsetY)) {
+		if ( !foundAxis ) {
+			if ( Math.abs(offsetX) > Math.abs(offsetY) ) {
 				axis = 'x';
 			}
-			else if (Math.abs(offsetX) < Math.abs(offsetY)) {
+			else if ( Math.abs(offsetX) < Math.abs(offsetY) ) {
 				axis = 'y';
 			}
 			else {
 				axis = 'none';
 			}
 			distance = Math.max(Math.abs(offsetX), Math.abs(offsetY));
-			if (distance > 50)
+			if ( distance > 50 )
 				foundAxis = true;
 		}
 		Math.abs(deltaX) >= Math.abs(deltaY) ?
 			direction = deltaX > 0 ? 'right' : deltaX < 0 ? 'left' : 'none' :
 			direction = deltaY > 0 ? 'down' : deltaY < 0 ? 'up' : 'none';
 
-		if (!dragging) {
+		if ( !dragging ) {
 			dragging = true;
-			triggerEvent(target, createEvent('es_dragstart', e), getData())
 
-			document.body.classList.add('jsn-es-draggable-dragging')
-			target.classList.add('jsn-es-draggable-dragging')
+			target.trigger(createEvent('es_dragstart', e ), getData());
+			$('body').add(target).addClass('jsn-es-draggable-dragging');
 		}
-		if (dragging) {
+		if ( dragging ) {
+
 			timeStop = Date.now();
 			calculateVelocity();
 			timeStart = Date.now();
-			triggerEvent(target, createEvent('es_dragmove', e), getData())
+			target.trigger(createEvent('es_dragmove', e ), getData());
 		}
 	}
 
-	function release(e) {
-		if (!tapped)
+	function release ( e ) {
+		if ( !tapped )
 			return;
-		switch (e.type) {
+		switch ( e.type ) {
 			case 'touchend':
 			case 'touchcancel':
-				if (e.touches.length)
+				if ( e.touches.length )
 					return;
 		}
 		tapped = false;
 
-		if (!dragging)
+		if ( !dragging )
 			return
 
 		timeStop = Date.now();
 		calculateVelocity();
 
 		dragging = false;
-		document.body.classList.remove('jsn-es-draggable-dragging');
-		target.classList.remove('jsn-es-draggable-dragging')
-		triggerEvent(target, createEvent('es_dragstop', e), getData())
+		$('body').add(target).removeClass('jsn-es-draggable-dragging');
+		target.trigger(createEvent('es_dragstop', e), getData());
+		target.removeData('jsn-es-draggable-data');
 	}
 
 	function calculateVelocity() {
@@ -167,7 +167,7 @@ void function () {
 		velocityX = Math.abs(deltaX / timeOffset);
 		velocityY = Math.abs(deltaY / timeOffset);
 	}
-	function getData() {
+	function getData () {
 		var data = DRAG_DATA;
 		data.direction = direction;
 		data.axis = axis;
@@ -182,38 +182,28 @@ void function () {
 
 		return data;
 	}
-	function bindEvent(element, event, handler, capture) {
+	function bindEvent( element, event, handler, capture) {
 		if (element.addEventListener)
-			return element.addEventListener(event, handler, capture);
+			return element.addEventListener(event,handler,capture);
 		if (element.attachEvent)
-			return element.attachEvent(event, handler, capture);
+			return element.attachEvent(event,handler,capture);
 	}
-	function createEvent(type, e) {
-		let event
-		if (typeof(Event) === 'function') {
-			event = new Event(type)
-		} else {
-			event = document.createEvent('Event')
-			event.initEvent(type, true, true)
-		}
-		event.originalEvent = e
-		event.preventDefault = e.preventDefault.bind(e)
-		event.stopPropagation = e.stopPropagation.bind(e)
-		return event
+	function createEvent( type, e ) {
+		var options = {};
+		options.originalEvent = e;
+		options.preventDefault = e.preventDefault.bind(e);
+		options.stopPropagation = e.stopPropagation.bind(e);
+		return $.Event(type, options)
 	}
-	function triggerEvent(target, event, data) {
-		event.data = data
-		return (target || window).dispatchEvent(event)
-	}
-	function findParentNode(child) {
+	function findParentNode( child ) {
 		var parent = child.parentNode, found = null;
 
 		while (parent && !found && !parent.isEqualNode(document.body))
 			parent.classList && parent.classList.contains('jsn-es-draggable') ?
-				found = parent :
+				found = parent:
 				parent = parent.parentNode;
 
 		return found;
 	}
 
-}()
+}(jQuery)

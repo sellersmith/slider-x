@@ -1,20 +1,19 @@
 const prefix = 'pf'
 const refinePFSliderArray = (arr, size) => arr.map(obj => { return { ...obj, index: obj.index % size } })
 
+// Export all these FOLLOWING stuff before publish
+
 if (!Array.prototype.includes) {
   Array.prototype.includes = function(item) {
     return this.indexOf(item) !== -1
   }
 }
 
-// Export all these FOLLOWING stuff before publish
-
 export const PageFlySliderClasses = {
   wrapper: `${prefix}-slider-wrapper`,
   inner: `${prefix}-slider-inner`,
   slide: `${prefix}-slider-slide`,
   indicators: `${prefix}-slider-pagination`,
-  indicatorItem: `${prefix}-slider-pagination-item`,
   controller: `${prefix}-slider-nav`,
   disabledCtrl: `${prefix}-slider-nav-disabled`,
   nextCtrl: `${prefix}-next-nav`,
@@ -24,10 +23,10 @@ export const PageFlySliderClasses = {
 
 // The logic is compicated! Stay tune before reading this func
 export const getPFSlideMovementData = (slider, direction, toIndex) => {
-  let { totalSlide, $slider } = slider
+  let { totalSlide, sliderWidth, $slides } = slider
   totalSlide *= 3
+  const sliderOffsetLeft = slider.el.getBoundingClientRect().left
 
-  const sliderWidth = $slider.width()
   const slideWidth = calculatePFSlideSize(slider)
   const { curr, slidesToShow, slidesToScroll, gutter } = slider.opts
 
@@ -52,7 +51,8 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
     let firstX
     if (currIndexes.includes(nextIndex)) {
-      firstX = slider.$slider.children().eq(nextIndex).position().left
+      ///// Pausing here
+      firstX = $slides[nextIndex].getBoundingClientRect().left - sliderOffsetLeft
     } else firstX = sliderWidth + gutter
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -78,7 +78,7 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
     // Calculate next slides ready-position - where the next slides stay and be ready to move in
     let firstX // left position of the last slide in next slides
     if (currIndexes.includes((nextIndex + slidesToShow - 1) % totalSlide)) {
-      firstX = slider.$slider.children().eq((nextIndex + slidesToShow - 1) % totalSlide).position().left
+      firstX = $slides[(nextIndex + slidesToShow - 1) % totalSlide].getBoundingClientRect().left - sliderOffsetLeft
     } else firstX = -(slideWidth + gutter)
 
     for (let i = 0; i < slidesToShow; i++) {
@@ -94,15 +94,13 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
 
   // Calculate new position for curr-showing-slides
   for (let i = 0; i < slidesToShow; i++) {
-    const $slide = slider.$slider.children().eq((curr + i) % totalSlide)
-    const slideX = $slide.position().left
-
+    const slideX = $slides[(curr + i) % totalSlide].getBoundingClientRect().left - sliderOffsetLeft
     let newX
     if (direction === 'next') newX = slideX - (gutter + slideWidth) * slidesMove
     else if (direction === 'prev') newX = slideX + (gutter + slideWidth) * slidesMove
 
     if (slider.moveByDrag) {
-      const currLeft = slider.$slider.children().eq(curr % totalSlide).position().left
+      const currLeft = $slides[curr % totalSlide].getBoundingClientRect().left - sliderOffsetLeft
       if (direction === 'prev') newX = slideX + (sliderWidth - currLeft) + gutter
       else if (direction === 'next') newX = slideX - (sliderWidth + currLeft) - gutter
     }
@@ -116,6 +114,8 @@ export const getPFSlideMovementData = (slider, direction, toIndex) => {
   nextSlidesReadyPos = refinePFSliderArray(nextSlidesReadyPos, totalSlide)
   nextSlidesNewPos = refinePFSliderArray(nextSlidesNewPos, totalSlide)
   currSlidesNewPos = refinePFSliderArray(currSlidesNewPos, totalSlide)
+
+  // console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
 
   return { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos }
 }

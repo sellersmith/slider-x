@@ -11,9 +11,10 @@
 
 .pf-slider-slide {
   will-change: contents;
-  /* width: 100%; */
+  width: 100%;
   position: absolute !important;
-  /* transform: translate3d(100%, 0, 0); */
+  transform: translate3d(100%, 0, 0);
+  overflow: hidden;
   top: 0;
 }
 
@@ -29,10 +30,13 @@
   text-decoration: none;
   font-size: 18px;
   cursor: pointer;
+  border: unset;
+  background: unset;
 }
 
 .pf-slider-nav:focus {
   text-decoration: none;
+  outline: unset;
 }
 
 .pf-slider-nav.nav-style-1::before,
@@ -315,6 +319,7 @@
   background: transparent;
   border: 1px solid #212121;
   border-radius: 50%;
+  box-sizing: border-box;
 }
 
 /* Pagination style 3 */

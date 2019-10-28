@@ -1,177 +1,141 @@
 import { PageFlySliderClasses, getPFSlideMovementData, calculatePFSlideSize } from './helpers'
 import DOMObserver from './observer'
 require('./draggable')
-let $ = window.jQuery
 
 const { wrapper, inner, slide, indicators, controller, nextCtrl, prevCtrl, disabledCtrl, turnOffMouseEvent } = PageFlySliderClasses
 
 export class PageFlySliderController {
-// export class PageFlySliderController {
+// class PageFlySliderController {
   constructor(ele, opts) {
     this.el = ele
     this.originalStyles = { wrapper: '', inner: [] }
 
-    // Create an observer to observe any style's change of slider (this is for updating height)
-    // NOTE: this doesn't work on IE < 11 
     this.observer = new DOMObserver()
-    this.observer.observe(this.el, this.handleStyleChange.bind(this))
 
-    this.$el = $(this.el) // The original element
     this.$slider = null // The .inner div that wrap all slides
-    this.sliderHeight = this.$el.get(0).offsetHeight
-    this.sliderWidth = null
+    this.sliderHeight = this.el.offsetHeight
+    this.sliderWidth = this.el.offsetWidth
 
-    this.totalSlide = this.$el.children().length
-    this.opts = $.extend({}, opts) // Each slider's opts is a specific instance of opts argument
+    this.totalSlide = this.el.children.length
+    this.opts = Object.create(opts || {}) // Each slider's opts is a specific instance of opts argument
 
     this.autoPlayTimeoutId = ''
-
+    this.paused = false
     this.initialize()
   }
 
-  getWrapperWidthThenInit() {
-    // Remove string url("")
-    const { $el } = this
-    const sliderBackgroundImg = $el.css('background-image').slice(4, -1).replace(/"/g, "")
-    let wrapperWidth
-
-    const tempImg = new Image()
-    tempImg.src = sliderBackgroundImg
-    tempImg.onload = () => {
-      wrapperWidth = $el.get(0).offsetWidth
-      this.sliderWidth = wrapperWidth
-      this.initialize()
-    }
-  }
-
   initialize() {
-    this.opts.curr = 0
     this.verifyOptions()
 
     // Setup DOM + set event handler
-    this.$el.on('click', this.handleClick.bind(this))
-
+    this.el.addEventListener('click', this.handleClick)
     this.setupSliderDOM()
 
     // Set up drag n drop event
     this.moveByDrag = false
     this.missingSlidesOnDrag = false // For dragging multiple slides
-    this.$slider.on('es_dragmove', this.handleDragMove.bind(this))
-    this.$slider.on('es_dragstop', this.handleDragStop.bind(this))
+
+    this.$slider.addEventListener('es_dragmove', this.handleDragMove.bind(this))
+    this.$slider.addEventListener('es_dragstop', this.handleDragStop.bind(this))
 
     this.setAutoPlay()
-    // $(window).resize((e) => this.handleResize(e))
 
-    // Set slider-instance data
-    this.$el.data('pf-slider-x', this)
-    this.$el.attr('data-slider-x-init', 'init-ed')
+    // Set data to detect slider-x
+    this.el.dataset.pfSliderXInited = true
+    this.observer.observe(this.el, this.handleStyleChange.bind(this))
 
-    console.info("New PageFly Slider initialized!!!", this)
-    return this
+    window.addEventListener('blur', this.pause)
+    window.addEventListener('focus', this.play)
+
+    console.log("New PageFly Slider initialized!!!", this)
   }
 
-  setupSliderDOM() {
-    const { $el } = this
+  get $slides() { return this.$slider ? this.$slider.children : [] }
 
-    $el.addClass(wrapper)
+  setupSliderDOM() {
+    const { el } = this
+    const $slides = this.el.children
+
+    el.classList.add(wrapper)
     // Save original styles
-    this.originalStyles.wrapper = $el.attr('style') ? $el.attr('style') : ''
+    this.originalStyles.wrapper = el.getAttribute('style') ? el.getAttribute('style') : ''
 
     // Create an inner div to wrap all slide item
-    const $inner = $(`<div></div>`)
-    $el.children().each((i, child) => {
+    const $inner = document.createElement('div')
+    while ($slides[0]) {
+      const $slide = $slides[0]
       // Save original styles
-      const childStyles = $(child).attr('style') ? $(child).attr('style') : ''
+      const childStyles = $slide.getAttribute('style') ? $slide.getAttribute('style') : ''
       this.originalStyles.inner.push(childStyles)
 
-      $inner.append(child)
-    })
+      $inner.appendChild($slide)
+    }
 
     // Save the inner DOM
     this.$slider = $inner
 
     // Append controllers
-    const $nextCtrl = $(`<a data-action='next'></a>`)
-    const $prevCtrl = $(`<a data-action='prev'></a>`)
+    const $nextCtrl = document.createElement('button')
+    $nextCtrl.dataset.sliderxAction = 'next'
+    const $prevCtrl = document.createElement('button')
+    $prevCtrl.dataset.sliderxAction = 'prev'
 
     // Append indicators
-    const $indicators = $('<ol>')
+    const $indicators = document.createElement('ol')
     for (let i = 0; i < Math.ceil(this.totalSlide / this.opts.slidesToShow); i++) {
-      const $indItem = $(`<li data-goto-slide=${i * this.opts.slidesToShow} data-action='goto'></li>`)
-      $indicators.append($indItem)
+      const $indItem = document.createElement('li')
+      $indItem.dataset.sliderxAction = 'goto'
+      $indItem.dataset.gotoSlide = i * this.opts.slidesToShow
+      $indicators.appendChild($indItem)
     }
-    $el.append($inner).append($indicators).append($prevCtrl).append($nextCtrl)
+
+    el.appendChild($inner)
+    el.appendChild($indicators)
+    el.appendChild($prevCtrl)
+    el.appendChild($nextCtrl)
 
     this.cloneSlide()
 
-    // Wait for the background image load complete then update the Slider style
-    // Remove string url("")
-    const sliderBackgroundImg = $el.css('background-image').slice(4, -1).replace(/"/g, "")
-    const waitForWidth = () => {
-      this.sliderWidth = $el.get(0).offsetWidth
-      if (this.sliderWidth) {
-        this.updateSliderStyle()
-        this.udpateActiveSlideStyle()
-      } else {
-        setTimeout(waitForWidth, 100)
-      }
-    }
-    if (!sliderBackgroundImg) {
-      waitForWidth()
-    }
-    else {
-      const tempImg = new Image()
-      tempImg.src = sliderBackgroundImg
-      tempImg.onload = () => {
-        waitForWidth()
-      }
-    }
-
-    // Save slider height
-    // this.sliderHeight = this.
+    this.updateSliderStyle()
+    this.udpateActiveSlideStyle()
   }
 
   cloneSlide() {
-    const { length } = this.$slider.children()
+    const { totalSlide, $slider, $slides } = this
 
-    for (let i = 0; i < length; i++) {
-      const $slide = this.$slider.children().eq(i)
-      $slide.clone().attr('data-slide-clone', true).appendTo(this.$slider)
-    }
-    for (let i = 0; i < length; i++) {
-      const $slide = this.$slider.children().eq(i)
-      $slide.clone().attr('data-slide-clone', true).appendTo(this.$slider)
+    for (let i = 0; i < totalSlide * 2; i++) {
+      const $slide = $slides[i % totalSlide]
+      const $cloneSlide = $slide.cloneNode(true)
+      $cloneSlide.dataset.slideClone = true
+      $slider.appendChild($cloneSlide)
     }
   }
 
   /* SETUP EVENT DELEGATION */
   handleResize(e) {
     const { curr, slidesToShow, gutter } = this.opts
-    let { totalSlide, sliderWidth } = this
+    let { totalSlide, $slides, sliderWidth } = this
     totalSlide *= 3
-
     const newSlideWidth = calculatePFSlideSize(this)
-    const $slides = this.$slider.children()
-    $slides.css({ width: `${newSlideWidth}px`, transition: '' })
 
     for (let i = 0; i < totalSlide; i++) {
-      const $slide = $slides.eq(i)
-      if (i >= curr && i < curr + slidesToShow) {
-        $slide.css({ transform: `translate3d(${(newSlideWidth + gutter) * (i - curr)}px, 0, 0)` })
-      } else {
-        $slide.css({ transform: `translate3d(${sliderWidth + gutter}px, 0, 0)` })
-      }
+      const $slide = $slides[i]
+      $slide.style.width = `${newSlideWidth}px`
+      $slide.style.transition = ''
+
+      const newLeft = (i >= curr && i < curr + slidesToShow) ? (newSlideWidth + gutter) * (i - curr) : sliderWidth + gutter
+      $slide.style.transform = `translate3d(${newLeft}px, 0, 0)`
     }
   }
 
-  handleClick(e) {
-    const action = e.target.getAttribute('data-action')
+  handleClick = e => {
+    const action = e.target.dataset.sliderxAction
     switch (action) {
       case 'next': this.next(); break
       case 'prev': this.prev(); break
       case 'goto':
         // DOMStringMap convert dataset from hyphen style to upperCase (goto-slide => gotoSlide)
-        const index = parseInt(e.target.getAttribute('data-goto-slide')) || 0
+        const index = parseInt(e.target.dataset.gotoSlide) || 0
         this.goto(index)
         break
       default: console.log('Slider clicked')
@@ -179,12 +143,12 @@ export class PageFlySliderController {
   }
 
   handleStyleChange() {
-    const width = this.$el.width()
-    this.sliderWidth = width
+    this.sliderWidth = this.el.offsetWidth
     this.handleResize()
   }
 
-  handleDragMove(e, data) {
+  handleDragMove(e) {
+    const data = e.data
     if (Math.abs(data.moveX) < PageFlySliderController.constructor.MIN_DRAG_DISTANCE) return
     this.clearAutoPlay()
 
@@ -212,21 +176,25 @@ export class PageFlySliderController {
 
 
     // The key is: move all 3 slide! Genius!
-    for (let slide of prevSlidesReadyPos) {
-      const $slide = this.$slider.children().eq(slide.index)
+    for (let i = 0; i < prevSlidesReadyPos.length; i++) {
+      const slide = prevSlidesReadyPos[i]
+      const $slide = this.$slides[slide.index]
       this.translateSlide($slide, slide.readyX + translateRange)
     }
-    for (let slide of currSlidesPos) {
-      const $slide = this.$slider.children().eq(slide.index)
+    for (let i = 0; i < currSlidesPos.length; i++) {
+      const slide = currSlidesPos[i]
+      const $slide = this.$slides[slide.index]
       this.translateSlide($slide, slide.readyX + translateRange)
     }
-    for (let slide of nextSlidesReadyPos) {
-      const $slide = this.$slider.children().eq(slide.index)
+    for (let i = 0; i < nextSlidesReadyPos.length; i++) {
+      const slide = nextSlidesReadyPos[i]
+      const $slide = this.$slides[slide.index]
       this.translateSlide($slide, slide.readyX + translateRange)
     }
   }
 
-  handleDragStop(e, data) {
+  handleDragStop(e) {
+    const data = e.data
     if (Math.abs(data.moveX) < PageFlySliderController.constructor.MIN_DRAG_DISTANCE) return
     // Turn off draggable until slides move completely
     this.moveByDrag = true
@@ -313,13 +281,10 @@ export class PageFlySliderController {
     // Set the slider height
     this.opts.height = this.sliderHeight || this.opts.height
 
-    // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
-
-    // No gutter if only one slide shown in a section
     if (this.opts.slidesToShow === 1) this.opts.gutter = 0
 
-    // Set the style of slider nav n pagination to legal values
+    // Set the style of slider nav n pagination to valid values
     const defPags = this.constructor.styleOptions.paginations
     const defNavs = this.constructor.styleOptions.navs
 
@@ -353,9 +318,8 @@ export class PageFlySliderController {
     // Turn off autoPlay if loop is false
     if (!this.opts.loop) this.opts.autoPlay = false
 
-    // Set the style of slider nav n pagination to legal values
+    // Set the style of slider nav n pagination to valid values
     // this.updateSliderStyle()
-
     // this.updateSliderCtrlStyle(this.opts.curr)
     // this.setAutoPlay()
     this.destroy()
@@ -363,7 +327,7 @@ export class PageFlySliderController {
   }
 
   setAutoPlay() {
-    if (this.opts.autoPlay) {
+    if (this.opts.autoPlay && !this.paused) {
       this.autoPlayTimeoutId = setTimeout(() => {
         this.moveSlide('next')
       }, (this.opts.autoPlayDelay))
@@ -374,30 +338,48 @@ export class PageFlySliderController {
     clearTimeout(this.autoPlayTimeoutId)
   }
 
+  pause = () => {
+    this.paused = true
+    this.clearAutoPlay()
+  }
+
+  play = () => {
+    this.paused = false
+    this.setAutoPlay()
+  }
+
   /* CONTROLLER FUNCTIONS */
   destroy() {
+    const { el } = this
     this.clearAutoPlay()
-    // Remove all cloned slides
-    this.$slider.find('*[data-slide-clone=true]').remove()
 
     // Save all items, remove all classes, inline-style n reverse the original style
     const items = []
-    this.$slider.children().each((i, child) => {
-      $(child).removeClass(slide).removeClass('active').attr('style', '').attr('style', this.originalStyles.inner[i])
-      items.push($(child))
-    })
+    // this.$slides = this.$slider.children
+    for (let i = 0; i < this.totalSlide; i++) {
+      const $slide = this.$slides[i]
+      $slide.classList.remove(slide)
+      $slide.classList.remove('active')
+      $slide.style = this.originalStyles.inner[i]
+      items.push($slide)
+    }
 
-    // Remove class, event handler, data-instance and all children
-    // We currently don't change any style of the original element but I stll do .attr(...) for might-exist-problems in the future
-    this.$el.removeClass(wrapper).attr('style', '').attr('style', this.originalStyles.wrapper)
-    this.$el.off('click')
-    this.$el.attr('data-slider-x-init', null)
-    this.$el.data('pf-slider-x', null)
-    this.$el.data('pf-slider-initialized', null)
-    this.$el.empty()
+    // Remove class, event handler, dataset and all children
+    el.classList.remove(wrapper)
+    el.style = this.originalStyles.wrapper
+    el.removeEventListener('click', this.handleClick)
+    delete el.dataset['pfSliderXInited']
+
+    delete this.$slider
+    delete this.$slides
+    this.observer.unobserve(el)
+    window.removeEventListener('blur', this.pause)
+    window.removeEventListener('focus', this.play)
+
+    while (el.firstChild) { el.removeChild(el.firstChild) }
 
     // Append the original item
-    for (let item of items) { this.$el.append(item) }
+    for (let i = 0; i < items.length; i++) { el.appendChild(items[i]) }
 
     console.log('Removed slider-x !!')
   }
@@ -422,7 +404,7 @@ export class PageFlySliderController {
     }
 
     // Turn off mouse event on moving
-    this.$el.addClass(turnOffMouseEvent)
+    this.el.classList.add(turnOffMouseEvent)
 
     const { nextIndex, nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos } = getPFSlideMovementData(this, direction, toIndex)
     // console.log(nextSlidesReadyPos, currSlidesNewPos, nextSlidesNewPos)
@@ -434,8 +416,9 @@ export class PageFlySliderController {
 
     if (!this.moveByDrag) {
       // Only move the $next slide to the ready-position in case user does not drag
-      for (let slide of nextSlidesReadyPos) {
-        const $slide = this.$slider.children().eq(slide.index)
+      for (let i = 0; i < nextSlidesReadyPos.length; i++) {
+        const slide = nextSlidesReadyPos[i]
+        const $slide = this.$slides[slide.index]
         this.translateSlide($slide, slide.readyX)
       }
     }
@@ -451,21 +434,23 @@ export class PageFlySliderController {
        * The curr slides is out of window so just don't move them
        */
       if (!this.missingSlidesOnDrag) {
-        for (let slide of currSlidesNewPos) {
-          const $slide = this.$slider.children().eq(slide.index)
+        for (let i = 0; i < currSlidesNewPos.length; i++) {
+          const slide = currSlidesNewPos[i]
+          const $slide = this.$slides[slide.index]
           this.translateSlide($slide, slide.newX, duration)
         }
       }
 
-      for (let slide of nextSlidesNewPos) {
-        const $slide = this.$slider.children().eq(slide.index)
+      for (let i = 0; i < nextSlidesNewPos.length; i++) {
+        const slide = nextSlidesNewPos[i]
+        const $slide = this.$slides[slide.index]
         this.translateSlide($slide, slide.newX, duration)
       }
 
       // Do stuffs after slides moving complete
       setTimeout(() => {
         this.setAutoPlay()
-        this.$el.removeClass(turnOffMouseEvent)
+        this.el.classList.remove(turnOffMouseEvent)
         this.moveByDrag = false
         this.missingSlidesOnDrag = false
       }, duration)
@@ -477,13 +462,9 @@ export class PageFlySliderController {
   }
 
   translateSlide($slide, toX, duration) {
-    if (duration) {
-      $slide.css({ 'transition': `transform ${duration}ms linear` })
-    } else {
-      $slide.css({ 'transition': '' })
-    }
-
-    $slide.css('transform', `translate3d(${toX}px, 0, 0)`)
+    const transition = duration ? `transform ${duration}ms ease` : ''
+    $slide.style.transition = transition
+    $slide.style.transform = `translate3d(${toX}px, 0, 0)`
   }
 
   next() {
@@ -528,11 +509,11 @@ export class PageFlySliderController {
 
   /* STYLE FUNCTIONS */
   updateSliderStyle() {
-    const $slides = this.$slider.children()
-    const $curr = $slides.eq(this.opts.curr)
+    const { $slider, $slides, el, opts } = this
+    const $curr = $slides[this.opts.curr]
     const slideWidth = calculatePFSlideSize(this)
 
-    const { adaptiveHeight, height } = this.opts
+    const { adaptiveHeight, height } = opts
     if (!adaptiveHeight) {
       // Slider height = the highest child in case adaptiveHeight is off
       // for (let i = 0; i < $slides.length; i++) {
@@ -540,73 +521,80 @@ export class PageFlySliderController {
       // }
 
       // Stretch all slide height to equal to the heightest slide
-      $slides.css({ 'height': '100%', width: `${slideWidth}px` })
-      this.$slider.css({ 'height': '100%', 'transition': '' })
-      this.$el.css({ 'transition': '' })
+      for (let i = 0; i < $slides.length; i++) { $slides[i].style.cssText += `height: 100%; width: ${slideWidth}px;` }
+      $slider.style.cssText = `height: 100%; transition: '';`
+      el.style.transition = ''
     } else {
-      $slides.css({ 'height': '' })
+      for (let i = 0; i < $slides.length; i++) { $slides[i].style.height = '' }
+      el.style.transition = `height ${opts.duration}ms ease-in-out`
+      $slider.style.transition = `height ${opts.duration}ms ease-in-out`
 
-      this.$el.css('transition', `height ${this.opts.duration}ms ease-in-out`)
-      this.$slider.css('transition', `height ${this.opts.duration}ms ease-in-out`)
-
-      this.$el.css('height', '')
-      this.$slider.css('height', `${$curr.height()}px`)
+      el.style.height = ''
+      $slider.style.height = `${$curr.height()}px`
     }
 
-    $slides.addClass(slide)
-    const { gutter } = this.opts
+    for (let i = 0; i < $slides.length; i++) { $slides[i].classList.add(slide) }
+    const { gutter } = opts
 
     for (let i = 0; i < $slides.length; i++) {
       const slideX = i * (slideWidth + gutter)
-      $slides.eq(i).css({ transform: `translate3d(${slideX}px, 0, 0)` })
+      $slides[i].style.transform = `translate3d(${slideX}px, 0, 0)`
     }
 
-    // $curr.css('transform', 'translate3d(0, 0, 0)')
-
-    this.$slider.addClass(inner)
-    this.opts.draggable ? this.$slider.addClass('jsn-es-draggable') : this.$slider.removeClass('jsn-es-draggable')
+    $slider.classList.add(inner)
+    opts.draggable ? $slider.classList.add('jsn-es-draggable') : $slider.classList.remove('jsn-es-draggable')
 
     // Styling for navigators and indicators
-    const { navStyle } = this.opts
-    const { paginationStyle } = this.opts
+    const { navStyle, paginationStyle } = opts
 
-    this.$el.children('a[data-action="next"]').attr('class', '').attr('class', `${nextCtrl} ${controller} ${navStyle}`)
-    this.$el.children('a[data-action="prev"]').attr('class', '').attr('class', `${prevCtrl} ${controller} ${navStyle}`)
-
-    this.$el.children('ol').attr('class', '').attr('class', `${indicators} ${paginationStyle}`)
+    el.querySelector('[data-sliderx-action="next"]').setAttribute('class', `${nextCtrl} ${controller} ${navStyle}`)
+    el.querySelector('[data-sliderx-action="prev"]').setAttribute('class', `${prevCtrl} ${controller} ${navStyle}`)
+    el.querySelector('ol').setAttribute('class', `${indicators} ${paginationStyle}`)
 
     // Toggle show/hide nav/pagination
-    navStyle === 'none' ? this.$el.children('a').hide() : this.$el.children('a').show()
-    paginationStyle === 'none' ? this.$el.children('ol').hide() : this.$el.children('ol').show()
+    const navDisplay = navStyle === 'none' ? 'none' : 'flex'
+    const paginationDisplay = paginationStyle === 'none' ? 'none' : 'block'
+
+    el.querySelector('[data-sliderx-action="next"]').style.display = navDisplay
+    el.querySelector('[data-sliderx-action="prev"]').style.display = navDisplay
+    el.querySelector('ol.pf-slider-pagination').style.display = paginationDisplay
   }
 
   updateSliderCtrlStyle(index) {
-    this.$el.find('a').removeClass(disabledCtrl)
+    const { totalSlide, opts, el } = this
+    const { loop, slidesToShow } = opts
 
-    if (index === 0 && !this.opts.loop) {
-      this.$el.find(`.${prevCtrl}`).addClass(disabledCtrl)
-    }
-    else if (index === this.totalSlide - this.opts.slidesToShow && !this.opts.loop) {
-      this.$el.find(`.${nextCtrl}`).addClass(disabledCtrl)
-    }
+    const $next = el.querySelector('.pf-next-nav')
+    const $prev = el.querySelector('.pf-prev-nav')
+
+    $next.classList.remove(disabledCtrl)
+    $prev.classList.remove(disabledCtrl)
+
+    if (index === 0 && !loop) $prev.classList.add(disabledCtrl)
+    else if (index === totalSlide - slidesToShow && !loop) $next.classList.add(disabledCtrl)
   }
 
   udpateActiveSlideStyle() {
     // Add class .active for current active slide n indicator
     const { curr, slidesToShow, loop } = this.opts
 
-    this.$slider.children(`.${slide}.active`).removeClass('active')
-    this.$slider.children().eq(curr).addClass('active')
+    const $currSlide = this.$slider.querySelector(`.${slide}.active`)
+    $currSlide ? $currSlide.classList.remove('active') : null
+
+    this.$slides[curr].classList.add('active')
 
     let activeSlide = Math.floor((curr % (this.totalSlide)) / slidesToShow) * slidesToShow
+
     if (!loop) {
       if (curr + slidesToShow === this.totalSlide) {
         activeSlide = Math.floor((this.totalSlide - 1) / slidesToShow) * slidesToShow
       }
     }
 
-    this.$el.find('li.active').removeClass('active')
-    this.$el.find('ol').find(`li[data-goto-slide="${activeSlide}"]`).addClass('active')
+    const $currLi = this.el.querySelector('ol.pf-slider-pagination li.active')
+    $currLi ? $currLi.classList.remove('active') : null
+
+    this.el.querySelector(`li[data-goto-slide="${activeSlide}"]`).classList.add('active')
 
     this.updateSliderCtrlStyle(curr)
   }
@@ -622,7 +610,7 @@ PageFlySliderController.defaultOptions = {
   gutter: 15,
   autoPlay: true,
   autoPlayDelay: 3000,
-  duration: 450,
+  duration: 400,
   loop: true,
   draggable: true,
   paginationStyle: 'pagination-style-1',
@@ -641,29 +629,5 @@ PageFlySliderController.styleOptions = {
   navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5', 'none']
 }
 
-function init(jQuery) {
-  $ = jQuery
-  jQuery.fn.pageflySlider = function (opts, ...args) {
-    return this.each((i, element) => {
-      let instance = jQuery(element).data('pf-slider-x')
-      if (!instance) {
-        if (typeof opts === 'string') {
-          throw new Error('This element was not initialized as a Slider yet')
-        }
-        instance = new PageFlySliderController(element, opts)
-        jQuery(element).attr('data-slider-x-init', 'init-ed')
-        jQuery(element).data('pf-slider-x', instance)
-        jQuery(element).data('pf-slider-initialized', true)
-      } else {
-        if (typeof opts === 'string') {
-          instance[opts](...args)
-        }
-      }
-    })
-  }
-}
-
-if (typeof jQuery !== 'undefined') {
-  init(jQuery)
-}
-export default init
+// Comment this line before bundling for production version
+window.PageFlySliderController = PageFlySliderController
