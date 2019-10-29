@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sellersmith/pf-slider.git"
+    "url": "git+https://github.com/sellersmith/slider-x"
   },
   "author": "SellerSmith Team",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sellersmith/pf-slider/issues"
+    "url": "https://github.com/sellersmith/slider-x/issues"
   },
-  "homepage": "https://github.com/sellersmith/pf-slider#readme",
+  "homepage": "https://github.com/sellersmith/slider-x#readme",
   "keywords": [
-    "js-library"
+    "JS Library", "JS Plugin"
   ],
   "devDependencies": {
     "@babel/core": "^7.1.2",
