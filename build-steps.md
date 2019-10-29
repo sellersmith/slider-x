@@ -8,7 +8,6 @@
  7. Export class `DOMObserver` in `observer.js`
  8. Bundle all stuff using: `yarn webpack`
  9. Check to confirm everything work fine by open `demo/demo.html`
- 10. Un-export `PageFlySliderController` to window by uncomment the last line in `main.js`
- 11. Update new version in `package.json`
- 12. Publish using: `npm publish`
- 13. Checkout to `master`, keep a copy of release
+ 10. Update new version in `package.json`
+ 11. Publish using: `npm publish`
+ 12. Checkout to `master`, keep a copy of release

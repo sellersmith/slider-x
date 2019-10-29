@@ -629,5 +629,4 @@ SliderX.styleOptions = {
   navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5', 'none']
 }
 
-// Comment this line before bundling for production version
 window.PageFlySliderController = SliderX
