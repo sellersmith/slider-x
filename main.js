@@ -630,4 +630,4 @@ SliderX.styleOptions = {
 }
 
 // Comment this line before bundling for production version
-window.PageFlySliderController = SliderX
+window.SliderX = SliderX
