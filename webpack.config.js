@@ -8,7 +8,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'umd',
-    library: 'SliderX',
+    library: 'PageFly SliderX',
     filename: 'slider-x.js'
   },
   module: {
