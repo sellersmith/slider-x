@@ -47,7 +47,7 @@ class SliderX {
     window.addEventListener('blur', this.pause)
     window.addEventListener('focus', this.play)
 
-    console.log("New PageFly Slider initialized!!!", this)
+    console.info("New PageFly Slider initialized!!!", this)
   }
 
   get $slides() { return this.$slider ? this.$slider.children : [] }
@@ -547,8 +547,8 @@ class SliderX {
     // Styling for navigators and indicators
     const { navStyle, paginationStyle } = opts
 
-    el.querySelector('[data-sliderx-action="next"]').setAttribute('class', `${nextCtrl} ${controller} ${navStyle}`)
-    el.querySelector('[data-sliderx-action="prev"]').setAttribute('class', `${prevCtrl} ${controller} ${navStyle}`)
+    el.querySelector('[data-sliderx-action="next"]').setAttribute('class', `${nextCtrl} ${controller} ${navStyle}-right`)
+    el.querySelector('[data-sliderx-action="prev"]').setAttribute('class', `${prevCtrl} ${controller} ${navStyle}-left`)
     el.querySelector('ol').setAttribute('class', `${indicators} ${paginationStyle}`)
 
     // Toggle show/hide nav/pagination
@@ -614,7 +614,7 @@ SliderX.defaultOptions = {
   loop: true,
   draggable: true,
   paginationStyle: 'pagination-style-1',
-  navStyle: 'nav-style-1',
+  navStyle: 'nav-style-1 fa-caret',
   adaptiveHeight: false,
   height: 400,
 }
@@ -626,7 +626,7 @@ SliderX.styleOptions = {
    * Remember to keep the 'none' in order to toggle show/hide pagination/nav option
    */
   paginations: ['pagination-style-1', 'pagination-style-2', 'pagination-style-3', 'none'],
-  navs: ['nav-style-1', 'nav-style-2', 'nav-style-3', 'nav-style-4', 'nav-style-5', 'none']
+  navs: ['nav-style-1 fa-caret', 'nav-style-2 fa-angle', 'nav-style-3 fa-angle', 'nav-style-4 fa-long-arrow', 'nav-style-5 fa-long-arrow', 'none']
 }
 
 // Comment this line before bundling for production version
