@@ -46,8 +46,6 @@ class SliderX {
 
     window.addEventListener('blur', this.pause)
     window.addEventListener('focus', this.play)
-
-    console.info("New PageFly Slider initialized!!!", this)
   }
 
   get $slides() { return this.$slider ? this.$slider.children : [] }
@@ -77,8 +75,13 @@ class SliderX {
     // Append controllers
     const $nextCtrl = document.createElement('button')
     $nextCtrl.dataset.sliderxAction = 'next'
+    $nextCtrl.setAttribute('type', 'button')
+    $nextCtrl.setAttribute('aria-label', 'button')
+    
     const $prevCtrl = document.createElement('button')
     $prevCtrl.dataset.sliderxAction = 'prev'
+    $prevCtrl.setAttribute('type', 'button')
+    $prevCtrl.setAttribute('aria-label', 'button')
 
     // Append indicators
     const $indicators = document.createElement('ol')
@@ -380,8 +383,6 @@ class SliderX {
 
     // Append the original item
     for (let i = 0; i < items.length; i++) { el.appendChild(items[i]) }
-
-    console.log('Removed slider-x !!')
   }
 
   moveSlide(direction, toIndex, customDuration) {
