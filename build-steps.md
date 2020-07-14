@@ -1,7 +1,7 @@
 ## Build guide
  1. Commit all code in development branch `native`
  2. Checkout to `master`
- 3. Merge branch `native`
+ 3. Merge branch `native` into `master`
  4. `export` all functions in `helper.js`
  5. Uncomment the first and last line in `main.js` (Remember to `import` func in the first line if you export new in `helper.js`)
  6. Export class `SliderX` in `main.js`

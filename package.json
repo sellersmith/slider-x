@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/sellersmith/slider-x#readme",
   "keywords": [
-    "JS Library", "JS Plugin"
+    "JS Library",
+    "JS Plugin"
   ],
   "devDependencies": {
     "@babel/core": "^7.1.2",
